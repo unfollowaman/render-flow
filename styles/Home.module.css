@@ -1,0 +1,720 @@
+/* ─────────────────────────────────────────────
+   HOME MODULE — html2png
+   Gumroad-inspired SaaS, Montserrat + Instrument Serif
+   ───────────────────────────────────────────── */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #e8e8ea;
+}
+
+/* ── HEADER ──────────────────────────────────── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(232, 232, 234, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1.5px solid rgba(1, 43, 27, 0.1);
+}
+
+.headerInner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logoMushroom {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.logoText {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: #012b1b;
+  letter-spacing: -0.02em;
+}
+
+.nav {
+  display: flex;
+  gap: 24px;
+}
+
+.nav a {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #5a6a64;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.nav a:hover {
+  color: #ffa100;
+}
+
+/* ── HERO ────────────────────────────────────── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 80px 24px 64px;
+  text-align: center;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 161, 0, 0.12);
+  border: 1.5px solid rgba(255, 161, 0, 0.35);
+  color: #012b1b;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 7px 16px;
+  border-radius: 100px;
+  margin-bottom: 28px;
+}
+
+.heroBadgeDot {
+  width: 7px;
+  height: 7px;
+  background: #ffa100;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.heroTitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(42px, 6vw, 72px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: #012b1b;
+  margin-bottom: 20px;
+}
+
+.heroAccent {
+  color: #ffa100;
+  position: relative;
+}
+
+.heroAccent::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 4px;
+  background: #ffa100;
+  border-radius: 2px;
+  opacity: 0.4;
+}
+
+.heroDesc {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 20px;
+  color: #5a6a64;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.heroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.heroMeta span {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #012b1b;
+  background: rgba(1, 43, 27, 0.07);
+  padding: 5px 14px;
+  border-radius: 100px;
+  letter-spacing: 0.01em;
+}
+
+/* Pixel grid decoration */
+.pixelGrid {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  pointer-events: none;
+  opacity: 0.04;
+}
+
+.pixelCell {
+  border: 1px solid #012b1b;
+}
+
+/* ── MAIN / CONTAINER ────────────────────────── */
+.main {
+  flex: 1;
+  padding: 0 24px 80px;
+}
+
+.container {
+  max-width: 820px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── CARD ────────────────────────────────────── */
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px;
+  border: 1.5px solid rgba(1, 43, 27, 0.1);
+  box-shadow: 0 2px 20px rgba(1, 43, 27, 0.06);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.cardTitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #012b1b;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -0.01em;
+}
+
+.stepBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: #ffa100;
+  color: #012b1b;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.sampleBtn {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffa100;
+  background: rgba(255, 161, 0, 0.1);
+  border: 1.5px solid rgba(255, 161, 0, 0.3);
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.01em;
+}
+
+.sampleBtn:hover {
+  background: rgba(255, 161, 0, 0.2);
+  border-color: rgba(255, 161, 0, 0.6);
+}
+
+/* ── TEXTAREA / DROP ZONE ──────────────────────── */
+.dropZone {
+  position: relative;
+  border-radius: 12px;
+  transition: all 0.15s;
+}
+
+.dropZoneActive {
+  outline: 2.5px dashed #ffa100;
+  outline-offset: 2px;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 280px;
+  background: #f7f7f8;
+  border: 1.5px solid #e0e0e4;
+  border-radius: 12px;
+  padding: 16px 18px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #012b1b;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  display: block;
+}
+
+.textarea::placeholder {
+  color: #a0aaa6;
+  font-style: italic;
+}
+
+.textarea:focus {
+  border-color: #ffa100;
+  box-shadow: 0 0 0 3px rgba(255, 161, 0, 0.12);
+  background: #fff;
+}
+
+.dropOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 161, 0, 0.08);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffa100;
+  pointer-events: none;
+}
+
+/* ── UPLOAD ROW ──────────────────────────────── */
+.uploadRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.uploadBtn {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #012b1b;
+  background: #f2f2f4;
+  border: 1.5px solid #d4d4d8;
+  padding: 9px 18px;
+  border-radius: 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.15s;
+}
+
+.uploadBtn:hover {
+  background: #e8e8ea;
+  border-color: #c0c0c4;
+}
+
+.uploadHint {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 14px;
+  color: #9aa39e;
+  font-style: italic;
+}
+
+.charCount {
+  margin-left: auto;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9aa39e;
+  background: #f2f2f4;
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+
+/* ── DIVIDER ─────────────────────────────────── */
+.divider {
+  height: 1.5px;
+  background: #f0f0f2;
+  margin: 24px 0;
+}
+
+/* ── CONVERT BUTTON ──────────────────────────── */
+.convertBtn {
+  width: 100%;
+  height: 56px;
+  background: #ffa100;
+  color: #012b1b;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(255, 161, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.convertBtn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0);
+  transition: background 0.15s;
+}
+
+.convertBtn:hover:not(:disabled)::before {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.convertBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(255, 161, 0, 0.4);
+}
+
+.convertBtn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(255, 161, 0, 0.2);
+}
+
+.convertBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.convertBtnLoading {
+  background: #012b1b;
+  color: #ffa100;
+  box-shadow: none;
+}
+
+.marioRunner {
+  font-size: 20px;
+  animation: bounce 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-3px); }
+}
+
+/* ── LOADER CARD ─────────────────────────────── */
+.loaderCard {
+  background: #012b1b;
+  border-radius: 20px;
+  padding: 32px;
+  border: 1.5px solid rgba(255, 161, 0, 0.2);
+  overflow: hidden;
+}
+
+.marioTrack {
+  position: relative;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 161, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.marioWorld {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  z-index: 2;
+  position: relative;
+}
+
+.block {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: #ffa100;
+  color: #012b1b;
+  font-size: 9px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+  border-radius: 3px;
+  animation: blockBounce 1.5s ease-in-out infinite;
+}
+
+.block:nth-child(2) { animation-delay: 0.2s; }
+.block:nth-child(3) { animation-delay: 0.4s; background: rgba(255,161,0,0.5); }
+
+@keyframes blockBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.pipeLeft, .pipeRight {
+  font-size: 20px;
+  color: rgba(255, 161, 0, 0.4);
+  font-family: monospace;
+}
+
+.progressTrack {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: rgba(255, 161, 0, 0.1);
+}
+
+.progressFill {
+  height: 100%;
+  background: #ffa100;
+  animation: progressAnim 8s linear forwards;
+  border-radius: 2px;
+}
+
+@keyframes progressAnim {
+  0% { width: 0%; }
+  20% { width: 18%; }
+  40% { width: 38%; }
+  60% { width: 62%; }
+  80% { width: 82%; }
+  95% { width: 93%; }
+  100% { width: 95%; }
+}
+
+.mario {
+  font-size: 26px;
+  z-index: 2;
+  animation: marioWalk 0.4s steps(2) infinite, marioProgress 8s linear forwards;
+}
+
+@keyframes marioWalk {
+  0% { transform: scaleX(1); }
+  50% { transform: scaleX(-1); }
+  100% { transform: scaleX(1); }
+}
+
+@keyframes marioProgress {
+  0% { margin-right: calc(100% - 60px); }
+  100% { margin-right: 0; }
+}
+
+.loadingStep {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffa100;
+  text-align: center;
+  margin-bottom: 8px;
+  min-height: 20px;
+  transition: all 0.3s;
+}
+
+.loadingHint {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ── ERROR CARD ──────────────────────────────── */
+.errorCard {
+  background: #fff5f5;
+  border: 1.5px solid rgba(229, 62, 62, 0.3);
+  border-radius: 14px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.errorIcon {
+  font-size: 20px;
+  color: #e53e3e;
+  font-weight: 900;
+  font-family: 'Montserrat', sans-serif;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.errorTitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #c53030;
+  margin-bottom: 5px;
+}
+
+.errorMessage {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  color: #742a2a;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* ── OUTPUT / PREVIEW ────────────────────────── */
+.resultMeta {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #5a6a64;
+  background: #f2f2f4;
+  padding: 5px 12px;
+  border-radius: 100px;
+}
+
+.previewWrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1.5px solid #e0e0e4;
+  margin-bottom: 20px;
+}
+
+.checkerBg {
+  background-image:
+    linear-gradient(45deg, #e8e8ea 25%, transparent 25%),
+    linear-gradient(-45deg, #e8e8ea 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e8e8ea 75%),
+    linear-gradient(-45deg, transparent 75%, #e8e8ea 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  background-color: #f5f5f7;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100px;
+  max-height: 600px;
+  overflow: auto;
+}
+
+.previewImage {
+  display: block;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+}
+
+/* ── DOWNLOAD ROW ────────────────────────────── */
+.downloadRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.downloadBtn {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  background: #012b1b;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s;
+  box-shadow: 0 3px 12px rgba(1, 43, 27, 0.2);
+}
+
+.downloadBtn:hover {
+  background: #01391f;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 18px rgba(1, 43, 27, 0.28);
+}
+
+.downloadBtn:active {
+  transform: translateY(0);
+}
+
+.downloadHint {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9aa39e;
+}
+
+/* ── FOOTER ──────────────────────────────────── */
+.footer {
+  border-top: 1.5px solid rgba(1, 43, 27, 0.08);
+  padding: 20px 24px;
+}
+
+.footerInner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.footerInner span {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9aa39e;
+}
+
+/* ── RESPONSIVE ──────────────────────────────── */
+@media (max-width: 600px) {
+  .hero {
+    padding: 48px 20px 40px;
+  }
+  .card {
+    padding: 24px 20px;
+  }
+  .loaderCard {
+    padding: 24px 20px;
+  }
+  .downloadRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .footerInner {
+    justify-content: center;
+    text-align: center;
+  }
+  }
+
