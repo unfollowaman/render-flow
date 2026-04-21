@@ -1,6 +1,8 @@
 import chromium from "@sparticuz/chromium";
 import puppeteer from "puppeteer-core";
 
+chromium.setGraphicsMode = false;
+
 // Extract width/height from HTML content
 function extractDimensions(html) {
   const widthMatch =
@@ -60,10 +62,10 @@ export default async function handler(req, res) {
     const isLocal = process.env.NODE_ENV === "development";
 
     browser = await puppeteer.launch({
-  args: [...chromium.args, "--no-sandbox", "--disable-setuid-sandbox"],
+  args: chromium.args,
   defaultViewport: chromium.defaultViewport,
   executablePath: await chromium.executablePath(),
-  headless: chromium.headless,
+  headless: "new",
 });
 
     const page = await browser.newPage();
