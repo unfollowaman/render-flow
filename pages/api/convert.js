@@ -60,20 +60,11 @@ export default async function handler(req, res) {
     const isLocal = process.env.NODE_ENV === "development";
 
     browser = await puppeteer.launch({
-      args: isLocal
-        ? [
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-            "--disable-dev-shm-usage",
-          ]
-        : chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: isLocal
-        ? process.env.PUPPETEER_EXECUTABLE_PATH ||
-          "/usr/bin/google-chrome-stable"
-        : await chromium.executablePath(),
-      headless: isLocal ? true : chromium.headless,
-    });
+  args: [...chromium.args, "--no-sandbox", "--disable-setuid-sandbox"],
+  defaultViewport: chromium.defaultViewport,
+  executablePath: await chromium.executablePath(),
+  headless: chromium.headless,
+});
 
     const page = await browser.newPage();
 
