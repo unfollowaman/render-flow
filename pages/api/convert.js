@@ -1,36 +1,15 @@
-import chromium from "@sparticuz/chromium";
 import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium-min";
 
-chromium.setGraphicsMode = false;
-
-// Extract width/height from HTML content
 function extractDimensions(html) {
-  const widthMatch =
-    html.match(/width:\s*(\d+)px/i) ||
-    html.match(/width['":\s]+(\d+)/i) ||
-    html.match(/<meta[^>]+viewport[^>]+width=(\d+)/i);
-  const heightMatch =
-    html.match(/height:\s*(\d+)px/i) ||
-    html.match(/height['":\s]+(\d+)/i);
+  const bodyWidthMatch = html.match(/(?:body|html)[^{]*\{[^}]*width:\s*(\d+)px/i);
+  const bodyHeightMatch = html.match(/(?:body|html)[^{]*\{[^}]*height:\s*(\d+)px/i);
+  const widthMatch = html.match(/width:\s*(\d+)px/i);
+  const heightMatch = html.match(/height:\s*(\d+)px/i);
 
-  // Try to find explicit body/html dimensions
-  const bodyWidthMatch = html.match(
-    /(?:body|html)[^{]*\{[^}]*width:\s*(\d+)px/i
-  );
-  const bodyHeightMatch = html.match(
-    /(?:body|html)[^{]*\{[^}]*height:\s*(\d+)px/i
-  );
+  let width = bodyWidthMatch ? parseInt(bodyWidthMatch[1]) : widthMatch ? parseInt(widthMatch[1]) : 1200;
+  let height = bodyHeightMatch ? parseInt(bodyHeightMatch[1]) : heightMatch ? parseInt(heightMatch[1]) : 630;
 
-  let width = 1200;
-  let height = 630;
-
-  if (bodyWidthMatch) width = parseInt(bodyWidthMatch[1]);
-  else if (widthMatch) width = parseInt(widthMatch[1]);
-
-  if (bodyHeightMatch) height = parseInt(bodyHeightMatch[1]);
-  else if (heightMatch) height = parseInt(heightMatch[1]);
-
-  // Clamp to sane values
   width = Math.min(Math.max(width, 100), 3840);
   height = Math.min(Math.max(height, 100), 2160);
 
@@ -48,76 +27,46 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Missing or invalid HTML content" });
   }
 
-  if (html.length > 5_000_000) {
-    return res
-      .status(413)
-      .json({ error: "HTML content too large (max 5MB)" });
-  }
-
   let browser = null;
 
   try {
     const { width, height } = extractDimensions(html);
 
-    const isLocal = process.env.NODE_ENV === "development";
-
-    browser = await puppeteer.launch({
-  args: chromium.args,
-  executablePath: await chromium.executablePath(),
-  headless: chromium.headless,
-  defaultViewport: {
-    width: width,
-    height: height,
-  },
-});
-
-    const page = await browser.newPage();
-
-    // Disable JavaScript execution inside the rendered HTML
-    await page.setJavaScriptEnabled(false);
-
-    // Set viewport based on extracted or default dimensions
-    await page.setViewport({
-      width,
-      height,
-      deviceScaleFactor: 1,
-    });
-
-    // Set a realistic user agent
-    await page.setUserAgent(
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    const executablePath = await chromium.executablePath(
+      "https://github.com/Sparticuz/chromium/releases/download/v123.0.0/chromium-v123.0.0-pack.tar"
     );
 
-    // Allow external resources (Google Fonts, CDN assets, etc.)
-    await page.setRequestInterception(false);
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: { width, height, deviceScaleFactor: 1 },
+      executablePath,
+      headless: true,
+    });
 
-    // Load HTML content and wait for all network requests to settle
+    const page = await browser.newPage();
+    await page.setJavaScriptEnabled(false);
+    await page.setViewport({ width, height, deviceScaleFactor: 1 });
+    await page.setUserAgent(
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+    );
+
     await page.setContent(html, {
       waitUntil: ["load", "networkidle0"],
       timeout: 45000,
     });
 
-    // Extra wait for fonts/images to render
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    await new Promise((r) => setTimeout(r, 800));
 
-    // Capture screenshot
-    const screenshotBuffer = await page.screenshot({
+    const screenshot = await page.screenshot({
       type: "png",
       fullPage: false,
-      clip: {
-        x: 0,
-        y: 0,
-        width,
-        height,
-      },
+      clip: { x: 0, y: 0, width, height },
     });
 
     await browser.close();
     browser = null;
 
-    // Return PNG as base64
-    const base64 = Buffer.from(screenshotBuffer).toString("base64");
-
+    const base64 = Buffer.from(screenshot).toString("base64");
     return res.status(200).json({
       image: `data:image/png;base64,${base64}`,
       width,
@@ -125,23 +74,14 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     if (browser) {
-      try {
-        await browser.close();
-      } catch (_) {}
+      try { await browser.close(); } catch (_) {}
     }
 
-    console.error("Conversion error:", err);
-
-    let errorMessage = "Rendering failed";
+    let errorMessage = err.message || "Unknown rendering error";
     if (err.message?.includes("timeout")) {
-      errorMessage =
-        "Timeout: Page took too long to load. Check external resource URLs.";
+      errorMessage = "Timeout: Page took too long to load.";
     } else if (err.message?.includes("net::ERR")) {
       errorMessage = `Network error loading external resource: ${err.message}`;
-    } else if (err.message?.includes("Navigation")) {
-      errorMessage = "Failed to navigate to content. Check your HTML syntax.";
-    } else {
-      errorMessage = err.message || "Unknown rendering error";
     }
 
     return res.status(500).json({ error: errorMessage });
@@ -150,9 +90,6 @@ export default async function handler(req, res) {
 
 export const config = {
   api: {
-    bodyParser: {
-      sizeLimit: "6mb",
-    },
+    bodyParser: { sizeLimit: "6mb" },
   },
 };
-
