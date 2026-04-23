@@ -1,6 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  serverExternalPackages: ['@sparticuz/chromium'],
-}
+const nextConfig = {}
 
 module.exports = nextConfig
