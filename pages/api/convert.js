@@ -1,5 +1,4 @@
-import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium-min";
+import { chromium } from "playwright-core";
 
 function extractDimensions(html) {
   const bodyWidthMatch = html.match(/(?:body|html)[^{]*\{[^}]*width:\s*(\d+)px/i);
@@ -32,25 +31,12 @@ export default async function handler(req, res) {
   try {
     const { width, height } = extractDimensions(html);
 
-    const isLocal = process.env.NODE_ENV === "development";
-
-    const executablePath = isLocal
-      ? undefined
-      : await chromium.executablePath();
-
-    browser = await puppeteer.launch({
-      args: chromium.args,
-      executablePath,
-      headless: chromium.headless,
-      defaultViewport: {
-        width,
-        height,
-      },
+    browser = await chromium.launch({
+      headless: true,
     });
 
     const page = await browser.newPage();
-    await page.setJavaScriptEnabled(false);
-    await page.setViewport({ width, height, deviceScaleFactor: 1 });
+    await page.setViewportSize({ width, height });
     await page.setUserAgent(
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
     );
