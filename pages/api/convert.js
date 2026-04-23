@@ -32,15 +32,20 @@ export default async function handler(req, res) {
   try {
     const { width, height } = extractDimensions(html);
 
-    const executablePath = await chromium.executablePath(
-      "https://github.com/Sparticuz/chromium/releases/download/v123.0.0/chromium-v123.0.0-pack.tar"
-    );
+    const isLocal = process.env.NODE_ENV === "development";
+
+    const executablePath = isLocal
+      ? undefined
+      : await chromium.executablePath();
 
     browser = await puppeteer.launch({
       args: chromium.args,
-      defaultViewport: { width, height, deviceScaleFactor: 1 },
       executablePath,
-      headless: true,
+      headless: chromium.headless,
+      defaultViewport: {
+        width,
+        height,
+      },
     });
 
     const page = await browser.newPage();
