@@ -5,13 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "postinstall": "playwright install chromium"
+    "start": "next start"
   },
   "dependencies": {
     "next": "^14.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "playwright": "^1.40.0"
+    "playwright-core": "^1.40.0",
+    "@sparticuz/chromium": "^123.0.1"
   }
 }
