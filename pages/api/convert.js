@@ -1,4 +1,5 @@
 import { chromium } from "playwright-core";
+import chromiumBinary from "@sparticuz/chromium";
 
 function extractDimensions(html) {
   const bodyWidthMatch = html.match(/(?:body|html)[^{]*\{[^}]*width:\s*(\d+)px/i);
@@ -30,9 +31,12 @@ export default async function handler(req, res) {
 
   try {
     const { width, height } = extractDimensions(html);
+    const executablePath = await chromiumBinary.executablePath();
 
     browser = await chromium.launch({
-      headless: true,
+      executablePath,
+      args: chromiumBinary.args,
+      headless: chromiumBinary.headless,
     });
 
     const page = await browser.newPage();
@@ -42,9 +46,10 @@ export default async function handler(req, res) {
     );
 
     await page.setContent(html, {
-      waitUntil: ["load", "networkidle0"],
+      waitUntil: "load",
       timeout: 45000,
     });
+    await page.waitForLoadState("networkidle", { timeout: 45000 });
 
     await new Promise((r) => setTimeout(r, 800));
 
@@ -65,7 +70,9 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     if (browser) {
-      try { await browser.close(); } catch (_) {}
+      try {
+        await browser.close();
+      } catch (_) {}
     }
 
     let errorMessage = err.message || "Unknown rendering error";

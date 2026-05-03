@@ -1,6 +1,6 @@
 # 🍄 html2png — Pixel-perfect HTML to PNG Converter
 
-A serverless HTML → PNG converter powered by Puppeteer + headless Chromium on Vercel.
+A serverless HTML → PNG converter powered by Playwright + serverless Chromium on Vercel.
 
 ---
 
@@ -21,13 +21,7 @@ A serverless HTML → PNG converter powered by Puppeteer + headless Chromium on 
 # 1. Install dependencies
 npm install
 
-# 2. Install Chromium for local dev
-npx puppeteer browsers install chrome
-
-# 3. Set executable path (optional, auto-detected on most systems)
-echo 'PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable' > .env.local
-
-# 4. Run development server
+# 2. Run development server
 npm run dev
 ```
 
@@ -60,7 +54,7 @@ The `vercel.json` already configures:
 │   ├── _document.js       # Custom HTML document (fonts)
 │   ├── index.js           # Main UI page
 │   └── api/
-│       └── convert.js     # 🔑 Serverless Puppeteer endpoint
+│       └── convert.js     # 🔑 Serverless Playwright endpoint
 ├── styles/
 │   ├── globals.css        # Global reset + typography
 │   └── Home.module.css    # Page-level CSS modules
@@ -104,9 +98,9 @@ The `vercel.json` already configures:
 
 | Setting | Value |
 |---|---|
-| JavaScript | ❌ Disabled |
+| JavaScript | ✅ Enabled (for page rendering) |
 | Scale factor | 1x |
-| Wait condition | `load` + `networkidle0` |
+| Wait condition | `load` + `networkidle` |
 | Extra settle time | 800ms |
 | Max HTML size | 5MB |
 | Timeout | 45s |
@@ -156,7 +150,7 @@ The `vercel.json` already configures:
 | Package | Purpose |
 |---|---|
 | `next` | Framework + serverless functions |
-| `puppeteer-core` | Headless browser control |
+| `playwright-core` | Headless browser control |
 | `@sparticuz/chromium` | Lightweight Chromium for serverless |
 
 ---
