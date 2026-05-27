@@ -31,6 +31,7 @@ export default async function handler(req, res) {
 
   try {
     const { width, height } = extractDimensions(html);
+    chromiumBinary.setGraphicsMode = false;
     const executablePath = await chromiumBinary.executablePath();
 
     browser = await chromium.launch({
