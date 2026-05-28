@@ -29,6 +29,25 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
+
+## 🌍 Deployment Notes (GitHub Pages vs Netlify vs Vercel)
+
+This project is a **Next.js app with a serverless API** (`/api/convert`) that runs Chromium.
+
+- **GitHub Pages is not compatible** with this app architecture.
+  - GitHub Pages is static hosting only (HTML/CSS/JS files).
+  - It cannot run `pages/api/convert.js`, so conversion will never work there.
+- **Netlify can host it**, but only when configured as a Next.js app (build + Next.js runtime/plugin).
+  - This repo now includes `netlify.toml` with the official Next.js plugin.
+- **Vercel is the primary target** for this project and is the most reliable platform for this Playwright + Chromium setup.
+
+### Netlify setup checklist
+
+1. Build command: `npm run build`
+2. Publish directory: leave empty / managed by Netlify Next.js plugin
+3. Node version: 18+ (recommended)
+4. Ensure the deploy includes serverless functions (not a static-only deploy)
+
 ## ☁️ Deploy to Vercel
 
 ```bash
