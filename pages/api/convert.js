@@ -52,8 +52,6 @@ export default async function handler(req, res) {
     });
     await page.waitForLoadState("networkidle", { timeout: 45000 });
 
-    await new Promise((r) => setTimeout(r, 800));
-
     const screenshot = await page.screenshot({
       type: "png",
       fullPage: false,
