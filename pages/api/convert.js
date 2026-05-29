@@ -16,6 +16,8 @@ function extractDimensions(html) {
   return { width, height };
 }
 
+let cachedBrowser = null;
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -28,23 +30,35 @@ export default async function handler(req, res) {
   }
 
   let browser = null;
+  let context = null;
 
   try {
     const { width, height } = extractDimensions(html);
-    chromiumBinary.setGraphicsMode = false;
-    const executablePath = await chromiumBinary.executablePath();
 
-    browser = await chromium.launch({
-      executablePath,
-      args: chromiumBinary.args,
-      headless: chromiumBinary.headless,
+    // Validate that the cached browser is still connected
+    if (cachedBrowser && !cachedBrowser.isConnected()) {
+      cachedBrowser = null;
+    }
+
+    if (!cachedBrowser) {
+      chromiumBinary.setGraphicsMode = false;
+      const executablePath = await chromiumBinary.executablePath();
+
+      cachedBrowser = await chromium.launch({
+        executablePath,
+        args: chromiumBinary.args,
+        headless: typeof chromiumBinary.headless === "string" ? true : chromiumBinary.headless,
+      });
+    }
+
+    browser = cachedBrowser;
+
+    context = await browser.newContext({
+      viewport: { width, height },
+      userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
     });
 
-    const page = await browser.newPage();
-    await page.setViewportSize({ width, height });
-    await page.setUserAgent(
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
-    );
+    const page = await context.newPage();
 
     await page.setContent(html, {
       waitUntil: "load",
@@ -58,8 +72,8 @@ export default async function handler(req, res) {
       clip: { x: 0, y: 0, width, height },
     });
 
-    await browser.close();
-    browser = null;
+    await context.close();
+    context = null;
 
     const base64 = Buffer.from(screenshot).toString("base64");
     return res.status(200).json({
@@ -68,10 +82,15 @@ export default async function handler(req, res) {
       height,
     });
   } catch (err) {
-    if (browser) {
+    if (context) {
       try {
-        await browser.close();
+        await context.close();
       } catch (_) {}
+    }
+
+    // In case of a fatal error with the browser, clear the cache
+    if (browser && !browser.isConnected()) {
+      cachedBrowser = null;
     }
 
     let errorMessage = err.message || "Unknown rendering error";
