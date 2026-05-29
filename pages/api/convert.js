@@ -28,6 +28,22 @@ function extractDimensions(html) {
 
 let cachedBrowser = null;
 
+async function getBrowser() {
+  if (cachedBrowser?.isConnected()) {
+    return cachedBrowser;
+  }
+
+  const executablePath = await chromiumBinary.executablePath();
+
+  cachedBrowser = await chromium.launch({
+    executablePath,
+    args: chromiumBinary.args,
+    headless: chromiumBinary.headless !== false,
+  });
+
+  return cachedBrowser;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -45,10 +61,9 @@ export default async function handler(req, res) {
   try {
     const { width, height } = extractDimensions(html);
 
-    browser = await chromium.launch({
-      executablePath,
-      args: chromiumBinary.args,
-      headless: chromiumBinary.headless !== false,
+    browser = await getBrowser();
+    context = await browser.newContext({
+      viewport: { width, height },
     });
 
     const page = await context.newPage();
