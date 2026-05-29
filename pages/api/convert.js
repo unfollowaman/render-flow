@@ -1,6 +1,16 @@
 import { chromium } from "playwright-core";
 import chromiumBinary from "@sparticuz/chromium";
 
+const RENDER_TIMEOUT_MS = 45_000;
+
+async function waitForPageToRender(page, html) {
+  await page.setContent(html, {
+    waitUntil: "load",
+    timeout: RENDER_TIMEOUT_MS,
+  });
+  await page.waitForLoadState("networkidle", { timeout: RENDER_TIMEOUT_MS });
+}
+
 function extractDimensions(html) {
   const bodyWidthMatch = html.match(/(?:body|html)[^{]*\{[^}]*width:\s*(\d+)px/i);
   const bodyHeightMatch = html.match(/(?:body|html)[^{]*\{[^}]*height:\s*(\d+)px/i);
@@ -46,11 +56,7 @@ export default async function handler(req, res) {
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
     );
 
-    await page.setContent(html, {
-      waitUntil: "load",
-      timeout: 45000,
-    });
-    await page.waitForLoadState("networkidle", { timeout: 45000 });
+    await waitForPageToRender(page, html);
 
     const screenshot = await page.screenshot({
       type: "png",
