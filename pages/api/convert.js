@@ -45,27 +45,10 @@ export default async function handler(req, res) {
   try {
     const { width, height } = extractDimensions(html);
 
-    // Validate that the cached browser is still connected
-    if (cachedBrowser && !cachedBrowser.isConnected()) {
-      cachedBrowser = null;
-    }
-
-    if (!cachedBrowser) {
-      chromiumBinary.setGraphicsMode = false;
-      const executablePath = await chromiumBinary.executablePath();
-
-      cachedBrowser = await chromium.launch({
-        executablePath,
-        args: chromiumBinary.args,
-        headless: typeof chromiumBinary.headless === "string" ? true : chromiumBinary.headless,
-      });
-    }
-
-    browser = cachedBrowser;
-
-    context = await browser.newContext({
-      viewport: { width, height },
-      userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+    browser = await chromium.launch({
+      executablePath,
+      args: chromiumBinary.args,
+      headless: chromiumBinary.headless !== false,
     });
 
     const page = await context.newPage();
