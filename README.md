@@ -101,7 +101,6 @@ The `vercel.json` already configures:
 | JavaScript | ✅ Enabled (for page rendering) |
 | Scale factor | 1x |
 | Wait condition | `load` + `networkidle` |
-| Extra settle time | 800ms |
 | Max HTML size | 5MB |
 | Timeout | 45s |
 
