@@ -47,7 +47,7 @@ export default async function handler(req, res) {
     browser = await chromium.launch({
       executablePath,
       args: chromiumBinary.args,
-      headless: chromiumBinary.headless,
+      headless: chromiumBinary.headless !== false,
     });
 
     const page = await browser.newPage();
