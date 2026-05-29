@@ -39,17 +39,25 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Missing or invalid HTML content" });
   }
 
-  let browser = null;
   let context = null;
 
   try {
     const { width, height } = extractDimensions(html);
 
-    browser = await chromium.launch({
-      executablePath,
-      args: chromiumBinary.args,
-      headless: chromiumBinary.headless !== false,
-    });
+    chromiumBinary.setGraphicsMode = false;
+
+    if (!cachedBrowser || !cachedBrowser.isConnected()) {
+      const executablePath = await chromiumBinary.executablePath();
+
+      cachedBrowser = await chromium.launch({
+        executablePath,
+        args: chromiumBinary.args,
+        headless: typeof chromiumBinary.headless === 'string' ? true : chromiumBinary.headless !== false,
+      });
+    }
+
+    const browser = cachedBrowser;
+    context = await browser.newContext();
 
     const page = await context.newPage();
 
@@ -78,7 +86,7 @@ export default async function handler(req, res) {
     }
 
     // In case of a fatal error with the browser, clear the cache
-    if (browser && !browser.isConnected()) {
+    if (cachedBrowser && !cachedBrowser.isConnected()) {
       cachedBrowser = null;
     }
 
