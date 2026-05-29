@@ -2,6 +2,17 @@ import Head from "next/head";
 import { useState, useRef, useCallback } from "react";
 import styles from "../styles/Home.module.css";
 
+const MARIO_SPRITE_FRAMES = ["🏃", "🏃‍♂️", "🚶", "🚶‍♂️"];
+
+const LOADING_STEPS = [
+  "Launching headless Chromium…",
+  "Loading HTML content…",
+  "Fetching external assets…",
+  "Waiting for fonts & images…",
+  "Rendering page…",
+  "Capturing screenshot…",
+];
+
 const SAMPLE_HTML = `<!DOCTYPE html>
 <html>
 <head>
@@ -74,28 +85,18 @@ export default function Home() {
   const outputRef = useRef(null);
   const marioIntervalRef = useRef(null);
 
-  const loadingSteps = [
-    "Launching headless Chromium…",
-    "Loading HTML content…",
-    "Fetching external assets…",
-    "Waiting for fonts & images…",
-    "Rendering page…",
-    "Capturing screenshot…",
-  ];
-
   const startMarioAnimation = () => {
     let frame = 0;
-    let step = 0;
     marioIntervalRef.current = setInterval(() => {
-      frame = (frame + 1) % 4;
+      frame = (frame + 1) % MARIO_SPRITE_FRAMES.length;
       setMarioFrame(frame);
     }, 150);
 
     let stepIdx = 0;
-    setLoadingStep(loadingSteps[0]);
+    setLoadingStep(LOADING_STEPS[0]);
     const stepInterval = setInterval(() => {
-      stepIdx = Math.min(stepIdx + 1, loadingSteps.length - 1);
-      setLoadingStep(loadingSteps[stepIdx]);
+      stepIdx = Math.min(stepIdx + 1, LOADING_STEPS.length - 1);
+      setLoadingStep(LOADING_STEPS[stepIdx]);
     }, 1800);
 
     return stepInterval;
@@ -178,7 +179,7 @@ export default function Home() {
   };
 
   // Mario pixel art frames
-  const marioSprite = ["🏃", "🏃‍♂️", "🚶", "🚶‍♂️"][marioFrame];
+  const marioSprite = MARIO_SPRITE_FRAMES[marioFrame];
 
   return (
     <>
