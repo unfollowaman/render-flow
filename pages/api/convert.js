@@ -12,8 +12,49 @@ async function waitForPageToRender(page, html) {
 }
 
 function extractDimensions(html) {
-  const bodyWidthMatch = html.match(/(?:body|html)[^{]*\{[^}]*width:\s*(\d+)px/i);
-  const bodyHeightMatch = html.match(/(?:body|html)[^{]*\{[^}]*height:\s*(\d+)px/i);
+  let bodyWidthMatch = null;
+  let bodyHeightMatch = null;
+
+  const lowerHtml = html.toLowerCase();
+  let searchIndex = 0;
+
+  // Quick check if there are any braces at all
+  if (lowerHtml.indexOf('{') !== -1) {
+    while (searchIndex < lowerHtml.length) {
+      const bodyIdx = lowerHtml.indexOf('body', searchIndex);
+      const htmlIdx = lowerHtml.indexOf('html', searchIndex);
+
+      let targetIdx = -1;
+      if (bodyIdx !== -1 && htmlIdx !== -1) {
+        targetIdx = Math.min(bodyIdx, htmlIdx);
+      } else if (bodyIdx !== -1) {
+        targetIdx = bodyIdx;
+      } else if (htmlIdx !== -1) {
+        targetIdx = htmlIdx;
+      } else {
+        break;
+      }
+
+      const braceIdx = lowerHtml.indexOf('{', targetIdx);
+      if (braceIdx === -1) break; // No more '{' in the rest of the string
+
+      const closeBraceIdx = lowerHtml.indexOf('}', braceIdx);
+      if (closeBraceIdx === -1) break; // No more '}' in the rest of the string
+
+      const blockContent = html.substring(braceIdx + 1, closeBraceIdx);
+
+      const wMatch = blockContent.match(/width:\s*(\d+)px/i);
+      const hMatch = blockContent.match(/height:\s*(\d+)px/i);
+
+      if (wMatch && !bodyWidthMatch) bodyWidthMatch = wMatch;
+      if (hMatch && !bodyHeightMatch) bodyHeightMatch = hMatch;
+
+      if (bodyWidthMatch && bodyHeightMatch) break;
+
+      searchIndex = targetIdx + 4;
+    }
+  }
+
   const widthMatch = html.match(/width:\s*(\d+)px/i);
   const heightMatch = html.match(/height:\s*(\d+)px/i);
 
