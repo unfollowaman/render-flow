@@ -13,6 +13,9 @@ const LOADING_STEPS = [
   "Capturing screenshot…",
 ];
 
+// Pre-computed array for the decorative pixel grid to prevent allocations on every render
+const PIXEL_GRID_CELLS = Array.from({ length: 64 });
+
 const SAMPLE_HTML = `<!DOCTYPE html>
 <html>
 <head>
@@ -230,7 +233,7 @@ export default function Home() {
 
           {/* Decorative pixel grid */}
           <div className={styles.pixelGrid} aria-hidden="true">
-            {Array.from({ length: 64 }).map((_, i) => (
+            {PIXEL_GRID_CELLS.map((_, i) => (
               <div key={i} className={styles.pixelCell} />
             ))}
           </div>
