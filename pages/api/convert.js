@@ -57,7 +57,7 @@ export default async function handler(req, res) {
     }
 
     const browser = cachedBrowser;
-    context = await browser.newContext();
+    context = await browser.newContext({ javaScriptEnabled: false });
 
     const page = await context.newPage();
 
