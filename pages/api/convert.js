@@ -1,7 +1,28 @@
+import dns from "dns/promises";
 import { chromium } from "playwright-core";
 import chromiumBinary from "@sparticuz/chromium";
 
 const RENDER_TIMEOUT_MS = 45_000;
+
+function isForbiddenIP(ip) {
+  if (!ip) return false;
+  if (ip.startsWith("127.")) return true;
+  if (ip.startsWith("10.")) return true;
+  if (ip.startsWith("192.168.")) return true;
+  if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(ip)) return true;
+  if (ip.startsWith("169.254.")) return true;
+  if (ip === "::1") return true;
+  if (ip.toLowerCase().startsWith("fc")) return true; // fc00::/7 (fc00... to fd...)
+  if (ip.toLowerCase().startsWith("fd")) return true;
+  if (ip.toLowerCase().startsWith("fe80")) return true;
+  if (ip === "0.0.0.0" || ip === "::") return true;
+  if (ip.toLowerCase().startsWith("::ffff:")) {
+    const ipv4 = ip.split(":").pop();
+    return isForbiddenIP(ipv4);
+  }
+  return false;
+}
+
 
 async function waitForPageToRender(page, html) {
   await page.setContent(html, {
@@ -59,7 +80,34 @@ export default async function handler(req, res) {
     const browser = cachedBrowser;
     context = await browser.newContext({ javaScriptEnabled: false });
 
+
     const page = await context.newPage();
+
+    await page.route("**/*", async (route) => {
+      const request = route.request();
+      let url;
+      try {
+        url = new URL(request.url());
+      } catch (e) {
+        return route.abort("blockedbyclient");
+      }
+
+      if (["http:", "https:"].includes(url.protocol)) {
+        try {
+          const lookup = await dns.lookup(url.hostname);
+          if (isForbiddenIP(lookup.address)) {
+            return route.abort("accessdenied");
+          }
+        } catch (err) {
+          return route.abort("name_not_resolved");
+        }
+      } else if (url.protocol !== "data:") {
+        return route.abort("accessdenied");
+      }
+
+      route.continue();
+    });
+
 
     await waitForPageToRender(page, html);
 
