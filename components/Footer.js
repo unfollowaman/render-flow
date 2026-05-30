@@ -1,0 +1,12 @@
+import styles from "../styles/Home.module.css";
+
+export function Footer() {
+  return (
+    <footer className={styles.footer}>
+      <div className={styles.footerInner}>
+        <span>🍄 html2png — serverless HTML rendering</span>
+        <span>Built with Next.js + Puppeteer + @sparticuz/chromium</span>
+      </div>
+    </footer>
+  );
+}
