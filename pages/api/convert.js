@@ -17,8 +17,8 @@ function extractDimensions(html) {
   const widthMatch = html.match(/width:\s*(\d+)px/i);
   const heightMatch = html.match(/height:\s*(\d+)px/i);
 
-  let width = bodyWidthMatch ? parseInt(bodyWidthMatch[1]) : widthMatch ? parseInt(widthMatch[1]) : 1200;
-  let height = bodyHeightMatch ? parseInt(bodyHeightMatch[1]) : heightMatch ? parseInt(heightMatch[1]) : 630;
+  let width = parseInt(bodyWidthMatch?.[1] ?? widthMatch?.[1] ?? "1200", 10);
+  let height = parseInt(bodyHeightMatch?.[1] ?? heightMatch?.[1] ?? "630", 10);
 
   width = Math.min(Math.max(width, 100), 3840);
   height = Math.min(Math.max(height, 100), 2160);
