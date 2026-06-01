@@ -83,10 +83,13 @@ export default async function handler(req, res) {
 
     if (!cachedBrowser || !cachedBrowser.isConnected()) {
       const executablePath = await chromiumBinary.executablePath();
+      const args = chromiumBinary.args.filter(
+        (arg) => arg !== "--single-process" && arg !== "--in-process-gpu"
+      );
 
       cachedBrowser = await chromium.launch({
         executablePath,
-        args: chromiumBinary.args,
+        args,
         headless: typeof chromiumBinary.headless === 'string' ? true : chromiumBinary.headless !== false,
       });
     }
