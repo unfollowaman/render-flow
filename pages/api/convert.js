@@ -47,6 +47,20 @@ function extractDimensions(html) {
   return { width, height };
 }
 
+if (process.env.VERCEL) {
+  // @sparticuz/chromium checks this environment variable to determine if it should
+  // extract the AWS Lambda native dependencies (libnss3.so, libnspr4.so, etc.).
+  // Vercel serverless functions are AWS Lambda functions under the hood, but don't
+  // necessarily expose these variables automatically.
+  // We need to set it *before* importing/using the module heavily, or at least before executablePath().
+  const match = process.version.match(/^v(\d+)/);
+  if (match && parseInt(match[1], 10) >= 20) {
+    process.env.AWS_LAMBDA_JS_RUNTIME = "nodejs20.x";
+  } else {
+    process.env.AWS_LAMBDA_JS_RUNTIME = "nodejs18.x";
+  }
+}
+
 let cachedBrowser = null;
 
 export default async function handler(req, res) {
