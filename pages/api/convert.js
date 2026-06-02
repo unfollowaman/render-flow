@@ -1,6 +1,5 @@
 import dns from "dns/promises";
 import { chromium } from "playwright-core";
-import chromiumBinary from "@sparticuz/chromium";
 
 const RENDER_TIMEOUT_MS = 45_000;
 
@@ -62,20 +61,6 @@ function extractDimensions(html) {
   return { width, height };
 }
 
-if (process.env.VERCEL) {
-  // @sparticuz/chromium checks this environment variable to determine if it should
-  // extract the AWS Lambda native dependencies (libnss3.so, libnspr4.so, etc.).
-  // Vercel serverless functions are AWS Lambda functions under the hood, but don't
-  // necessarily expose these variables automatically.
-  // We need to set it *before* importing/using the module heavily, or at least before executablePath().
-  const match = process.version.match(/^v(\d+)/);
-  if (match && parseInt(match[1], 10) >= 20) {
-    process.env.AWS_LAMBDA_JS_RUNTIME = "nodejs20.x";
-  } else {
-    process.env.AWS_LAMBDA_JS_RUNTIME = "nodejs18.x";
-  }
-}
-
 let cachedBrowser = null;
 
 export default async function handler(req, res) {
@@ -92,6 +77,23 @@ export default async function handler(req, res) {
   let context = null;
 
   try {
+    if (process.env.VERCEL) {
+      // @sparticuz/chromium checks this environment variable to determine if it should
+      // extract the AWS Lambda native dependencies (libnss3.so, libnspr4.so, etc.).
+      // Vercel serverless functions are AWS Lambda functions under the hood, but don't
+      // necessarily expose these variables automatically.
+      // We need to set it *before* importing/using the module heavily, or at least before executablePath().
+      const match = process.version.match(/^v(\d+)/);
+      if (match && parseInt(match[1], 10) >= 20) {
+        process.env.AWS_LAMBDA_JS_RUNTIME = "nodejs20.x";
+      } else {
+        process.env.AWS_LAMBDA_JS_RUNTIME = "nodejs18.x";
+      }
+    }
+
+    // Dynamically import to ensure AWS_LAMBDA_JS_RUNTIME is set before module evaluation
+    const chromiumBinary = (await import("@sparticuz/chromium")).default;
+
     const { width, height } = extractDimensions(html);
 
     chromiumBinary.setGraphicsMode = false;
@@ -116,7 +118,12 @@ export default async function handler(req, res) {
     const page = await context.newPage();
 
     await page.route("**/*", async (route) => {
-      const request = route.request();
+      let request;
+      try {
+        request = route.request();
+      } catch (_) {
+        return;
+      }
       let url;
       try {
         url = new URL(request.url());
