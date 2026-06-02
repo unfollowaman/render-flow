@@ -8,10 +8,10 @@
     "start": "next start"
   },
   "dependencies": {
+    "@sparticuz/chromium": "^123.0.1",
     "next": "^14.0.0",
+    "playwright-core": "1.42.1",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "playwright-core": "^1.40.0",
-    "@sparticuz/chromium": "^123.0.1"
+    "react-dom": "^18.0.0"
   }
 }
