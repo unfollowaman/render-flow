@@ -144,6 +144,8 @@ export default async function handler(req, res) {
       height,
     });
   } catch (err) {
+    console.error("Conversion error:", err);
+
     if (context) {
       try {
         await context.close();
@@ -155,11 +157,11 @@ export default async function handler(req, res) {
       cachedBrowser = null;
     }
 
-    let errorMessage = err.message || "Unknown rendering error";
+    let errorMessage = "An internal server error occurred.";
     if (err.message?.includes("timeout")) {
       errorMessage = "Timeout: Page took too long to load.";
     } else if (err.message?.includes("net::ERR")) {
-      errorMessage = `Network error loading external resource: ${err.message}`;
+      errorMessage = "Network error loading external resource.";
     }
 
     return res.status(500).json({ error: errorMessage });
