@@ -23,6 +23,21 @@ function isForbiddenIP(ip) {
   return false;
 }
 
+async function safeDnsLookup(hostname, timeoutMs = 5000) {
+  let timeoutId;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error('DNS lookup timeout')), timeoutMs);
+  });
+  try {
+    const result = await Promise.race([
+      dns.lookup(hostname),
+      timeoutPromise
+    ]);
+    return result;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 async function waitForPageToRender(page, html) {
   await page.setContent(html, {
@@ -97,7 +112,7 @@ export default async function handler(req, res) {
     const browser = cachedBrowser;
     context = await browser.newContext({ javaScriptEnabled: false });
 
-
+    context.setDefaultTimeout(RENDER_TIMEOUT_MS);
     const page = await context.newPage();
 
     await page.route("**/*", async (route) => {
@@ -106,25 +121,38 @@ export default async function handler(req, res) {
       try {
         url = new URL(request.url());
       } catch (e) {
-        return route.abort("blockedbyclient");
+        try {
+          await route.abort("blockedbyclient");
+        } catch (_) {}
+        return;
       }
 
       if (["http:", "https:"].includes(url.protocol)) {
         try {
-          const lookup = await dns.lookup(url.hostname);
+          const lookup = await safeDnsLookup(url.hostname, 5000);
           if (isForbiddenIP(lookup.address)) {
-            return route.abort("accessdenied");
+            try {
+              await route.abort("accessdenied");
+            } catch (_) {}
+            return;
           }
         } catch (err) {
-          return route.abort("name_not_resolved");
+          try {
+            await route.abort("name_not_resolved");
+          } catch (_) {}
+            return;
         }
       } else if (url.protocol !== "data:") {
-        return route.abort("accessdenied");
+        try {
+          await route.abort("accessdenied");
+        } catch (_) {}
+        return;
       }
 
-      route.continue();
+      try {
+        await route.continue();
+      } catch (_) {}
     });
-
 
     await waitForPageToRender(page, html);
 
@@ -150,11 +178,15 @@ export default async function handler(req, res) {
       try {
         await context.close();
       } catch (_) {}
+      context = null;
     }
 
-    // In case of a fatal error with the browser, clear the cache
-    if (cachedBrowser && !cachedBrowser.isConnected()) {
-      cachedBrowser = null;
+    if (cachedBrowser) {
+      try {
+        if (!cachedBrowser.isConnected()) cachedBrowser = null;
+      } catch (_) {
+        cachedBrowser = null;
+      }
     }
 
     let errorMessage = "An internal server error occurred.";
