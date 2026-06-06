@@ -22,7 +22,13 @@ function isForbiddenIP(ip) {
   return false;
 }
 
+const dnsCache = new Map();
+const MAX_DNS_CACHE_SIZE = 1000;
+
 async function safeDnsLookup(hostname, timeoutMs = 5000) {
+  if (dnsCache.has(hostname)) {
+    return dnsCache.get(hostname);
+  }
   let timeoutId;
   const timeoutPromise = new Promise((_, reject) => {
     timeoutId = setTimeout(() => reject(new Error('DNS lookup timeout')), timeoutMs);
@@ -32,6 +38,11 @@ async function safeDnsLookup(hostname, timeoutMs = 5000) {
       dns.lookup(hostname),
       timeoutPromise
     ]);
+    if (dnsCache.size >= MAX_DNS_CACHE_SIZE) {
+      const firstKey = dnsCache.keys().next().value;
+      dnsCache.delete(firstKey);
+    }
+    dnsCache.set(hostname, result);
     return result;
   } finally {
     clearTimeout(timeoutId);
