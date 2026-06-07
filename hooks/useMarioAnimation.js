@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 
 const MARIO_SPRITE_FRAMES = ["🏃", "🏃‍♂️", "🚶", "🚶‍♂️"];
 
@@ -36,6 +36,10 @@ export function useMarioAnimation() {
     clearInterval(marioIntervalRef.current);
     clearInterval(stepIntervalRef.current);
   }, []);
+
+  useEffect(() => {
+    return stopMarioAnimation;
+  }, [stopMarioAnimation]);
 
   const marioSprite = MARIO_SPRITE_FRAMES[marioFrame];
 
