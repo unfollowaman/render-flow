@@ -1,0 +1,1256 @@
+# Architectural Audit Report — `html2png`
+
+## Scope & Method
+
+I inspected the repository in read-only mode before this document was created. The original audit did not modify files; this `Trash` file now preserves that audit report in the repository root.
+
+**Inspection commands used:**
+
+* ✅ `pwd && find .. -name AGENTS.md -print && rg --files -g '!*node_modules*' -g '!*.png' -g '!*.jpg' -g '!*.jpeg' -g '!*.gif' -g '!*.webp' | sed -n '1,200p'`
+* ✅ `cat package.json; cat next.config.js; cat vercel.json; sed -n '1,220p' README.md`
+* ✅ `nl -ba pages/api/convert.js | sed -n '1,240p'`
+* ✅ `nl -ba pages/index.js`
+* ✅ `nl -ba hooks/useHtmlToPngConversion.js`
+* ✅ `nl -ba hooks/useMarioAnimation.js`
+* ✅ `nl -ba components/*.js`
+* ✅ `nl -ba styles/globals.css`
+* ✅ `nl -ba styles/Home.module.css`
+* ✅ `rg -n "process\.env|NEXT_PUBLIC|VERCEL|AWS_|DATABASE|SUPABASE|S3|BUCKET|SECRET|TOKEN|KEY|AUTH|COOKIE|localStorage|sessionStorage" -g '!package-lock.json'`
+* ✅ `rg -n "fetch\(|axios|/api/|pages/api|export default async function handler|route\(|chromium|screenshot|setContent|javaScriptEnabled|canvas|html2canvas|dom-to-image|rasterize|puppeteer|playwright" -g '!package-lock.json'`
+* ✅ `git status --short`
+* ⚠️ `npm audit --omit=dev --json` — failed because the npm registry audit endpoint returned HTTP 403 in this environment.
+
+---
+
+# 1. Project Overview
+
+## What this application does
+
+`html2png` is a small Next.js web application that accepts raw HTML from a user and returns a PNG screenshot rendered by headless Chromium on the server. The README describes it as a “serverless HTML → PNG converter powered by Playwright + serverless Chromium on Vercel.”
+
+The application is intentionally stateless: the README states there is no storage, no authentication, and no persistence.
+
+## Main user workflow
+
+1. User opens the single-page web UI at `/`.
+2. User either:
+   * pastes HTML into the editor, or
+   * uploads/drags a `.html` file into the input area.
+3. User clicks **Convert to PNG**.
+4. Frontend sends `POST /api/convert` with `{ html }`.
+5. API route launches or reuses a headless Chromium browser through Playwright.
+6. API route injects the supplied HTML into a browser page.
+7. Server captures a PNG screenshot, base64-encodes it, and returns it as a data URL.
+8. Frontend renders a preview image and provides a client-side download button.
+
+## Core features
+
+* Raw HTML paste/edit input.
+* `.html` file upload and drag/drop support.
+* Sample HTML loader.
+* Server-side HTML-to-PNG rendering using Playwright and `@sparticuz/chromium`.
+* External HTTP/HTTPS/data asset handling with URL routing and SSRF-oriented IP blocking.
+* Loading animation / Mario-themed conversion status.
+* Preview + PNG download.
+
+## High-level architecture diagram
+
+```text
+Browser
+  |
+  | GET /
+  v
+Next.js Pages Router
+  |
+  | pages/index.js
+  v
+React UI
+  |-- Header
+  |-- Hero
+  |-- InputCard
+  |-- LoadingCard
+  |-- ErrorCard
+  |-- OutputCard
+  |
+  | POST /api/convert { html }
+  v
+Next.js API Route: pages/api/convert.js
+  |
+  | Validate method/body
+  | Extract dimensions from HTML string
+  | Launch/reuse Playwright Chromium
+  | Create isolated browser context with JavaScript disabled
+  | Intercept resource requests
+  | Resolve DNS and block private/link-local/local IPs
+  | page.setContent(html)
+  | wait for load + networkidle
+  | page.screenshot({ type: "png", clip })
+  v
+JSON response
+  {
+    image: "data:image/png;base64,...",
+    width,
+    height
+  }
+  |
+  v
+React OutputCard preview + download
+```
+
+---
+
+# 2. Tech Stack
+
+## Frontend framework/library
+
+* **Next.js Pages Router** — the project uses `pages/index.js`, `pages/_app.js`, `pages/_document.js`, and `pages/api/convert.js`, which are Pages Router conventions.
+* **React 18** — `react` and `react-dom` are dependencies.
+
+Locked versions in `package-lock.json`:
+
+* `next`: `14.2.35`.
+* `react`: `18.3.1`.
+* `react-dom`: `18.3.1`.
+
+## Backend framework/runtime
+
+* **Next.js API Routes** — backend endpoint is `pages/api/convert.js`, exported as a default async handler.
+* **Node.js runtime** — implied by Next.js API route and Node APIs such as `dns/promises` and `Buffer`.
+
+## Programming languages used
+
+* JavaScript / JSX.
+* CSS.
+* JSON configuration.
+
+No TypeScript files are present in the repository file list.
+
+## Build tools
+
+* **Next.js build system** — scripts are `next dev`, `next build`, and `next start`.
+
+No Vite, Webpack config, Parcel config, Babel config, or TypeScript config exists in the important file list inspected.
+
+## Package manager
+
+* **npm** — `package-lock.json` is present and uses lockfile version 3.
+
+## CSS framework/library
+
+* No Tailwind, Bootstrap, Material UI CSS framework, or CSS-in-JS library is declared.
+* Styling is custom CSS:
+  * global CSS in `styles/globals.css`.
+  * CSS Module in `styles/Home.module.css`, imported by components and page files.
+
+## UI component libraries
+
+No third-party UI component libraries are declared in `package.json`; only `@sparticuz/chromium`, `next`, `playwright-core`, `react`, and `react-dom` are runtime dependencies.
+
+## State management solution
+
+* Local React state and hooks only:
+  * `useState` for the HTML input in `pages/index.js`.
+  * `useHtmlToPngConversion` manages `loading`, `result`, and `error`.
+  * `useMarioAnimation` manages animation frame and loading step.
+
+There is no Redux, Zustand, Jotai, React Query, SWR, Apollo, or context-based global state layer.
+
+## Database
+
+No database dependency, schema, migration, ORM, query code, or DB environment variable exists. The README explicitly says the app is stateless with no storage/auth/persistence.
+
+## Storage solution
+
+No storage solution exists. Uploaded `.html` files are read client-side via `FileReader` and placed into component state; they are not uploaded as files to object storage.
+
+## Authentication system
+
+No authentication system exists. No auth packages or auth environment variables were found. The README explicitly states “no auth.”
+
+## Deployment platform
+
+* **Vercel** — `vercel.json` configures the serverless function, and README deployment instructions use `vercel deploy`.
+
+## Hosting configuration
+
+* `vercel.json` configures `pages/api/convert.js` with:
+  * `memory`: `1024`
+  * `maxDuration`: `60` seconds.
+
+## Environment variables used
+
+The code references:
+
+* `process.env.VERCEL` — used to detect Vercel/serverless environment.
+* `process.env.AWS_LAMBDA_JS_RUNTIME` — set dynamically to `nodejs20.x` or `nodejs18.x` for `@sparticuz/chromium` native dependency behavior.
+
+No `.env.example` exists, and `.env` / `.env.local` are ignored by `.gitignore`.
+
+---
+
+# 3. File Structure Analysis
+
+## Important folder structure
+
+```text
+/
+├── README.md
+├── package.json
+├── package-lock.json
+├── next.config.js
+├── vercel.json
+├── .gitignore
+├── bench.js
+├── bench_dns.js
+├── pages/
+│   ├── _app.js
+│   ├── _document.js
+│   ├── index.js
+│   └── api/
+│       └── convert.js
+├── components/
+│   ├── index.js
+│   ├── Header.js
+│   ├── Hero.js
+│   ├── InputCard.js
+│   ├── LoadingCard.js
+│   ├── ErrorCard.js
+│   ├── OutputCard.js
+│   └── Footer.js
+├── hooks/
+│   ├── useHtmlToPngConversion.js
+│   └── useMarioAnimation.js
+└── styles/
+    ├── globals.css
+    └── Home.module.css
+```
+
+## Purpose of major folders
+
+### `pages/`
+
+Next.js Pages Router entrypoints:
+
+* `_app.js` loads global CSS and renders the active page component.
+* `_document.js` customizes the root HTML document and loads Google Fonts for the application shell.
+* `index.js` is the main user-facing UI page.
+* `api/convert.js` is the server-side conversion API route.
+
+### `components/`
+
+Reusable presentational and interaction components exported from `components/index.js`.
+
+### `hooks/`
+
+Custom React hooks:
+
+* `useHtmlToPngConversion` handles conversion request lifecycle.
+* `useMarioAnimation` handles local loading animation state/timers.
+
+### `styles/`
+
+* `globals.css`: reset, CSS variables, global typography, scrollbar styles.
+* `Home.module.css`: page/component styles scoped through CSS Modules.
+
+## Purpose of major files
+
+### `package.json`
+
+Declares scripts and runtime dependencies.
+
+### `package-lock.json`
+
+npm lockfile. It pins dependency resolution, including `@sparticuz/chromium`, `next`, `playwright-core`, `react`, and `react-dom`.
+
+### `next.config.js`
+
+Configures `experimental.serverComponentsExternalPackages` for `@sparticuz/chromium`.
+
+### `vercel.json`
+
+Configures the serverless API function resource limits.
+
+### `pages/index.js`
+
+Main React page. It creates the HTML state, creates an output ref, initializes the two custom hooks, and composes the page from Header/Hero/Input/Loading/Error/Output/Footer.
+
+### `pages/api/convert.js`
+
+Core server-side conversion engine. It validates requests, launches Chromium via Playwright, blocks some unsafe network destinations, renders the supplied HTML, screenshots it, and returns JSON.
+
+### `components/InputCard.js`
+
+User input component. It includes the sample HTML, file upload, drag/drop, textarea, character count, and conversion button.
+
+### `components/OutputCard.js`
+
+Displays returned PNG preview and performs client-side download using a generated `<a>` element.
+
+### `bench.js`
+
+A standalone Node benchmark comparing repeated inline `Array.from` allocation with a precomputed array.
+
+### `bench_dns.js`
+
+A standalone Node benchmark comparing DNS lookup with and without cache behavior.
+
+## Application entry points
+
+### Browser UI entry point
+
+* `pages/index.js` is the `/` page.
+* `pages/_app.js` wraps every page and imports global styles.
+* `pages/_document.js` provides root HTML/head/body.
+
+### API entry point
+
+* `pages/api/convert.js` maps to `/api/convert`.
+
+## Startup flow
+
+### Local development
+
+1. `npm install`
+2. `npm run dev`
+3. Next.js starts development server from the `next dev` script.
+
+### Production build/start
+
+1. `npm run build`
+2. `npm run start`
+3. Next.js uses `next build` and `next start`.
+
+---
+
+# 4. Frontend Analysis
+
+## How pages are rendered
+
+This is a single Next.js Pages Router page at `/`. The page component returns static JSX with client-side React interactivity. It uses `next/head` for page metadata.
+
+There is no `getServerSideProps`, `getStaticProps`, App Router, React Server Components page tree, or dynamic route file in this repo.
+
+## Routing system
+
+* UI route:
+  * `/` → `pages/index.js`.
+* API route:
+  * `/api/convert` → `pages/api/convert.js`.
+
+## Component hierarchy
+
+```text
+Home page: pages/index.js
+  ├─ Head
+  └─ div.page
+     ├─ Header
+     ├─ Hero
+     ├─ main.main
+     │  └─ div.container
+     │     ├─ InputCard
+     │     ├─ LoadingCard       conditional: loading
+     │     ├─ ErrorCard         conditional: error
+     │     └─ OutputCard        conditional: result
+     └─ Footer
+```
+
+## Data flow
+
+```text
+User input
+  |
+  v
+InputCard textarea / file upload
+  |
+  | setHtml(...)
+  v
+html state in pages/index.js
+  |
+  | passed into useHtmlToPngConversion
+  v
+handleConvert()
+  |
+  | fetch("/api/convert", { html })
+  v
+result/error/loading state in hook
+  |
+  v
+Conditional rendering:
+  - LoadingCard
+  - ErrorCard
+  - OutputCard
+```
+
+The `html` state is owned by `pages/index.js`.
+`InputCard` mutates it through `setHtml`.
+The conversion hook posts the state to `/api/convert` and updates `result`/`error`/`loading`.
+
+## API communication flow
+
+Frontend sends:
+
+```js
+fetch("/api/convert", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ html }),
+});
+```
+
+This is implemented in `useHtmlToPngConversion`.
+
+## State management flow
+
+State is local only:
+
+* `html` in `pages/index.js`.
+* `loading`, `result`, and `error` in `useHtmlToPngConversion`.
+* `marioFrame` and `loadingStep` in `useMarioAnimation`.
+
+Timers are cleaned up in the `useMarioAnimation` cleanup effect.
+
+## Styling architecture
+
+* Global styles:
+  * CSS reset and design tokens in `styles/globals.css`.
+  * global body typography and background.
+* Component/page styles:
+  * CSS Modules via `styles/Home.module.css`.
+  * Header styles at top of module.
+  * Hero styles.
+  * Input/editor/card styles.
+  * Loading/error/output/footer/responsive styles.
+
+## Reusable components
+
+Most important components:
+
+* `InputCard` — primary user input and file handling.
+* `OutputCard` — preview and download UX.
+* `LoadingCard` — conversion progress display.
+* `ErrorCard` — user-visible error display.
+* `Hero`, `Header`, `Footer` — page shell/marketing.
+
+## Dead/unused components
+
+No obviously dead React components were found. All exported components from `components/index.js` are imported in `pages/index.js`.
+
+## Duplicate / inconsistent code areas
+
+Not duplicate code exactly, but there are documentation/UI inconsistencies:
+
+* `Hero` says “Powered by Puppeteer on Vercel,” but the implementation imports `playwright-core`, not Puppeteer.
+* `Footer` says “Next.js + Puppeteer + @sparticuz/chromium,” but implementation uses Playwright.
+* README rendering table says JavaScript is enabled, but the code creates a context with `javaScriptEnabled: false`.
+* README says max HTML size is 5MB, while the API body parser is configured to 6MB.
+
+---
+
+# 5. HTML → PNG Conversion Engine
+
+This is the core system.
+
+## Exactly how HTML is converted into PNG
+
+The conversion happens on the **server side** inside `pages/api/convert.js`.
+
+High-level sequence:
+
+1. API accepts only `POST`.
+2. API validates that `req.body.html` exists and is a string.
+3. API conditionally sets AWS Lambda runtime environment metadata when running on Vercel.
+4. API dynamically imports `@sparticuz/chromium`.
+5. API extracts screenshot dimensions from CSS-like `width: Npx` / `height: Npx` patterns in the submitted HTML.
+6. API launches or reuses a cached Playwright Chromium browser.
+7. API creates a browser context with JavaScript disabled.
+8. API intercepts all page network requests.
+9. API allows `http:`, `https:`, and `data:` URLs after DNS safety checks; it blocks other protocols.
+10. API calls `page.setContent(html, { waitUntil: "load", timeout: 45000 })`.
+11. API waits for `networkidle`.
+12. API takes a PNG screenshot with `clip: { x: 0, y: 0, width, height }`.
+13. API base64-encodes the PNG and returns a JSON data URL.
+
+## Libraries used
+
+* `playwright-core` for browser automation.
+* `@sparticuz/chromium` for serverless-compatible Chromium executable.
+* Node `dns/promises` for DNS resolution before allowing requests.
+
+## Client-side or server-side rendering?
+
+The actual HTML-to-PNG conversion happens **server-side**, in the Next.js API route. The browser client only sends HTML and renders the returned image.
+
+## Is canvas involved?
+
+No canvas rendering library is used. Searches found no `canvas`, `html2canvas`, `dom-to-image`, or `rasterizeHTML` implementation. The conversion uses Playwright’s native `page.screenshot`.
+
+## Puppeteer, Playwright, html2canvas, dom-to-image, rasterizeHTML?
+
+* **Playwright:** yes, via `playwright-core`.
+* **Puppeteer:** no implementation; only misleading marketing text mentions Puppeteer.
+* **html2canvas:** no.
+* **dom-to-image:** no.
+* **rasterizeHTML:** no.
+* **Canvas:** no direct use.
+
+## Screenshot generation process step-by-step
+
+```text
+POST /api/convert
+  |
+  | req.method !== "POST" -> 405
+  | missing/non-string html -> 400
+  v
+Set Vercel/Lambda runtime env hint if process.env.VERCEL
+  |
+  v
+import("@sparticuz/chromium")
+  |
+  v
+extractDimensions(html)
+  |
+  | default 1200 x 630
+  | clamp width: 100..3840
+  | clamp height: 100..2160
+  v
+Launch cached Playwright Chromium if needed
+  |
+  v
+browser.newContext({ javaScriptEnabled: false })
+  |
+  v
+context.newPage()
+  |
+  v
+page.route("**/*", request filter)
+  |
+  v
+page.setContent(html, waitUntil: "load", timeout: 45s)
+  |
+  v
+page.waitForLoadState("networkidle", timeout: 45s)
+  |
+  v
+page.screenshot({
+  type: "png",
+  fullPage: false,
+  clip: { x: 0, y: 0, width, height }
+})
+  |
+  v
+Buffer -> base64 -> data:image/png;base64,...
+  |
+  v
+200 JSON { image, width, height }
+```
+
+## Export pipeline step-by-step
+
+Frontend export pipeline:
+
+1. API response is stored in `result`.
+2. `OutputCard` renders `<img src={result.image}>`.
+3. Download button creates an `<a>` element.
+4. It sets `href` to the returned data URL.
+5. It sets filename to `render-${Date.now()}.png`.
+6. It triggers `link.click()`.
+
+## Resolution handling
+
+Resolution is inferred from user HTML text, not computed from the rendered DOM:
+
+```js
+const bodyWidthMatch = html.match(/(?:body|html)[^{]{0,4096}\{[^}]{0,4096}width:\s*(\d+)px/i);
+const bodyHeightMatch = html.match(/(?:body|html)[^{]{0,4096}\{[^}]{0,4096}height:\s*(\d+)px/i);
+const widthMatch = html.match(/width:\s*(\d+)px/i);
+const heightMatch = html.match(/height:\s*(\d+)px/i);
+```
+
+Then:
+
+* default width: `1200`
+* default height: `630`
+* min width/height: `100`
+* max width: `3840`
+* max height: `2160`
+
+## Scaling logic
+
+There is no explicit scaling or `deviceScaleFactor` configuration. The screenshot uses Playwright default scale behavior and returns “1x” in the frontend UI.
+
+Important caveat: the code clips to the extracted dimensions, but it does **not** call `page.setViewportSize({ width, height })` or create the context with a matching viewport. The browser context is created only with `javaScriptEnabled: false`.
+This means large requested dimensions rely on Playwright screenshot clipping behavior rather than an explicitly sized viewport. Further runtime testing would be needed to confirm behavior at the upper clamp limits.
+
+## Font loading strategy
+
+### Application UI fonts
+
+The app shell loads Google Fonts in two places:
+
+* `styles/globals.css` imports Montserrat and Instrument Serif.
+* `_document.js` adds preconnects and a stylesheet link for the same families.
+
+This is redundant but functional.
+
+### Converted HTML fonts
+
+Submitted HTML may include its own font links. The server waits for `load` and then `networkidle`, so external font CSS/files may load before screenshot if they complete.
+
+There is no explicit `await page.evaluate(() => document.fonts.ready)` call, so font readiness depends on the `load`/`networkidle` behavior and browser font loading semantics.
+
+## Image loading strategy
+
+External images in submitted HTML are loaded by Chromium as page resources. Every request is intercepted by `page.route("**/*")`; HTTP/HTTPS resources undergo DNS lookup and private-IP filtering before `route.continue()`.
+
+The code waits for `networkidle` after `setContent`, which generally gives images and stylesheets a chance to complete.
+
+## SVG handling
+
+There is no special SVG-specific code. SVGs are handled by Chromium like any other browser-supported resource:
+
+* Inline SVG in the submitted HTML should render naturally.
+* External SVG over HTTP/HTTPS goes through the same request routing and DNS safety checks.
+* SVG data URLs are allowed because `data:` is permitted.
+
+## Error handling
+
+API error handling includes:
+
+* `405` for non-POST methods.
+* `400` for missing/non-string HTML.
+* Route-level aborts for invalid URLs, blocked protocols, DNS failures, and forbidden IPs.
+* General `try/catch` around rendering. It logs the internal error, closes the context, checks cached browser connectivity, maps timeout/network messages to user-facing strings, and returns `500`.
+* API body size limit is configured to 6MB.
+
+Frontend error handling:
+
+* Empty HTML is blocked client-side with a user message.
+* Non-OK responses throw an error from response JSON.
+* Error messages display in `ErrorCard`.
+
+## Conversion pipeline diagram
+
+```text
+React InputCard
+  |
+  | textarea/file -> html state
+  v
+useHtmlToPngConversion.handleConvert
+  |
+  | POST /api/convert
+  | body: { html }
+  v
+Next API handler
+  |
+  | reject non-POST
+  | reject missing/non-string html
+  v
+extractDimensions(html)
+  |
+  | regex CSS width/height
+  | defaults: 1200x630
+  | clamps: 100..3840 x 100..2160
+  v
+Chromium setup
+  |
+  | if Vercel, set AWS_LAMBDA_JS_RUNTIME
+  | import @sparticuz/chromium
+  | chromium.executablePath()
+  | filter launch args
+  | playwright.chromium.launch(...)
+  | cache browser globally
+  v
+Browser context
+  |
+  | browser.newContext({ javaScriptEnabled: false })
+  | context.setDefaultTimeout(45s)
+  | page = context.newPage()
+  v
+Network guard
+  |
+  | page.route("**/*")
+  | parse request URL
+  | allow http/https only after DNS check
+  | allow data:
+  | block all other protocols
+  | block selected private/link-local/local IP ranges
+  v
+Render
+  |
+  | page.setContent(html, waitUntil: "load", timeout: 45s)
+  | page.waitForLoadState("networkidle", timeout: 45s)
+  v
+Capture
+  |
+  | page.screenshot({
+  |   type: "png",
+  |   fullPage: false,
+  |   clip: { x: 0, y: 0, width, height }
+  | })
+  v
+Serialize
+  |
+  | Buffer -> base64
+  | data:image/png;base64,...
+  v
+JSON response
+  |
+  | { image, width, height }
+  v
+OutputCard
+  |
+  | <img src={image}>
+  | download via generated <a>
+```
+
+---
+
+# 6. API Analysis
+
+## Complete API map
+
+| Endpoint | Method | Purpose | Called from |
+|---|---:|---|---|
+| `/api/convert` | `POST` | Convert submitted HTML string into PNG data URL | `hooks/useHtmlToPngConversion.js` |
+
+## `POST /api/convert`
+
+### Implementation file
+
+`pages/api/convert.js` exports the handler for the API route.
+
+### Request body
+
+```json
+{
+  "html": "<html>...</html>"
+}
+```
+
+This is documented in the README.
+The frontend sends the same shape.
+
+### Validation
+
+* Method must be `POST`, otherwise returns `405`.
+* `html` must exist and be a string, otherwise returns `400`.
+
+### Success response
+
+```json
+{
+  "image": "data:image/png;base64,...",
+  "width": 1200,
+  "height": 630
+}
+```
+
+### Error response
+
+```json
+{
+  "error": "..."
+}
+```
+
+### Where called
+
+Called by `useHtmlToPngConversion` with `fetch("/api/convert")`.
+
+### Body size limit
+
+Configured at 6MB.
+
+---
+
+# 7. Database & Storage
+
+## Database schema
+
+No database is present.
+
+Evidence:
+
+* No DB dependencies in `package.json`.
+* No DB references in environment/code search.
+* README says “no storage, no auth, zero persistence.”
+
+## Tables / collections / relationships
+
+None.
+
+## Storage buckets
+
+None.
+
+## Uploaded assets handling
+
+Uploaded `.html` files are read in the browser with `FileReader.readAsText(file)` and placed into the `html` React state. They are not uploaded as assets or persisted separately.
+
+## Data lifecycle
+
+```text
+HTML file/paste
+  -> browser React state
+  -> JSON POST body
+  -> server memory during request
+  -> Chromium page memory during render
+  -> PNG buffer
+  -> base64 JSON response
+  -> browser React state/result preview
+  -> optional local user download
+```
+
+No application-side persistence is implemented.
+
+---
+
+# 8. External Services
+
+## Third-party APIs / SDKs / services
+
+### Vercel
+
+Used as intended deployment platform. README deployment instructions use Vercel CLI, and `vercel.json` configures the serverless API function.
+
+### Google Fonts
+
+Used by the app UI:
+
+* Global CSS imports Montserrat and Instrument Serif from `fonts.googleapis.com`.
+* `_document.js` preconnects to Google Fonts domains and loads the same families.
+
+User-submitted HTML can also load Google Fonts or other external font providers because HTTP/HTTPS resources are allowed after DNS filtering.
+
+### External user-supplied HTTP/HTTPS assets
+
+The converter intentionally supports external CSS, images, and fonts. README says external assets such as Google Fonts, CDN CSS, and external images are fetched automatically.
+
+### npm packages / SDKs
+
+* `@sparticuz/chromium`: serverless Chromium binary.
+* `playwright-core`: browser automation and screenshot capture.
+* `next`, `react`, `react-dom`: web framework/runtime.
+
+## Analytics tools
+
+None found.
+
+## Monitoring tools
+
+None found.
+
+## Payment services
+
+None found.
+
+## CDN usage
+
+No configured CDN provider beyond:
+
+* user-submitted external assets over HTTP/HTTPS,
+* Google Fonts,
+* Vercel hosting platform if deployed there.
+
+---
+
+# 9. Build & Deployment
+
+## How project runs locally
+
+README instructions:
+
+```bash
+npm install
+npm run dev
+```
+
+Then open `http://localhost:3000`.
+
+`package.json` confirms `npm run dev` maps to `next dev`.
+
+## Build process
+
+```bash
+npm run build
+```
+
+`package.json` maps this to `next build`.
+
+## Production start
+
+```bash
+npm run start
+```
+
+`package.json` maps this to `next start`.
+
+## Production deployment flow
+
+README deployment flow:
+
+```bash
+npm i -g vercel
+vercel deploy
+```
+
+## CI/CD setup
+
+No CI/CD config files were found in the inspected repository file list. There is no `.github/workflows`, GitLab CI, CircleCI, Dockerfile, or deployment pipeline config in the important file tree.
+
+## Hosting architecture
+
+```text
+Vercel Project
+  |
+  | Static/SSR Next.js page:
+  |   /
+  |
+  | Serverless Function:
+  |   pages/api/convert.js
+  |   memory: 1024 MB
+  |   maxDuration: 60 sec
+  |
+  v
+Headless Chromium via @sparticuz/chromium
+```
+
+Vercel resource settings are configured in `vercel.json`.
+
+---
+
+# 10. Security Review
+
+## Positive security controls
+
+### JavaScript disabled for untrusted HTML
+
+The rendered HTML runs in a Playwright browser context with `javaScriptEnabled: false`. This significantly reduces script-based XSS/exfiltration risk inside the headless renderer.
+
+### Protocol filtering
+
+The API route allows only:
+
+* `http:`
+* `https:`
+* `data:`
+
+Other protocols are aborted.
+
+This blocks obvious `file:`, `ftp:`, `chrome:`, and similar protocol usage.
+
+### Private IP blocking attempt
+
+The code blocks IPv4 private ranges, localhost, link-local, some IPv6 local ranges, unspecified addresses, and IPv4-mapped IPv6.
+
+### Body size limit
+
+Body parser is limited to 6MB, reducing unbounded request body risk.
+
+## Risks / weaknesses
+
+### SSRF risk still exists via browser-side DNS behavior
+
+The code performs `dns.lookup(url.hostname)` before calling `route.continue()`.
+However, Chromium will perform its own network request after `route.continue()`. If DNS answers change between Node’s lookup and Chromium’s connection, DNS rebinding or resolver differences could bypass the check. This is a common SSRF pitfall.
+
+### DNS cache has no TTL
+
+`safeDnsLookup` caches up to 1000 hostnames but does not expire entries by time.
+This can cause stale allow/block decisions, especially for CDNs and hosts with short TTLs.
+
+### Public unauthenticated rendering endpoint
+
+There is no authentication, rate limiting, quota, captcha, or origin validation. This matches the stateless design but exposes an expensive headless browser operation publicly.
+
+### Denial-of-service potential
+
+An attacker can submit complex HTML/CSS or many external assets and consume CPU/memory/time. The function has 1024MB and 60s max duration on Vercel.
+The render timeout is 45 seconds.
+
+### Misleading docs around JavaScript execution
+
+README says JavaScript is enabled, while the implementation disables JavaScript.
+This is not itself a vulnerability, but it can cause incorrect assumptions by maintainers/users.
+
+### User-supplied HTML is rendered unsanitized
+
+The application intentionally renders arbitrary HTML server-side. JavaScript is disabled, but HTML/CSS can still trigger external network requests, heavy layout, CSS parser work, large image decoding, and font fetching.
+
+### Dependency vulnerability audit inconclusive
+
+`npm audit --omit=dev --json` failed with `403 Forbidden` from the npm audit endpoint in this environment. Dependency vulnerability status is therefore **not verified** by this audit.
+
+---
+
+# 11. Performance Review
+
+## Current performance positives
+
+### Browser reuse
+
+A module-level `cachedBrowser` is reused across invocations when connected, avoiding repeated Chromium launches on warm serverless instances.
+
+### New context per request
+
+The code creates a new browser context per conversion and closes it after screenshot, which isolates request state while keeping browser launch amortized.
+
+### DNS cache
+
+DNS results are cached up to 1000 hostnames, reducing repeated DNS lookup overhead.
+
+### Precomputed decorative grid
+
+`Hero` precomputes the 64-cell pixel grid array outside the component to prevent allocations on every render.
+
+## Bottlenecks / risks
+
+### Cold start cost
+
+`@sparticuz/chromium` executable resolution and `chromium.launch()` are expensive on cold starts.
+
+### `networkidle` can be slow or flaky
+
+The render path waits for both `load` and `networkidle`, each with a 45-second timeout.
+Pages with analytics-like requests, long-polling assets, broken external resources, or slow fonts may delay or timeout.
+
+### Base64 JSON response overhead
+
+The PNG buffer is converted to base64 and returned inside JSON. Base64 inflates binary payload size, and the frontend holds the full data URL in memory.
+
+### Missing explicit viewport sizing
+
+The screenshot clips to requested dimensions, but the viewport is not explicitly set to those dimensions.
+This can cause inconsistent rendering for responsive CSS or large output sizes.
+
+### Regex-based dimension extraction
+
+Dimension extraction scans the raw HTML with regex and may select unintended `width`/`height` declarations outside `body`/`html` if body/html-specific matches are absent.
+
+### Large image/font decoding
+
+External images/fonts are loaded by Chromium and can be memory-heavy. The function memory is capped at 1024MB.
+
+## Optimization opportunities
+
+* Explicitly set viewport to extracted dimensions before rendering.
+* Add `deviceScaleFactor` as a controlled option if high-DPI output is needed.
+* Add optional request parameters for width/height instead of regex-only extraction.
+* Await `document.fonts.ready` if font fidelity is critical.
+* Return binary PNG directly instead of base64 JSON for lower memory/network overhead.
+* Add rate limiting or abuse protection.
+* Add DNS cache TTL.
+* Consider request-level asset limits or total render budget instrumentation.
+
+---
+
+# 12. Development Guide
+
+## Install
+
+```bash
+npm install
+```
+
+## Run locally
+
+```bash
+npm run dev
+```
+
+This runs `next dev`.
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+This runs `next build`.
+
+## Start production server locally
+
+```bash
+npm run start
+```
+
+This runs `next start`.
+
+## Deploy
+
+```bash
+npm i -g vercel
+vercel deploy
+```
+
+## Common debugging locations
+
+### UI composition and page flow
+
+* `pages/index.js` — main composition, state ownership, conditional rendering.
+
+### Conversion request lifecycle
+
+* `hooks/useHtmlToPngConversion.js` — frontend fetch, loading/result/error state, scroll to output.
+
+### Conversion engine
+
+* `pages/api/convert.js` — server-side Playwright rendering and screenshot capture.
+
+### Input/file upload problems
+
+* `components/InputCard.js` — textarea, file upload, drag/drop, sample loader.
+
+### Output/download problems
+
+* `components/OutputCard.js` — preview image and download logic.
+
+### Styling/layout issues
+
+* `styles/Home.module.css` — component styles.
+* `styles/globals.css` — global reset, variables, fonts.
+
+### Vercel function limits
+
+* `vercel.json` — API function memory and timeout.
+
+---
+
+# 13. Future Development Guide
+
+## Safest way to add new features
+
+### UI-only features
+
+Start in:
+
+* `pages/index.js` for page-level state/composition.
+* `components/` for reusable UI pieces.
+* `hooks/` if the feature needs reusable stateful behavior.
+* `styles/Home.module.css` for styling.
+
+The app already has a simple component layout and barrel export through `components/index.js`.
+
+### Conversion-engine features
+
+Start in:
+
+* `pages/api/convert.js`.
+
+This is where dimensions, browser launch, resource filtering, rendering wait strategy, screenshot options, and response shape are controlled.
+
+### Frontend/API contract changes
+
+If changing API response shape or request options, update both:
+
+* frontend hook: `hooks/useHtmlToPngConversion.js`.
+* backend route: `pages/api/convert.js`.
+
+## Files that should be modified first for common changes
+
+| Change | First files to inspect/modify |
+|---|---|
+| Add width/height controls | `InputCard.js`, `useHtmlToPngConversion.js`, `pages/api/convert.js` |
+| Add scale/DPI option | `InputCard.js`, `useHtmlToPngConversion.js`, `pages/api/convert.js`, `OutputCard.js` |
+| Improve SSRF protection | `pages/api/convert.js` |
+| Improve download behavior | `components/OutputCard.js` |
+| Add persistent history | new database/storage layer, then `useHtmlToPngConversion.js` and `OutputCard.js` |
+| Add auth | Next middleware/API guards, page UI, deployment env config |
+| Add tests | new test config; currently none exists |
+
+## Tightly coupled areas
+
+### Conversion API and frontend result shape
+
+`OutputCard` expects `result.image`, `result.width`, and `result.height`.
+The API returns exactly those fields.
+
+### Loading labels and actual backend steps
+
+`useMarioAnimation` displays fixed loading messages regardless of actual backend progress.
+The API does not stream progress events.
+
+### Dimension inference and screenshot clipping
+
+`extractDimensions` and `page.screenshot({ clip })` are tightly coupled.
+
+## Reusable areas
+
+* `InputCard` can be extended for additional conversion options.
+* `OutputCard` can be reused for any image response with width/height metadata.
+* `useHtmlToPngConversion` is the correct abstraction point for frontend request state.
+* `useMarioAnimation` is isolated and reusable for any loading flow.
+
+## Refactoring opportunities
+
+1. **Rename Puppeteer references to Playwright** in `Hero` and `Footer` to match implementation.
+2. **Align README with code** regarding JavaScript disabled/enabled and body size limit.
+3. **Extract conversion utilities** from `pages/api/convert.js` into testable modules:
+   * `extractDimensions`
+   * DNS/IP safety
+   * browser launch/cache
+   * render/screenshot
+4. **Add explicit viewport sizing** before screenshot.
+5. **Replace regex-based dimensions with API options** while keeping regex fallback.
+6. **Add automated tests** for:
+   * dimension extraction,
+   * IP blocking,
+   * API validation,
+   * successful conversion,
+   * timeout/network error mapping.
+7. **Remove redundant app font loading** by using either global `@import` or `_document.js` links, not both.
+
+---
+
+# 14. Reverse Engineering Summary
+
+## Executive summary
+
+`html2png` is a compact, stateless Next.js Pages Router application that converts user-supplied HTML into PNG images using Playwright-controlled serverless Chromium. The frontend is a single React page with local state and CSS Modules. The backend is one Next.js API route that validates the request, renders HTML in a JavaScript-disabled Chromium context, waits for page load/network idle, captures a PNG screenshot, and returns it as a base64 data URL.
+
+## Tech stack
+
+* **Frontend:** Next.js Pages Router + React 18.
+* **Backend:** Next.js API Route on Node.js.
+* **Renderer:** Playwright Core + `@sparticuz/chromium`.
+* **Styling:** custom CSS + CSS Modules.
+* **Package manager:** npm with `package-lock.json`.
+* **Deployment:** Vercel serverless function with 1024MB memory and 60s max duration.
+* **Database/storage/auth:** none.
+
+## Conversion engine
+
+The conversion engine is `pages/api/convert.js`. It uses Playwright’s `page.setContent` and `page.screenshot`, not canvas or browser-side HTML-to-canvas libraries. JavaScript is disabled in the render context. External HTTP/HTTPS resources are permitted after DNS-based private-IP filtering, and data URLs are permitted.
+
+## Critical files
+
+* `pages/api/convert.js` — conversion engine, SSRF guard, timeout/error handling, API response.
+* `hooks/useHtmlToPngConversion.js` — frontend API lifecycle.
+* `components/InputCard.js` — HTML input, sample, file upload.
+* `components/OutputCard.js` — preview and download.
+* `pages/index.js` — main page composition and state wiring.
+* `vercel.json` — production function resource limits.
+* `package.json` — scripts/dependencies.
+
+## Critical dependencies
+
+* `playwright-core` — browser control.
+* `@sparticuz/chromium` — serverless Chromium executable.
+* `next` — frontend framework and API route framework.
+* `react` / `react-dom` — UI rendering.
+
+## Things a new developer must understand before changing this app
+
+1. The frontend does **not** render HTML to PNG; it only submits HTML and displays the returned data URL.
+2. The conversion happens in `pages/api/convert.js` with Playwright and serverless Chromium.
+3. JavaScript inside submitted HTML is disabled, despite README/UI text that suggests otherwise.
+4. Output dimensions are inferred with regex from raw HTML and clamped, not measured from the rendered DOM.
+5. The API is unauthenticated and resource-intensive, so abuse controls should be considered before public/high-traffic use.
+6. External assets are intentionally supported but create SSRF, timeout, and performance considerations.
+7. Vercel deployment depends on `@sparticuz/chromium` runtime behavior and the function settings in `vercel.json`.
