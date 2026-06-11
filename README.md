@@ -145,7 +145,6 @@ The same app can also run on other Node.js hosts if the runtime can execute Next
 .
 ├── README.md
 ├── Trash
-├── bench.js
 ├── bench_dns.js
 ├── components/
 │   ├── ErrorCard.js
@@ -213,7 +212,6 @@ The same app can also run on other Node.js hosts if the runtime can execute Next
 - `next.config.js`: Next.js configuration. It marks `@sparticuz/chromium` as an external package for server components through the experimental `serverComponentsExternalPackages` option.
 - `vercel.json`: Vercel function resource configuration for `pages/api/convert.js`.
 - `.gitignore`: excludes `node_modules/`, `.next/`, environment files, logs, and `.DS_Store`.
-- `bench.js`: standalone Node benchmark comparing repeated inline array creation to a precomputed array.
 - `bench_dns.js`: standalone Node benchmark comparing DNS lookup behavior with and without an in-memory cache.
 - `Trash`: an existing architectural audit report preserved in the repository. It is not used by the application at runtime.
 

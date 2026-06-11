@@ -200,7 +200,6 @@ No `.env.example` exists, and `.env` / `.env.local` are ignored by `.gitignore`.
 ├── next.config.js
 ├── vercel.json
 ├── .gitignore
-├── bench.js
 ├── bench_dns.js
 ├── pages/
 │   ├── _app.js
@@ -285,10 +284,6 @@ User input component. It includes the sample HTML, file upload, drag/drop, texta
 ### `components/OutputCard.js`
 
 Displays returned PNG preview and performs client-side download using a generated `<a>` element.
-
-### `bench.js`
-
-A standalone Node benchmark comparing repeated inline `Array.from` allocation with a precomputed array.
 
 ### `bench_dns.js`
 
