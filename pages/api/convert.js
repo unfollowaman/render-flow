@@ -88,17 +88,19 @@ export default async function handler(req, res) {
   let context = null;
 
   try {
-    if (process.env.VERCEL) {
+    if (process.env.VERCEL || process.env.NETLIFY || process.env.AWS_REGION || process.env.AWS_EXECUTION_ENV) {
       // @sparticuz/chromium checks this environment variable to determine if it should
       // extract the AWS Lambda native dependencies (libnss3.so, libnspr4.so, etc.).
-      // Vercel serverless functions are AWS Lambda functions under the hood, but don't
+      // Vercel and Netlify serverless functions are AWS Lambda functions under the hood, but don't
       // necessarily expose these variables automatically.
       // We need to set it *before* importing/using the module heavily, or at least before executablePath().
-      const match = process.version.match(/^v(\d+)/);
-      if (match && parseInt(match[1], 10) >= 20) {
-        process.env.AWS_LAMBDA_JS_RUNTIME = "nodejs20.x";
-      } else {
-        process.env.AWS_LAMBDA_JS_RUNTIME = "nodejs18.x";
+      if (!process.env.AWS_LAMBDA_JS_RUNTIME) {
+        const match = process.version.match(/^v(\d+)/);
+        if (match && parseInt(match[1], 10) >= 20) {
+          process.env.AWS_LAMBDA_JS_RUNTIME = "nodejs20.x";
+        } else {
+          process.env.AWS_LAMBDA_JS_RUNTIME = "nodejs18.x";
+        }
       }
     }
 
@@ -109,7 +111,19 @@ export default async function handler(req, res) {
 
     chromiumBinary.setGraphicsMode = false;
 
-    if (!cachedBrowser || !cachedBrowser.isConnected()) {
+    let browser = cachedBrowser;
+    let launchNeeded = !browser || !browser.isConnected();
+
+    if (!launchNeeded) {
+      try {
+        context = await browser.newContext({ javaScriptEnabled: false });
+      } catch (err) {
+        console.warn("Cached browser failed to create context, relaunching...", err);
+        launchNeeded = true;
+      }
+    }
+
+    if (launchNeeded) {
       const executablePath = await chromiumBinary.executablePath();
       const args = chromiumBinary.args.filter(
         (arg) => arg !== "--single-process" && arg !== "--in-process-gpu"
@@ -120,10 +134,9 @@ export default async function handler(req, res) {
         args,
         headless: typeof chromiumBinary.headless === 'string' ? true : chromiumBinary.headless !== false,
       });
+      browser = cachedBrowser;
+      context = await browser.newContext({ javaScriptEnabled: false });
     }
-
-    const browser = cachedBrowser;
-    context = await browser.newContext({ javaScriptEnabled: false });
 
     context.setDefaultTimeout(RENDER_TIMEOUT_MS);
     const page = await context.newPage();
