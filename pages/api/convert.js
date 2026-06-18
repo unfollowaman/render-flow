@@ -73,6 +73,7 @@ function extractDimensions(html) {
 }
 
 let cachedBrowser = null;
+let cachedExecutablePath = null;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -120,10 +121,17 @@ export default async function handler(req, res) {
     }
 
     if (launchNeeded) {
-      const executablePath = await chromiumBinary.executablePath();
-      const args = chromiumBinary.args.filter(
-        (arg) => arg !== "--single-process" && arg !== "--in-process-gpu"
-      );
+      const executablePath = process.env.CHROMIUM_EXECUTABLE_PATH
+        || (cachedExecutablePath ?? (cachedExecutablePath = await chromiumBinary.executablePath()));
+      const args = [
+        ...chromiumBinary.args.filter(
+          (arg) => arg !== "--single-process" && arg !== "--in-process-gpu"
+        ),
+        "--no-zygote",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--single-process",
+      ];
 
       cachedBrowser = await chromium.launch({
         executablePath,
