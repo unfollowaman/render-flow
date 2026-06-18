@@ -1,8 +1,0 @@
-{
-  "functions": {
-    "pages/api/convert.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    }
-  }
-}
