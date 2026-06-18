@@ -18,7 +18,7 @@ export function Hero() {
         </h1>
         <p className={styles.heroDesc}>
           Paste raw HTML. Get a flawless PNG back — fonts, images, and all
-          external assets loaded. Powered by Puppeteer on Vercel.
+          external assets loaded. Powered by Playwright on Netlify.
         </p>
         <div className={styles.heroMeta}>
           <span>⚡ Serverless</span>

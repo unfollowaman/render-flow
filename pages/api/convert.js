@@ -89,11 +89,7 @@ export default async function handler(req, res) {
 
   try {
     if (process.env.VERCEL || process.env.NETLIFY || process.env.AWS_REGION || process.env.AWS_EXECUTION_ENV) {
-      // @sparticuz/chromium checks this environment variable to determine if it should
-      // extract the AWS Lambda native dependencies (libnss3.so, libnspr4.so, etc.).
-      // Vercel and Netlify serverless functions are AWS Lambda functions under the hood, but don't
-      // necessarily expose these variables automatically.
-      // We need to set it *before* importing/using the module heavily, or at least before executablePath().
+      // Netlify and other serverless platforms run on AWS Lambda under the hood. @sparticuz/chromium checks AWS_LAMBDA_JS_RUNTIME to resolve native dependencies. Set it before executablePath() is called if not already defined.
       if (!process.env.AWS_LAMBDA_JS_RUNTIME) {
         const match = process.version.match(/^v(\d+)/);
         if (match && parseInt(match[1], 10) >= 20) {
