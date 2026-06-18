@@ -74,6 +74,8 @@ function extractDimensions(html) {
 
 let cachedBrowser = null;
 let cachedExecutablePath = null;
+let browserLaunchCount = 0;
+const MAX_BROWSER_LAUNCHES = 5;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -116,6 +118,8 @@ export default async function handler(req, res) {
         context = await browser.newContext({ javaScriptEnabled: false });
       } catch (err) {
         console.warn("Cached browser failed to create context, relaunching...", err);
+        try { await browser.close(); } catch (_) {}
+        cachedBrowser = null;
         launchNeeded = true;
       }
     }
@@ -138,6 +142,11 @@ export default async function handler(req, res) {
         args,
         headless: typeof chromiumBinary.headless === 'string' ? true : chromiumBinary.headless !== false,
       });
+      browserLaunchCount++;
+      if (browserLaunchCount >= MAX_BROWSER_LAUNCHES) {
+        browserLaunchCount = 0;
+        cachedExecutablePath = null;
+      }
       browser = cachedBrowser;
       context = await browser.newContext({ javaScriptEnabled: false });
     }
@@ -191,14 +200,17 @@ export default async function handler(req, res) {
 
     await waitForPageToRender(page, html);
 
-    const screenshot = await page.screenshot({
-      type: "png",
-      fullPage: false,
-      clip: { x: 0, y: 0, width, height },
-    });
-
-    await context.close();
-    context = null;
+    let screenshot;
+    try {
+      screenshot = await page.screenshot({
+        type: "png",
+        fullPage: false,
+        clip: { x: 0, y: 0, width, height },
+      });
+    } finally {
+      await context.close().catch(() => {});
+      context = null;
+    }
 
     const base64 = Buffer.from(screenshot).toString("base64");
     return res.status(200).json({
@@ -218,7 +230,10 @@ export default async function handler(req, res) {
 
     if (cachedBrowser) {
       try {
-        if (!cachedBrowser.isConnected()) cachedBrowser = null;
+        if (!cachedBrowser.isConnected()) {
+          await cachedBrowser.close().catch(() => {});
+          cachedBrowser = null;
+        }
       } catch (_) {
         cachedBrowser = null;
       }
