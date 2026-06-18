@@ -171,7 +171,7 @@ export default async function handler(req, res) {
         return;
       }
 
-      if (["http:", "https:"].includes(url.protocol)) {
+      if (url.protocol === "http:" || url.protocol === "https:") {
         try {
           const lookup = await safeDnsLookup(url.hostname, 5000);
           if (isForbiddenIP(lookup.address)) {
