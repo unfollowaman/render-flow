@@ -1,7 +1,7 @@
 import dns from "dns/promises";
 import { chromium } from "playwright-core";
 
-const RENDER_TIMEOUT_MS = 45_000;
+const RENDER_TIMEOUT_MS = 8_000; // Netlify free plan enforces a 10s function timeout. This must stay well below that to allow time for Chromium startup and for the API to return a clean error response instead of a gateway timeout.
 
 function isForbiddenIP(ip) {
   if (!ip) return false;
@@ -54,7 +54,7 @@ async function waitForPageToRender(page, html) {
     waitUntil: "load",
     timeout: RENDER_TIMEOUT_MS,
   });
-  await page.waitForLoadState("networkidle", { timeout: RENDER_TIMEOUT_MS });
+  await page.waitForLoadState("networkidle", { timeout: 3_000 }).catch(() => {});
 }
 
 function extractDimensions(html) {
