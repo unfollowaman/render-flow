@@ -1,7 +1,11 @@
 import dns from "dns/promises";
 import { chromium } from "playwright-core";
 
-const RENDER_TIMEOUT_MS = 8_000; // Netlify free plan enforces a 10s function timeout. This must stay well below that to allow time for Chromium startup and for the API to return a clean error response instead of a gateway timeout.
+// Netlify free plan enforces a hard 10s function timeout. We reserve a safety
+// margin for cold start, response serialization, and network overhead, and
+// derive remaining budgets dynamically from a single shared clock.
+const TOTAL_FUNCTION_BUDGET_MS = 9_000; // stay under Netlify's 10s hard kill
+const SAFETY_MARGIN_MS = 500; // reserve for serialization/response overhead
 
 function isForbiddenIP(ip) {
   if (!ip) return false;
@@ -49,12 +53,17 @@ async function safeDnsLookup(hostname, timeoutMs = 5000) {
   }
 }
 
-async function waitForPageToRender(page, html) {
+async function waitForPageToRender(page, html, budgetMs) {
+  // Reserve roughly 70% of remaining budget for initial load,
+  // 30% for networkidle, with sane minimums for both.
+  const setContentTimeout = Math.max(1_500, Math.floor(budgetMs * 0.7));
+  const networkIdleTimeout = Math.max(800, Math.floor(budgetMs * 0.3));
+
   await page.setContent(html, {
     waitUntil: "load",
-    timeout: RENDER_TIMEOUT_MS,
+    timeout: setContentTimeout,
   });
-  await page.waitForLoadState("networkidle", { timeout: 3_000 }).catch(() => {});
+  await page.waitForLoadState("networkidle", { timeout: networkIdleTimeout }).catch(() => {});
 }
 
 function extractDimensions(html) {
@@ -78,6 +87,13 @@ let browserLaunchCount = 0;
 const MAX_BROWSER_LAUNCHES = 5;
 
 export default async function handler(req, res) {
+  const requestStartTime = Date.now();
+
+  function remainingBudget() {
+    const elapsed = Date.now() - requestStartTime;
+    return Math.max(0, TOTAL_FUNCTION_BUDGET_MS - SAFETY_MARGIN_MS - elapsed);
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -105,6 +121,12 @@ export default async function handler(req, res) {
 
     // Dynamically import to ensure AWS_LAMBDA_JS_RUNTIME is set before module evaluation
     const chromiumBinary = (await import("@sparticuz/chromium")).default;
+
+    if (remainingBudget() < 2_000) {
+      return res.status(503).json({
+        error: "Server is too busy to process this request right now. Please try again."
+      });
+    }
 
     const { width, height } = extractDimensions(html);
 
@@ -151,7 +173,8 @@ export default async function handler(req, res) {
       context = await browser.newContext({ javaScriptEnabled: false });
     }
 
-    context.setDefaultTimeout(RENDER_TIMEOUT_MS);
+    const budgetForRender = remainingBudget();
+    context.setDefaultTimeout(budgetForRender);
     const page = await context.newPage();
 
     await page.route("**/*", async (route) => {
@@ -198,7 +221,7 @@ export default async function handler(req, res) {
       } catch (_) {}
     });
 
-    await waitForPageToRender(page, html);
+    await waitForPageToRender(page, html, remainingBudget());
 
     let screenshot;
     try {
