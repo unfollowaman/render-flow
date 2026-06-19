@@ -75,8 +75,12 @@ function extractDimensions(html) {
   let width = parseInt(bodyWidthMatch?.[1] ?? widthMatch?.[1] ?? "1200", 10);
   let height = parseInt(bodyHeightMatch?.[1] ?? heightMatch?.[1] ?? "630", 10);
 
-  width = Math.min(Math.max(width, 100), 3840);
-  height = Math.min(Math.max(height, 100), 2160);
+  // Netlify/Lambda enforces a hard 6MB response payload limit. Base64 encoding
+  // adds ~33% overhead on top of the raw PNG, and the JSON wrapper adds a bit
+  // more. Capping at 1920x1080 keeps worst-case dense screenshots well under
+  // that ceiling while still covering common OG-image and social-card sizes.
+  width = Math.min(Math.max(width, 100), 1920);
+  height = Math.min(Math.max(height, 100), 1080);
 
   return { width, height };
 }
@@ -100,6 +104,10 @@ export default async function handler(req, res) {
 
   const { html } = req.body;
 
+  // Note: if the request body exceeds the 4mb bodyParser limit above, Next.js
+  // will reject the request before this handler runs, returning its own
+  // "API resolved without sending a response" or 413-style error rather than
+  // the custom 400 below. This is expected Next.js behavior, not a bug here.
   if (!html || typeof html !== "string") {
     return res.status(400).json({ error: "Missing or invalid HTML content" });
   }
@@ -236,6 +244,15 @@ export default async function handler(req, res) {
     }
 
     const base64 = Buffer.from(screenshot).toString("base64");
+    const payloadSizeBytes = Buffer.byteLength(base64, "utf8");
+    const MAX_RESPONSE_BYTES = 5_500_000; // stay safely under Lambda's 6MB hard limit
+
+    if (payloadSizeBytes > MAX_RESPONSE_BYTES) {
+      return res.status(413).json({
+        error: "Rendered image is too large to return. Try reducing the output dimensions or simplifying the page content.",
+      });
+    }
+
     return res.status(200).json({
       image: `data:image/png;base64,${base64}`,
       width,
@@ -275,6 +292,10 @@ export default async function handler(req, res) {
 
 export const config = {
   api: {
-    bodyParser: { sizeLimit: "6mb" },
+    // Netlify/Lambda has a hard 6MB total request payload limit including
+    // headers and routing overhead. Capping the parsed JSON body well below
+    // that ensures legitimate requests aren't rejected at the gateway level
+    // before they even reach this handler.
+    bodyParser: { sizeLimit: "4mb" },
   },
 };
