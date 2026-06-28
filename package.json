@@ -1,20 +1,19 @@
 {
   "name": "html2png",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@sparticuz/chromium": "123.0.1",
-    "next": "^14.0.0",
-    "playwright-core": "1.42.1",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "dom-to-image-more": "^3.4.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@netlify/plugin-nextjs": "^5.15.11"
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.0"
   }
 }

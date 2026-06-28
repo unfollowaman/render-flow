@@ -5,7 +5,7 @@ export function Footer() {
     <footer className={styles.footer}>
       <div className={styles.footerInner}>
         <span>🍄 html2png — serverless HTML rendering</span>
-        <span>Built with Next.js + Playwright + @sparticuz/chromium</span>
+        <span>Built with React + dom-to-image-more</span>
       </div>
     </footer>
   );

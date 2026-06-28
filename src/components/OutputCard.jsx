@@ -24,7 +24,7 @@ export const OutputCard = forwardRef(({ result }, ref) => {
 
       <div className={styles.previewWrapper}>
         <div className={styles.checkerBg}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
           <img
             src={result.image}
             alt="Rendered HTML"
