@@ -17,14 +17,13 @@ export function Hero() {
           <span className={styles.heroAccent}>Converter</span>
         </h1>
         <p className={styles.heroDesc}>
-          Paste raw HTML. Get a flawless PNG back — fonts, images, and all
-          external assets loaded. Powered by Playwright on Netlify.
+          Paste raw HTML. Get a PNG back — rendered entirely in your browser. No server, no uploads, no waiting.
         </p>
         <div className={styles.heroMeta}>
-          <span>⚡ Serverless</span>
-          <span>🎨 Full fidelity</span>
-          <span>🔒 Stateless</span>
-          <span>🌐 CDN assets supported</span>
+          <span>⚡ Client-side</span>
+          <span>🎨 CSS3 + Flexbox + Grid</span>
+          <span>🔒 Nothing leaves your browser</span>
+          <span>🌐 No server needed</span>
         </div>
       </div>
 

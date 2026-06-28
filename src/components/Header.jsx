@@ -10,7 +10,7 @@ export function Header() {
         </div>
         <nav className={styles.nav}>
           <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://app.netlify.com" target="_blank" rel="noopener">Deploy</a>
+          <a href="https://pages.github.com" target="_blank" rel="noopener">Deploy</a>
         </nav>
       </div>
     </header>
