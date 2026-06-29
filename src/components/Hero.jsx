@@ -7,10 +7,6 @@ export function Hero() {
   return (
     <section className={styles.hero}>
       <div className={styles.heroContent}>
-        <div className={styles.heroBadge}>
-          <span className={styles.heroBadgeDot} />
-          CLIENT-SIDE RENDERING VIA DOM-TO-IMAGE
-        </div>
         <h1 className={styles.heroTitle}>
           HTML to PNG
           <br />

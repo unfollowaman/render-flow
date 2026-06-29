@@ -83,7 +83,15 @@
   margin: 0 auto;
 }
 
-.heroBadge {
+.footerHighlights {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.footerBadge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -97,10 +105,9 @@
   text-transform: uppercase;
   padding: 7px 16px;
   border-radius: 100px;
-  margin-bottom: 28px;
 }
 
-.heroBadgeDot {
+.footerBadgeDot {
   width: 7px;
   height: 7px;
   background: #ffa100;
