@@ -3,12 +3,12 @@ import { useState, useRef, useCallback, useEffect } from "react";
 const MARIO_SPRITE_FRAMES = ["🏃", "🏃‍♂️", "🚶", "🚶‍♂️"];
 
 const LOADING_STEPS = [
-  "Launching headless Chromium…",
-  "Loading HTML content…",
-  "Fetching external assets…",
-  "Waiting for fonts & images…",
-  "Rendering page…",
-  "Capturing screenshot…",
+  "Preparing your HTML...",
+  "Rendering in iframe sandbox...",
+  "Capturing DOM snapshot...",
+  "Converting to PNG...",
+  "Finalising image...",
+  "Almost done...",
 ];
 
 export function useMarioAnimation() {
