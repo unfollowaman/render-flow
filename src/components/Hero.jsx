@@ -24,10 +24,17 @@ export function Hero() {
       </div>
 
       {/* Decorative pixel grid */}
-      <div className={styles.pixelGrid} aria-hidden="true">
-        {PIXEL_GRID_CELLS.map((_, i) => (
-          <div key={i} className={styles.pixelCell} />
-        ))}
+      <div className={styles.pixelGridWrapper} aria-hidden="true">
+        <div className={styles.pixelGrid}>
+          {PIXEL_GRID_CELLS.map((_, i) => (
+            <div key={`grid1-${i}`} className={styles.pixelCell} />
+          ))}
+        </div>
+        <div className={styles.pixelGrid}>
+          {PIXEL_GRID_CELLS.map((_, i) => (
+            <div key={`grid2-${i}`} className={styles.pixelCell} />
+          ))}
+        </div>
       </div>
     </section>
   );
