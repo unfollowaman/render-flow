@@ -9,7 +9,7 @@ export function Hero() {
       <div className={styles.heroContent}>
         <div className={styles.heroBadge}>
           <span className={styles.heroBadgeDot} />
-          Pixel-perfect rendering via headless Chromium
+          CLIENT-SIDE RENDERING VIA DOM-TO-IMAGE
         </div>
         <h1 className={styles.heroTitle}>
           HTML to PNG
