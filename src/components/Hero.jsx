@@ -1,7 +1,7 @@
 import styles from "../styles/Home.module.css";
 
 // Pre-computed array for the decorative pixel grid to prevent allocations on every render
-const PIXEL_GRID_CELLS = Array.from({ length: 64 });
+const PIXEL_GRID_CELLS = Array.from({ length: 256 });
 
 export function Hero() {
   return (
