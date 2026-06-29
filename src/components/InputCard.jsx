@@ -95,7 +95,6 @@ export function InputCard({ html, setHtml, loading, handleConvert, marioSprite, 
     <div className={styles.card}>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>
-          <span className={styles.stepBadge}>01</span>
           Input HTML
         </h2>
         <button className={styles.sampleBtn} onClick={loadSample}>
@@ -139,14 +138,14 @@ export function InputCard({ html, setHtml, loading, handleConvert, marioSprite, 
         >
           <span>📁</span> Upload .html file
         </button>
-        <span className={styles.uploadHint}>
-          or drag & drop onto the editor above
-        </span>
         {html && (
           <span className={styles.charCount}>
             {html.length.toLocaleString()} chars
           </span>
         )}
+        <span className={styles.uploadHint}>
+          or drag & drop onto the editor above
+        </span>
       </div>
 
       {/* Divider */}
@@ -165,7 +164,7 @@ export function InputCard({ html, setHtml, loading, handleConvert, marioSprite, 
           </>
         ) : (
           <>
-            <span>🚀</span> Convert to PNG
+            Convert to PNG
           </>
         )}
       </button>

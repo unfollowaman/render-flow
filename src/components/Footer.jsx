@@ -4,8 +4,7 @@ export function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.footerInner}>
-        <span>🍄 html2png — serverless HTML rendering</span>
-        <span>Built with Vite + React + dom-to-image-more</span>
+        <span>@unfollowaman</span>
       </div>
     </footer>
   );
