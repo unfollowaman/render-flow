@@ -713,6 +713,31 @@
   color: #9aa39e;
 }
 
+.resetBtn {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #e53e3e;
+  background: #fff5f5;
+  border: 1.5px solid rgba(229, 62, 62, 0.3);
+  padding: 12px 28px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  transition: all 0.15s;
+}
+
+.resetBtn:hover {
+  background: #ffe3e3;
+  transform: translateY(-1px);
+}
+
+.resetBtn:active {
+  transform: translateY(0);
+}
+
 /* ── FULLSCREEN OVERLAY ──────────────────────── */
 .fullscreenOverlay {
   position: fixed;

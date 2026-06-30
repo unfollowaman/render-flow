@@ -25,6 +25,11 @@ export function useHtmlToPngConversion({ outputRef }) {
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
 
+  const handleReset = useCallback(() => {
+    setResult(null)
+    setError(null)
+  }, [])
+
   const handleConvert = useCallback(async (htmlToConvert) => {
     if (!htmlToConvert.trim()) {
       setError('Please enter some HTML content first.')
@@ -100,5 +105,5 @@ export function useHtmlToPngConversion({ outputRef }) {
     }
   }, [outputRef])
 
-  return { loading, result, error, setError, handleConvert }
+  return { loading, result, error, setError, handleConvert, handleReset }
 }
