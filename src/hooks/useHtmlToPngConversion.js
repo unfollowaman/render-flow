@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react'
-import domtoimage from 'dom-to-image-more'
 
 const BODY_WIDTH_REGEX = /(?:body|html)[^{]{0,4096}\{[^}]{0,4096}width:\s*(\d+)px/i
 const BODY_HEIGHT_REGEX = /(?:body|html)[^{]{0,4096}\{[^}]{0,4096}height:\s*(\d+)px/i
@@ -73,7 +72,8 @@ export function useHtmlToPngConversion({ outputRef }) {
         }
       })
 
-      // Capture with dom-to-image-more
+      // Capture with dom-to-image-more (lazy loaded)
+      const domtoimage = (await import('dom-to-image-more')).default
       const dataUrl = await domtoimage.toPng(iframe.contentDocument.body, {
         width,
         height,
