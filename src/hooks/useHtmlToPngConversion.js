@@ -21,13 +21,13 @@ function extractDimensions(html) {
   return { width, height }
 }
 
-export function useHtmlToPngConversion({ outputRef, html }) {
+export function useHtmlToPngConversion({ outputRef }) {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
 
-  const handleConvert = useCallback(async () => {
-    if (!html.trim()) {
+  const handleConvert = useCallback(async (htmlToConvert) => {
+    if (!htmlToConvert.trim()) {
       setError('Please enter some HTML content first.')
       return
     }
@@ -44,7 +44,7 @@ export function useHtmlToPngConversion({ outputRef, html }) {
     iframe.style.border = 'none'
     iframe.style.visibility = 'hidden'
 
-    const { width, height } = extractDimensions(html)
+    const { width, height } = extractDimensions(htmlToConvert)
     iframe.style.width = width + 'px'
     iframe.style.height = height + 'px'
 
@@ -54,7 +54,7 @@ export function useHtmlToPngConversion({ outputRef, html }) {
       // Write HTML into iframe
       const iframeDoc = iframe.contentDocument || iframe.contentWindow.document
       iframeDoc.open()
-      iframeDoc.write(html)
+      iframeDoc.write(htmlToConvert)
       iframeDoc.close()
 
       // Wait for iframe load + extra settle time for fonts/images
@@ -98,7 +98,7 @@ export function useHtmlToPngConversion({ outputRef, html }) {
       document.body.removeChild(iframe)
       setLoading(false)
     }
-  }, [html, outputRef])
+  }, [outputRef])
 
   return { loading, result, error, setError, handleConvert }
 }

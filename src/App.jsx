@@ -5,7 +5,6 @@ import { Header, Hero, Footer, InputCard, LoadingCard, ErrorCard, OutputCard } f
 import { useHtmlToPngConversion } from "./hooks/useHtmlToPngConversion";
 
 export default function App() {
-  const [html, setHtml] = useState("");
   const outputRef = useRef(null);
 
   useEffect(() => {
@@ -14,7 +13,6 @@ export default function App() {
 
   const { loading, result, error, setError, handleConvert } = useHtmlToPngConversion({
     outputRef,
-    html,
   });
 
   return (
@@ -31,8 +29,6 @@ export default function App() {
 
           {/* ── INPUT CARD ─────────────────────────── */}
           <InputCard
-            html={html}
-            setHtml={setHtml}
             loading={loading}
             handleConvert={handleConvert}
             setError={setError}
