@@ -76,7 +76,8 @@ const SAMPLE_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-export function InputCard({ html, setHtml, loading, handleConvert, setError }) {
+export function InputCard({ loading, handleConvert, setError }) {
+  const [html, setHtml] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -169,7 +170,7 @@ export function InputCard({ html, setHtml, loading, handleConvert, setError }) {
       {/* Convert button */}
       <button
         className={`${styles.convertBtn} ${loading ? styles.convertBtnLoading : ""}`}
-        onClick={handleConvert}
+        onClick={() => handleConvert(html)}
         disabled={loading || !html.trim()}
       >
         {loading ? (
