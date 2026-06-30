@@ -1,7 +1,7 @@
 import { forwardRef, useState } from "react";
 import styles from "../styles/Home.module.css";
 
-export const OutputCard = forwardRef(({ result }, ref) => {
+export const OutputCard = forwardRef(({ result, onReset }, ref) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleDownload = () => {
@@ -52,6 +52,9 @@ export const OutputCard = forwardRef(({ result }, ref) => {
         <span className={styles.downloadHint}>
           {result.width} × {result.height} · PNG · 1x scale
         </span>
+        <button className={styles.resetBtn} onClick={onReset}>
+          Reset
+        </button>
       </div>
     </div>
   );

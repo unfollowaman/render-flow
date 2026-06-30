@@ -6,14 +6,20 @@ import { useHtmlToPngConversion } from "./hooks/useHtmlToPngConversion";
 
 export default function App() {
   const outputRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     document.title = "HTML → PNG Converter";
   }, []);
 
-  const { loading, result, error, setError, handleConvert } = useHtmlToPngConversion({
+  const { loading, result, error, setError, handleConvert, handleReset } = useHtmlToPngConversion({
     outputRef,
   });
+
+  const onReset = () => {
+    inputRef.current?.resetHtml();
+    handleReset();
+  };
 
   return (
     <div className={styles.page}>
@@ -29,6 +35,7 @@ export default function App() {
 
           {/* ── INPUT CARD ─────────────────────────── */}
           <InputCard
+            ref={inputRef}
             loading={loading}
             handleConvert={handleConvert}
             setError={setError}
@@ -41,7 +48,7 @@ export default function App() {
           {error && <ErrorCard error={error} />}
 
           {/* ── OUTPUT ─────────────────────────────── */}
-          {result && <OutputCard result={result} ref={outputRef} />}
+          {result && <OutputCard result={result} ref={outputRef} onReset={onReset} />}
         </div>
       </main>
 

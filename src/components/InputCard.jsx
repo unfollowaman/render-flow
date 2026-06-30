@@ -1,5 +1,5 @@
 import styles from "../styles/Home.module.css";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, forwardRef, useImperativeHandle } from "react";
 
 const MARIO_SPRITE_FRAMES = ["🏃", "🏃‍♂️", "🚶", "🚶‍♂️"];
 
@@ -76,10 +76,16 @@ const SAMPLE_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-export function InputCard({ loading, handleConvert, setError }) {
+export const InputCard = forwardRef(function InputCard({ loading, handleConvert, setError }, ref) {
   const [html, setHtml] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    resetHtml: () => {
+      setHtml("");
+    }
+  }));
 
   const loadSample = () => {
     setHtml(SAMPLE_HTML);
@@ -186,4 +192,4 @@ export function InputCard({ loading, handleConvert, setError }) {
       </button>
     </div>
   );
-}
+})
