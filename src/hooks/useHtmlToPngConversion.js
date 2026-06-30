@@ -21,7 +21,7 @@ function extractDimensions(html) {
   return { width, height }
 }
 
-export function useHtmlToPngConversion({ startMarioAnimation, stopMarioAnimation, outputRef, html }) {
+export function useHtmlToPngConversion({ outputRef, html }) {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
@@ -35,7 +35,6 @@ export function useHtmlToPngConversion({ startMarioAnimation, stopMarioAnimation
     setLoading(true)
     setError(null)
     setResult(null)
-    startMarioAnimation()
 
     // Create a hidden iframe to render the HTML in isolation
     const iframe = document.createElement('iframe')
@@ -97,10 +96,9 @@ export function useHtmlToPngConversion({ startMarioAnimation, stopMarioAnimation
       setError(message)
     } finally {
       document.body.removeChild(iframe)
-      stopMarioAnimation()
       setLoading(false)
     }
-  }, [html, startMarioAnimation, stopMarioAnimation, outputRef])
+  }, [html, outputRef])
 
   return { loading, result, error, setError, handleConvert }
 }

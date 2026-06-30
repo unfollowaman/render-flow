@@ -1,5 +1,20 @@
 import styles from "../styles/Home.module.css";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+
+const MARIO_SPRITE_FRAMES = ["🏃", "🏃‍♂️", "🚶", "🚶‍♂️"];
+
+function Mario() {
+  const [frame, setFrame] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFrame((f) => (f + 1) % MARIO_SPRITE_FRAMES.length);
+    }, 150);
+    return () => clearInterval(interval);
+  }, []);
+
+  return <span className={styles.marioRunner}>{MARIO_SPRITE_FRAMES[frame]}</span>;
+}
 
 const SAMPLE_HTML = `<!DOCTYPE html>
 <html>
@@ -61,7 +76,7 @@ const SAMPLE_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-export function InputCard({ html, setHtml, loading, handleConvert, marioSprite, setError }) {
+export function InputCard({ html, setHtml, loading, handleConvert, setError }) {
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -159,7 +174,7 @@ export function InputCard({ html, setHtml, loading, handleConvert, marioSprite, 
       >
         {loading ? (
           <>
-            <span className={styles.marioRunner}>{marioSprite}</span>
+            <Mario />
             Converting…
           </>
         ) : (

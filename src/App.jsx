@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import styles from "./styles/Home.module.css";
 
 import { Header, Hero, Footer, InputCard, LoadingCard, ErrorCard, OutputCard } from "./components";
-import { useMarioAnimation } from "./hooks/useMarioAnimation";
 import { useHtmlToPngConversion } from "./hooks/useHtmlToPngConversion";
 
 export default function App() {
@@ -13,11 +12,7 @@ export default function App() {
     document.title = "HTML → PNG Converter";
   }, []);
 
-  const { startMarioAnimation, stopMarioAnimation, marioSprite, loadingStep } = useMarioAnimation();
-
   const { loading, result, error, setError, handleConvert } = useHtmlToPngConversion({
-    startMarioAnimation,
-    stopMarioAnimation,
     outputRef,
     html,
   });
@@ -40,12 +35,11 @@ export default function App() {
             setHtml={setHtml}
             loading={loading}
             handleConvert={handleConvert}
-            marioSprite={marioSprite}
             setError={setError}
           />
 
           {/* ── LOADING STATE ──────────────────────── */}
-          {loading && <LoadingCard loadingStep={loadingStep} />}
+          {loading && <LoadingCard />}
 
           {/* ── ERROR ──────────────────────────────── */}
           {error && <ErrorCard error={error} />}

@@ -1,6 +1,29 @@
+import { useState, useEffect } from "react";
 import styles from "../styles/Home.module.css";
 
-export function LoadingCard({ loadingStep }) {
+const LOADING_STEPS = [
+  "Preparing your HTML...",
+  "Rendering in iframe sandbox...",
+  "Capturing DOM snapshot...",
+  "Converting to PNG...",
+  "Finalising image...",
+  "Almost done...",
+];
+
+function LoadingStepText() {
+  const [stepIdx, setStepIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStepIdx((idx) => Math.min(idx + 1, LOADING_STEPS.length - 1));
+    }, 1800);
+    return () => clearInterval(interval);
+  }, []);
+
+  return <p className={styles.loadingStep}>{LOADING_STEPS[stepIdx]}</p>;
+}
+
+export function LoadingCard() {
   return (
     <div className={styles.loaderCard}>
       <div className={styles.marioTrack}>
@@ -17,7 +40,7 @@ export function LoadingCard({ loadingStep }) {
         </div>
         <div className={styles.mario}>🍄</div>
       </div>
-      <p className={styles.loadingStep}>{loadingStep}</p>
+      <LoadingStepText />
       <p className={styles.loadingHint}>
         External assets (Google Fonts, CDN CSS/images) are being fetched…
       </p>
