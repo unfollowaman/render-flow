@@ -20,6 +20,37 @@ function extractDimensions(html) {
   return { width, height }
 }
 
+export async function waitForFontsAndImages(doc, timeoutMs = 5000) {
+  const readinessPromise = (async () => {
+    const promises = []
+
+    // Wait for fonts
+    if (doc.fonts && doc.fonts.ready) {
+      promises.push(doc.fonts.ready)
+    }
+
+    // Wait for images
+    const images = Array.from(doc.images || [])
+    for (const img of images) {
+      if (!img.complete) {
+        promises.push(
+          new Promise((resolve) => {
+            img.addEventListener('load', resolve, { once: true })
+            img.addEventListener('error', resolve, { once: true })
+          })
+        )
+      }
+    }
+
+    await Promise.all(promises)
+  })()
+
+  // Race against timeout
+  const timeoutPromise = new Promise((resolve) => setTimeout(resolve, timeoutMs))
+
+  await Promise.race([readinessPromise, timeoutPromise])
+}
+
 export function useHtmlToPngConversion({ outputRef }) {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
@@ -61,21 +92,23 @@ export function useHtmlToPngConversion({ outputRef }) {
       iframeDoc.write(htmlToConvert)
       iframeDoc.close()
 
-      // Wait for iframe load + extra settle time for fonts/images
+      // Wait for iframe load
       await new Promise((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error('timeout: page took too long to load')), 30000)
         const onLoad = () => {
           clearTimeout(timeout)
-          // Extra settle time for fonts and images
-          setTimeout(resolve, 1200)
+          resolve()
         }
         if (iframe.contentDocument.readyState === 'complete') {
           clearTimeout(timeout)
-          setTimeout(resolve, 1200)
+          resolve()
         } else {
           iframe.addEventListener('load', onLoad, { once: true })
         }
       })
+
+      // Wait explicitly for fonts and images in the iframe document
+      await waitForFontsAndImages(iframe.contentDocument)
 
       // Capture with dom-to-image-more (lazy loaded)
       const domtoimage = (await import('dom-to-image-more')).default
