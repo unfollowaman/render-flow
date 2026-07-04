@@ -1,18 +1,18 @@
 import { useState, useCallback } from 'react'
 
-const BODY_WIDTH_REGEX = /(?:body|html)[^{]{0,4096}\{[^}]{0,4096}width:\s*(\d+)px/i
-const BODY_HEIGHT_REGEX = /(?:body|html)[^{]{0,4096}\{[^}]{0,4096}height:\s*(\d+)px/i
-const WIDTH_REGEX = /width:\s*(\d+)px/i
-const HEIGHT_REGEX = /height:\s*(\d+)px/i
+const BODY_WIDTH_REGEX = /(?:body|html)\s*(?:\/\*.*?\*\/\s*)*\{[^}]*?width:\s*(\d+)px/i
+const BODY_HEIGHT_REGEX = /(?:body|html)\s*(?:\/\*.*?\*\/\s*)*\{[^}]*?height:\s*(\d+)px/i
+const INLINE_WIDTH_REGEX = /<(?:body|html)[^>]*style="[^"]*width:\s*(\d+)px/i
+const INLINE_HEIGHT_REGEX = /<(?:body|html)[^>]*style="[^"]*height:\s*(\d+)px/i
 
 function extractDimensions(html) {
   const bodyWidthMatch = html.match(BODY_WIDTH_REGEX)
   const bodyHeightMatch = html.match(BODY_HEIGHT_REGEX)
-  const widthMatch = html.match(WIDTH_REGEX)
-  const heightMatch = html.match(HEIGHT_REGEX)
+  const inlineWidthMatch = html.match(INLINE_WIDTH_REGEX)
+  const inlineHeightMatch = html.match(INLINE_HEIGHT_REGEX)
 
-  let width = parseInt(bodyWidthMatch?.[1] ?? widthMatch?.[1] ?? '1200', 10)
-  let height = parseInt(bodyHeightMatch?.[1] ?? heightMatch?.[1] ?? '630', 10)
+  let width = parseInt(bodyWidthMatch?.[1] ?? inlineWidthMatch?.[1] ?? '1200', 10)
+  let height = parseInt(bodyHeightMatch?.[1] ?? inlineHeightMatch?.[1] ?? '630', 10)
 
   width = Math.min(Math.max(width, 100), 3840)
   height = Math.min(Math.max(height, 100), 2160)
