@@ -238,11 +238,11 @@
 
 /* ── CARD ────────────────────────────────────── */
 .card {
-  background: #ffffff;
+  background: var(--neu-raised-bg);
   border-radius: 20px;
   padding: 32px;
-  border: 1.5px solid rgba(1, 43, 27, 0.1);
-  box-shadow: 0 2px 20px rgba(1, 43, 27, 0.06);
+  border: var(--neu-border);
+  box-shadow: var(--neu-raised-shadow);
 }
 
 .cardHeader {
@@ -283,8 +283,9 @@
   font-size: 12px;
   font-weight: 700;
   color: #ffa100;
-  background: rgba(255, 161, 0, 0.1);
-  border: 1.5px solid rgba(255, 161, 0, 0.3);
+  background: var(--neu-raised-bg);
+  border: var(--neu-border);
+  box-shadow: var(--neu-raised-shadow);
   padding: 6px 14px;
   border-radius: 8px;
   cursor: pointer;
@@ -293,8 +294,8 @@
 }
 
 .sampleBtn:hover {
-  background: rgba(255, 161, 0, 0.2);
-  border-color: rgba(255, 161, 0, 0.6);
+  transform: translateY(-3px);
+  box-shadow: var(--neu-raised-shadow-hover);
 }
 
 /* ── TEXTAREA / DROP ZONE ──────────────────────── */
@@ -312,8 +313,9 @@
 .textarea {
   width: 100%;
   min-height: 280px;
-  background: #f7f7f8;
-  border: 1.5px solid #e0e0e4;
+  background: var(--neu-recessed-bg);
+  border: none;
+  box-shadow: var(--neu-recessed-shadow);
   border-radius: 12px;
   padding: 16px 18px;
   font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
@@ -332,9 +334,7 @@
 }
 
 .textarea:focus {
-  border-color: #ffa100;
-  box-shadow: 0 0 0 3px rgba(255, 161, 0, 0.12);
-  background: #fff;
+  outline: 1px solid rgba(255, 161, 0, 0.3);
 }
 
 .dropOverlay {
@@ -366,8 +366,9 @@
   font-size: 13px;
   font-weight: 700;
   color: #012b1b;
-  background: #f2f2f4;
-  border: 1.5px solid #d4d4d8;
+  background: var(--neu-raised-bg);
+  border: var(--neu-border);
+  box-shadow: var(--neu-raised-shadow);
   padding: 9px 18px;
   border-radius: 9px;
   cursor: pointer;
@@ -378,8 +379,8 @@
 }
 
 .uploadBtn:hover {
-  background: #e8e8ea;
-  border-color: #c0c0c4;
+  transform: translateY(-3px);
+  box-shadow: var(--neu-raised-shadow-hover);
 }
 
 .uploadHint {
@@ -394,7 +395,8 @@
   font-size: 11px;
   font-weight: 600;
   color: #9aa39e;
-  background: #f2f2f4;
+  background: var(--neu-recessed-bg);
+  box-shadow: var(--neu-recessed-shadow);
   padding: 3px 10px;
   border-radius: 100px;
 }
@@ -410,13 +412,13 @@
 .convertBtn {
   width: 100%;
   height: 56px;
-  background: #ffa100;
-  color: #012b1b;
+  background: var(--neu-raised-bg);
+  color: #ffa100;
   font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  border: none;
+  border: var(--neu-border);
   border-radius: 12px;
   cursor: pointer;
   display: flex;
@@ -424,7 +426,7 @@
   justify-content: center;
   gap: 10px;
   transition: all 0.2s;
-  box-shadow: 0 4px 16px rgba(255, 161, 0, 0.3);
+  box-shadow: var(--neu-raised-shadow);
   position: relative;
   overflow: hidden;
 }
@@ -442,13 +444,13 @@
 }
 
 .convertBtn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(255, 161, 0, 0.4);
+  transform: translateY(-3px);
+  box-shadow: var(--neu-raised-shadow-hover);
 }
 
 .convertBtn:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(255, 161, 0, 0.2);
+  box-shadow: var(--neu-recessed-shadow);
 }
 
 .convertBtn:disabled {
@@ -458,9 +460,9 @@
 }
 
 .convertBtnLoading {
-  background: #012b1b;
+  background: var(--neu-recessed-bg);
   color: #ffa100;
-  box-shadow: none;
+  box-shadow: var(--neu-recessed-shadow);
 }
 
 .marioRunner {
@@ -475,19 +477,21 @@
 
 /* ── LOADER CARD ─────────────────────────────── */
 .loaderCard {
-  background: #012b1b;
+  background: var(--neu-raised-bg);
   border-radius: 20px;
   padding: 32px;
-  border: 1.5px solid rgba(255, 161, 0, 0.2);
+  border: var(--neu-border);
+  box-shadow: var(--neu-raised-shadow);
   overflow: hidden;
 }
 
 .marioTrack {
   position: relative;
   height: 56px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--neu-recessed-bg);
   border-radius: 10px;
-  border: 1.5px solid rgba(255, 161, 0, 0.15);
+  border: none;
+  box-shadow: var(--neu-recessed-shadow);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -580,7 +584,7 @@
   font-family: 'Montserrat', sans-serif;
   font-size: 14px;
   font-weight: 700;
-  color: #ffa100;
+  color: #012b1b;
   text-align: center;
   margin-bottom: 8px;
   min-height: 20px;
@@ -590,15 +594,16 @@
 .loadingHint {
   font-family: 'Instrument Serif', Georgia, serif;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(1, 43, 27, 0.5);
   text-align: center;
   font-style: italic;
 }
 
 /* ── ERROR CARD ──────────────────────────────── */
 .errorCard {
-  background: #fff5f5;
-  border: 1.5px solid rgba(229, 62, 62, 0.3);
+  background: var(--neu-raised-bg);
+  border: var(--neu-border);
+  box-shadow: var(--neu-raised-shadow);
   border-radius: 14px;
   padding: 20px 24px;
   display: flex;
@@ -637,7 +642,8 @@
   font-size: 12px;
   font-weight: 700;
   color: #5a6a64;
-  background: #f2f2f4;
+  background: var(--neu-recessed-bg);
+  box-shadow: var(--neu-recessed-shadow);
   padding: 5px 12px;
   border-radius: 100px;
 }
@@ -645,7 +651,8 @@
 .previewWrapper {
   border-radius: 12px;
   overflow: hidden;
-  border: 1.5px solid #e0e0e4;
+  border: none;
+  box-shadow: var(--neu-recessed-shadow);
   margin-bottom: 20px;
 }
 
@@ -683,9 +690,9 @@
   font-family: 'Montserrat', sans-serif;
   font-size: 14px;
   font-weight: 800;
-  color: #fff;
-  background: #012b1b;
-  border: none;
+  color: #012b1b;
+  background: var(--neu-raised-bg);
+  border: var(--neu-border);
   padding: 12px 28px;
   border-radius: 10px;
   cursor: pointer;
@@ -693,17 +700,17 @@
   align-items: center;
   gap: 8px;
   transition: all 0.15s;
-  box-shadow: 0 3px 12px rgba(1, 43, 27, 0.2);
+  box-shadow: var(--neu-raised-shadow);
 }
 
 .downloadBtn:hover {
-  background: #01391f;
-  transform: translateY(-1px);
-  box-shadow: 0 5px 18px rgba(1, 43, 27, 0.28);
+  transform: translateY(-3px);
+  box-shadow: var(--neu-raised-shadow-hover);
 }
 
 .downloadBtn:active {
   transform: translateY(0);
+  box-shadow: var(--neu-recessed-shadow);
 }
 
 .downloadHint {
@@ -718,8 +725,9 @@
   font-size: 14px;
   font-weight: 800;
   color: #e53e3e;
-  background: #fff5f5;
-  border: 1.5px solid rgba(229, 62, 62, 0.3);
+  background: var(--neu-raised-bg);
+  border: var(--neu-border);
+  box-shadow: var(--neu-raised-shadow);
   padding: 12px 28px;
   border-radius: 10px;
   cursor: pointer;
@@ -730,12 +738,13 @@
 }
 
 .resetBtn:hover {
-  background: #ffe3e3;
-  transform: translateY(-1px);
+  transform: translateY(-3px);
+  box-shadow: var(--neu-raised-shadow-hover);
 }
 
 .resetBtn:active {
   transform: translateY(0);
+  box-shadow: var(--neu-recessed-shadow);
 }
 
 /* ── FULLSCREEN OVERLAY ──────────────────────── */
