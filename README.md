@@ -1,6 +1,6 @@
 # HTML to PNG Converter
 
-![HTML to PNG Converter](./For%20readme.jpg)
+![HTML to PNG Converter](./readme-preview.jpg)
 
 ## Objective
 
