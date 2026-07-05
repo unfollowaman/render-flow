@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import styles from "./styles/Home.module.css";
 
 import { Header, Hero, Footer, InputCard, LoadingCard, ErrorCard, OutputCard } from "./components";
