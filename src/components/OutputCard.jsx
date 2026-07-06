@@ -13,25 +13,27 @@ export const OutputCard = forwardRef(({ result, onReset }, ref) => {
   };
 
   return (
-    <div className={styles.card} ref={ref}>
+    <div className={`${styles.card} neu-card`} ref={ref}>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>
           Preview
         </h2>
-        <div className={styles.resultMeta}>
+        <div className={`${styles.resultMeta} neu-recessed`}>
           {result.width} × {result.height}px
         </div>
       </div>
 
-      <div className={styles.previewWrapper}>
-        <div className={styles.checkerBg}>
+      <div className="neu-recessed" style={{ borderRadius: '12px', marginBottom: '20px' }}>
+        <div className={styles.previewWrapper} style={{ marginBottom: 0 }}>
+          <div className={styles.checkerBg}>
           <img
             src={result.image}
             alt="Rendered HTML"
             className={styles.previewImage}
             style={{ maxWidth: "100%", cursor: "pointer" }}
-            onClick={() => setIsFullscreen(true)}
-          />
+              onClick={() => setIsFullscreen(true)}
+            />
+          </div>
         </div>
       </div>
 
@@ -46,13 +48,13 @@ export const OutputCard = forwardRef(({ result, onReset }, ref) => {
       )}
 
       <div className={styles.downloadRow}>
-        <button className={styles.downloadBtn} onClick={handleDownload}>
+        <button className={`${styles.downloadBtn} neu-raised`} onClick={handleDownload}>
           <span>⬇</span> Download PNG
         </button>
         <span className={styles.downloadHint}>
           {result.width} × {result.height} · PNG · 1x scale
         </span>
-        <button className={styles.resetBtn} onClick={onReset}>
+        <button className={`${styles.resetBtn} neu-raised`} onClick={onReset}>
           Reset
         </button>
       </div>
