@@ -21,6 +21,14 @@
   --radius-lg: 20px;
   --shadow: 0 2px 12px rgba(1,43,27,0.08);
   --shadow-lg: 0 8px 40px rgba(1,43,27,0.12);
+
+  /* 3D Neumorphic Design System Variables */
+  --neu-raised-bg: #fafafa;
+  --neu-recessed-bg: #fdfdfd;
+  --neu-raised-shadow: 8px 10px 20px rgba(0,0,0,0.10), 2px 3px 6px rgba(0,0,0,0.06), -4px -4px 10px rgba(255,255,255,0.95);
+  --neu-raised-shadow-hover: 10px 12px 24px rgba(0,0,0,0.12), 3px 4px 8px rgba(0,0,0,0.08), -5px -5px 12px rgba(255,255,255,0.95);
+  --neu-recessed-shadow: inset 3px 3px 8px rgba(0,0,0,0.08), inset -3px -3px 8px rgba(255,255,255,0.95);
+  --neu-border: 1px solid rgba(255,255,255,0.8);
 }
 
 html {
