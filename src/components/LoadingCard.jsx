@@ -25,20 +25,22 @@ function LoadingStepText() {
 
 export function LoadingCard() {
   return (
-    <div className={styles.loaderCard}>
-      <div className={styles.marioTrack}>
-        <div className={styles.marioWorld}>
+    <div className={`${styles.loaderCard} neu-card`}>
+      <div className="neu-recessed" style={{ borderRadius: '10px', marginBottom: '20px' }}>
+        <div className={styles.marioTrack} style={{ marginBottom: 0 }}>
+          <div className={styles.marioWorld}>
           {/* Pixel blocks */}
           <span className={styles.block}>?</span>
           <span className={styles.block}>?</span>
           <span className={styles.block}>■</span>
           <span className={styles.pipeLeft}>╓</span>
-          <span className={styles.pipeRight}>╖</span>
+            <span className={styles.pipeRight}>╖</span>
+          </div>
+          <div className={styles.progressTrack}>
+            <div className={styles.progressFill} />
+          </div>
+          <div className={styles.mario}>🍄</div>
         </div>
-        <div className={styles.progressTrack}>
-          <div className={styles.progressFill} />
-        </div>
-        <div className={styles.mario}>🍄</div>
       </div>
       <LoadingStepText />
       <p className={styles.loadingHint}>

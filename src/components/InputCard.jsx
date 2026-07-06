@@ -114,35 +114,38 @@ export const InputCard = forwardRef(function InputCard({ loading, handleConvert,
   };
 
   return (
-    <div className={styles.card}>
+    <div className={`${styles.card} neu-card`}>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>
           Input HTML
         </h2>
-        <button className={styles.sampleBtn} onClick={loadSample}>
+        <button className={`${styles.sampleBtn} neu-raised`} onClick={loadSample}>
           Load sample ↗
         </button>
       </div>
 
       {/* Textarea */}
-      <div
-        className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ""}`}
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={handleDrop}
-      >
-        <textarea
-          className={styles.textarea}
-          value={html}
-          onChange={(e) => { setHtml(e.target.value); setError(null); }}
-          placeholder={`Paste your HTML here…\n\nOr drag & drop a .html file\n\n<!-- Tip: include explicit width/height on body\n     for perfect viewport sizing -->`}
-          spellCheck={false}
-        />
-        {dragOver && (
-          <div className={styles.dropOverlay}>
-            <span>📂 Drop .html file here</span>
-          </div>
-        )}
+      <div className="neu-recessed" style={{ borderRadius: '12px' }}>
+        <div
+          className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ""}`}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+        >
+          <textarea
+            className={styles.textarea}
+            value={html}
+            onChange={(e) => { setHtml(e.target.value); setError(null); }}
+            placeholder={`Paste your HTML here…\n\nOr drag & drop a .html file\n\n<!-- Tip: include explicit width/height on body\n     for perfect viewport sizing -->`}
+            spellCheck={false}
+            style={{ background: 'transparent' }}
+          />
+          {dragOver && (
+            <div className={styles.dropOverlay}>
+              <span>📂 Drop .html file here</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* File upload row */}
@@ -155,13 +158,13 @@ export const InputCard = forwardRef(function InputCard({ loading, handleConvert,
           onChange={(e) => handleFileUpload(e.target.files?.[0])}
         />
         <button
-          className={styles.uploadBtn}
+          className={`${styles.uploadBtn} neu-raised`}
           onClick={() => fileInputRef.current?.click()}
         >
           <span>📁</span> Upload .html file
         </button>
         {html && (
-          <span className={styles.charCount}>
+          <span className={`${styles.charCount} neu-recessed`}>
             {html.length.toLocaleString()} chars
           </span>
         )}
@@ -175,7 +178,7 @@ export const InputCard = forwardRef(function InputCard({ loading, handleConvert,
 
       {/* Convert button */}
       <button
-        className={`${styles.convertBtn} ${loading ? styles.convertBtnLoading : ""}`}
+        className={`${styles.convertBtn} neu-raised ${loading ? styles.convertBtnLoading : ""}`}
         onClick={() => handleConvert(html)}
         disabled={loading || !html.trim()}
       >

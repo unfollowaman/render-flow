@@ -31,6 +31,58 @@
   --neu-border: 1px solid rgba(255,255,255,0.8);
 }
 
+/* 3D Neumorphic Classes */
+.neu-raised {
+  position: relative;
+  z-index: 1;
+  background: var(--neu-raised-bg);
+  border: var(--neu-border);
+  box-shadow: var(--neu-raised-shadow);
+}
+.neu-raised::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+  box-shadow: var(--neu-recessed-shadow);
+}
+
+.neu-card {
+  position: relative;
+  z-index: 1;
+  background: var(--neu-raised-bg);
+  border: var(--neu-border);
+  box-shadow: var(--neu-raised-shadow);
+}
+.neu-card::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+  box-shadow: var(--neu-recessed-shadow);
+}
+
+.neu-recessed {
+  position: relative;
+  background: var(--neu-recessed-bg);
+  box-shadow: var(--neu-recessed-shadow);
+}
+.neu-recessed::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+  box-shadow: var(--neu-raised-shadow);
+  background: var(--neu-raised-bg);
+  border: var(--neu-border);
+}
+
 html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;

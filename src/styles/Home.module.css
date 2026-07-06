@@ -238,11 +238,8 @@
 
 /* ── CARD ────────────────────────────────────── */
 .card {
-  background: var(--neu-raised-bg);
   border-radius: 20px;
   padding: 32px;
-  border: var(--neu-border);
-  box-shadow: var(--neu-raised-shadow);
 }
 
 .cardHeader {
@@ -283,9 +280,6 @@
   font-size: 12px;
   font-weight: 700;
   color: #ffa100;
-  background: var(--neu-raised-bg);
-  border: var(--neu-border);
-  box-shadow: var(--neu-raised-shadow);
   padding: 6px 14px;
   border-radius: 8px;
   cursor: pointer;
@@ -313,9 +307,7 @@
 .textarea {
   width: 100%;
   min-height: 280px;
-  background: var(--neu-recessed-bg);
   border: none;
-  box-shadow: var(--neu-recessed-shadow);
   border-radius: 12px;
   padding: 16px 18px;
   font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
@@ -366,9 +358,6 @@
   font-size: 13px;
   font-weight: 700;
   color: #012b1b;
-  background: var(--neu-raised-bg);
-  border: var(--neu-border);
-  box-shadow: var(--neu-raised-shadow);
   padding: 9px 18px;
   border-radius: 9px;
   cursor: pointer;
@@ -395,8 +384,6 @@
   font-size: 11px;
   font-weight: 600;
   color: #9aa39e;
-  background: var(--neu-recessed-bg);
-  box-shadow: var(--neu-recessed-shadow);
   padding: 3px 10px;
   border-radius: 100px;
 }
@@ -412,13 +399,11 @@
 .convertBtn {
   width: 100%;
   height: 56px;
-  background: var(--neu-raised-bg);
   color: #ffa100;
   font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  border: var(--neu-border);
   border-radius: 12px;
   cursor: pointer;
   display: flex;
@@ -426,7 +411,6 @@
   justify-content: center;
   gap: 10px;
   transition: all 0.2s;
-  box-shadow: var(--neu-raised-shadow);
   position: relative;
   overflow: hidden;
 }
@@ -450,7 +434,6 @@
 
 .convertBtn:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: var(--neu-recessed-shadow);
 }
 
 .convertBtn:disabled {
@@ -460,9 +443,7 @@
 }
 
 .convertBtnLoading {
-  background: var(--neu-recessed-bg);
   color: #ffa100;
-  box-shadow: var(--neu-recessed-shadow);
 }
 
 .marioRunner {
@@ -477,21 +458,16 @@
 
 /* ── LOADER CARD ─────────────────────────────── */
 .loaderCard {
-  background: var(--neu-raised-bg);
   border-radius: 20px;
   padding: 32px;
-  border: var(--neu-border);
-  box-shadow: var(--neu-raised-shadow);
   overflow: hidden;
 }
 
 .marioTrack {
   position: relative;
   height: 56px;
-  background: var(--neu-recessed-bg);
   border-radius: 10px;
   border: none;
-  box-shadow: var(--neu-recessed-shadow);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -601,9 +577,6 @@
 
 /* ── ERROR CARD ──────────────────────────────── */
 .errorCard {
-  background: var(--neu-raised-bg);
-  border: var(--neu-border);
-  box-shadow: var(--neu-raised-shadow);
   border-radius: 14px;
   padding: 20px 24px;
   display: flex;
@@ -642,8 +615,6 @@
   font-size: 12px;
   font-weight: 700;
   color: #5a6a64;
-  background: var(--neu-recessed-bg);
-  box-shadow: var(--neu-recessed-shadow);
   padding: 5px 12px;
   border-radius: 100px;
 }
@@ -652,7 +623,6 @@
   border-radius: 12px;
   overflow: hidden;
   border: none;
-  box-shadow: var(--neu-recessed-shadow);
   margin-bottom: 20px;
 }
 
@@ -691,8 +661,6 @@
   font-size: 14px;
   font-weight: 800;
   color: #012b1b;
-  background: var(--neu-raised-bg);
-  border: var(--neu-border);
   padding: 12px 28px;
   border-radius: 10px;
   cursor: pointer;
@@ -700,7 +668,6 @@
   align-items: center;
   gap: 8px;
   transition: all 0.15s;
-  box-shadow: var(--neu-raised-shadow);
 }
 
 .downloadBtn:hover {
@@ -710,7 +677,6 @@
 
 .downloadBtn:active {
   transform: translateY(0);
-  box-shadow: var(--neu-recessed-shadow);
 }
 
 .downloadHint {
@@ -725,9 +691,6 @@
   font-size: 14px;
   font-weight: 800;
   color: #e53e3e;
-  background: var(--neu-raised-bg);
-  border: var(--neu-border);
-  box-shadow: var(--neu-raised-shadow);
   padding: 12px 28px;
   border-radius: 10px;
   cursor: pointer;
@@ -744,7 +707,6 @@
 
 .resetBtn:active {
   transform: translateY(0);
-  box-shadow: var(--neu-recessed-shadow);
 }
 
 /* ── FULLSCREEN OVERLAY ──────────────────────── */
