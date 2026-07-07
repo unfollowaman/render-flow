@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react'
+import { inlineResources } from './inlineResources'
 
 const BODY_WIDTH_REGEX = /(?:body|html)\s*(?:\/\*.*?\*\/\s*)*\{[^}]*?width:\s*(\d+)px/i
 const BODY_HEIGHT_REGEX = /(?:body|html)\s*(?:\/\*.*?\*\/\s*)*\{[^}]*?height:\s*(\d+)px/i
@@ -55,11 +56,13 @@ export function useHtmlToPngConversion({ outputRef }) {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
+  const [failedResources, setFailedResources] = useState([])
   const latestRequestIdRef = useRef(0)
 
   const handleReset = useCallback(() => {
     setResult(null)
     setError(null)
+    setFailedResources([])
   }, [])
 
   const handleConvert = useCallback(async (htmlToConvert) => {
@@ -90,10 +93,16 @@ export function useHtmlToPngConversion({ outputRef }) {
     document.body.appendChild(iframe)
 
     try {
+      // Inline external resources
+      const { html: processedHtml, failedUrls } = await inlineResources(htmlToConvert)
+
+      if (myRequestId !== latestRequestIdRef.current) return
+      setFailedResources(failedUrls)
+
       // Write HTML into iframe
       const iframeDoc = iframe.contentDocument || iframe.contentWindow.document
       iframeDoc.open()
-      iframeDoc.write(htmlToConvert)
+      iframeDoc.write(processedHtml)
       iframeDoc.close()
 
       // Wait for iframe load
@@ -159,5 +168,5 @@ export function useHtmlToPngConversion({ outputRef }) {
     }
   }, [outputRef])
 
-  return { loading, result, error, setError, handleConvert, handleReset }
+  return { loading, result, error, failedResources, setError, handleConvert, handleReset }
 }
