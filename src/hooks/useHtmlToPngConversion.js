@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 
 const BODY_WIDTH_REGEX = /(?:body|html)\s*(?:\/\*.*?\*\/\s*)*\{[^}]*?width:\s*(\d+)px/i
 const BODY_HEIGHT_REGEX = /(?:body|html)\s*(?:\/\*.*?\*\/\s*)*\{[^}]*?height:\s*(\d+)px/i
@@ -55,6 +55,7 @@ export function useHtmlToPngConversion({ outputRef }) {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
+  const latestRequestIdRef = useRef(0)
 
   const handleReset = useCallback(() => {
     setResult(null)
@@ -62,8 +63,13 @@ export function useHtmlToPngConversion({ outputRef }) {
   }, [])
 
   const handleConvert = useCallback(async (htmlToConvert) => {
+    latestRequestIdRef.current += 1
+    const myRequestId = latestRequestIdRef.current
+
     if (!htmlToConvert.trim()) {
-      setError('Please enter some HTML content first.')
+      if (myRequestId === latestRequestIdRef.current) {
+        setError('Please enter some HTML content first.')
+      }
       return
     }
 
@@ -131,19 +137,25 @@ export function useHtmlToPngConversion({ outputRef }) {
         bgcolor: null,
       })
 
-      setResult({ image: dataUrl, width: finalWidth, height: finalHeight })
-      setTimeout(() => {
-        outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 100)
+      if (myRequestId === latestRequestIdRef.current) {
+        setResult({ image: dataUrl, width: finalWidth, height: finalHeight })
+        setTimeout(() => {
+          outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 100)
+      }
     } catch (err) {
       let message = 'Rendering failed. Try inlining external assets as data: URLs.'
       if (err.message?.toLowerCase().includes('timeout')) {
         message = 'Timeout: page took too long to render.'
       }
-      setError(message)
+      if (myRequestId === latestRequestIdRef.current) {
+        setError(message)
+      }
     } finally {
       document.body.removeChild(iframe)
-      setLoading(false)
+      if (myRequestId === latestRequestIdRef.current) {
+        setLoading(false)
+      }
     }
   }, [outputRef])
 
