@@ -11,11 +11,11 @@ function extractDimensions(html) {
   const inlineWidthMatch = html.match(INLINE_WIDTH_REGEX)
   const inlineHeightMatch = html.match(INLINE_HEIGHT_REGEX)
 
-  let width = parseInt(bodyWidthMatch?.[1] ?? inlineWidthMatch?.[1] ?? '1200', 10)
-  let height = parseInt(bodyHeightMatch?.[1] ?? inlineHeightMatch?.[1] ?? '630', 10)
+  const widthMatch = bodyWidthMatch?.[1] ?? inlineWidthMatch?.[1]
+  const heightMatch = bodyHeightMatch?.[1] ?? inlineHeightMatch?.[1]
 
-  width = Math.min(Math.max(width, 100), 3840)
-  height = Math.min(Math.max(height, 100), 2160)
+  const width = widthMatch ? parseInt(widthMatch, 10) : null
+  const height = heightMatch ? parseInt(heightMatch, 10) : null
 
   return { width, height }
 }
@@ -73,15 +73,13 @@ export function useHtmlToPngConversion({ outputRef }) {
 
     // Create a hidden iframe to render the HTML in isolation
     const iframe = document.createElement('iframe')
-    iframe.style.position = 'fixed'
+    iframe.style.position = 'absolute'
     iframe.style.top = '-99999px'
     iframe.style.left = '-99999px'
+    iframe.style.width = '9999px'
+    iframe.style.height = '9999px'
     iframe.style.border = 'none'
     iframe.style.visibility = 'hidden'
-
-    const { width, height } = extractDimensions(htmlToConvert)
-    iframe.style.width = width + 'px'
-    iframe.style.height = height + 'px'
 
     document.body.appendChild(iframe)
 
@@ -110,11 +108,22 @@ export function useHtmlToPngConversion({ outputRef }) {
       // Wait explicitly for fonts and images in the iframe document
       await waitForFontsAndImages(iframe.contentDocument)
 
+      const scrollWidth = iframe.contentDocument.documentElement.scrollWidth
+      const scrollHeight = iframe.contentDocument.documentElement.scrollHeight
+
+      const { width: explicitWidth, height: explicitHeight } = extractDimensions(htmlToConvert)
+
+      const finalWidth = explicitWidth !== null ? explicitWidth : scrollWidth
+      const finalHeight = explicitHeight !== null ? explicitHeight : scrollHeight
+
+      iframe.style.width = finalWidth + 'px'
+      iframe.style.height = finalHeight + 'px'
+
       // Capture with dom-to-image-more (lazy loaded)
       const domtoimage = (await import('dom-to-image-more')).default
       const dataUrl = await domtoimage.toPng(iframe.contentDocument.body, {
-        width,
-        height,
+        width: finalWidth,
+        height: finalHeight,
         style: {
           margin: '0',
           padding: '0',
@@ -122,7 +131,7 @@ export function useHtmlToPngConversion({ outputRef }) {
         bgcolor: null,
       })
 
-      setResult({ image: dataUrl, width, height })
+      setResult({ image: dataUrl, width: finalWidth, height: finalHeight })
       setTimeout(() => {
         outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }, 100)
