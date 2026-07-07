@@ -131,6 +131,12 @@ export function useHtmlToPngConversion({ outputRef }) {
       const finalWidth = explicitWidth !== null ? explicitWidth : scrollWidth
       const finalHeight = explicitHeight !== null ? explicitHeight : scrollHeight
 
+      const totalArea = finalWidth * finalHeight
+      const MAX_AREA = 200000000
+      if (totalArea > MAX_AREA) {
+        throw new Error(`Dimensions too large: requested ${finalWidth}x${finalHeight} exceeds maximum supported area of ${MAX_AREA} total pixels.`)
+      }
+
       iframe.style.width = finalWidth + 'px'
       iframe.style.height = finalHeight + 'px'
 
@@ -156,6 +162,8 @@ export function useHtmlToPngConversion({ outputRef }) {
       let message = 'Rendering failed. Try inlining external assets as data: URLs.'
       if (err.message?.toLowerCase().includes('timeout')) {
         message = 'Timeout: page took too long to render.'
+      } else if (err.message?.includes('Dimensions too large')) {
+        message = err.message
       }
       if (myRequestId === latestRequestIdRef.current) {
         setError(message)
