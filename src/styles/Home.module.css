@@ -679,6 +679,12 @@
   transform: translateY(0);
 }
 
+.downloadIcon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
 .downloadHint {
   font-family: 'Montserrat', sans-serif;
   font-size: 12px;

@@ -1,5 +1,6 @@
 import { forwardRef, useState } from "react";
 import styles from "../styles/Home.module.css";
+import downloadIcon from "../assets/download-icon.png";
 
 export const OutputCard = forwardRef(({ result, onReset }, ref) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -49,7 +50,7 @@ export const OutputCard = forwardRef(({ result, onReset }, ref) => {
 
       <div className={styles.downloadRow}>
         <button className={`${styles.downloadBtn} neu-raised`} onClick={handleDownload}>
-          <span>⬇</span> Download PNG
+          <img src={downloadIcon} alt="Download" className={styles.downloadIcon} /> Download PNG
         </button>
         <span className={styles.downloadHint}>
           {result.width} × {result.height} · PNG · 1x scale
