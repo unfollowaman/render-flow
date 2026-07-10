@@ -140,16 +140,16 @@ export function useHtmlToPngConversion({ outputRef }) {
       iframe.style.width = finalWidth + 'px'
       iframe.style.height = finalHeight + 'px'
 
-      // Capture with dom-to-image-more (lazy loaded)
-      const domtoimage = (await import('dom-to-image-more')).default
-      const dataUrl = await domtoimage.toPng(iframe.contentDocument.body, {
+      // Capture with html-to-image (lazy loaded)
+      const { toPng } = await import('html-to-image')
+      const dataUrl = await toPng(iframe.contentDocument.body, {
         width: finalWidth,
         height: finalHeight,
         style: {
           margin: '0',
           padding: '0',
         },
-        bgcolor: null,
+        backgroundColor: null,
       })
 
       if (myRequestId === latestRequestIdRef.current) {
