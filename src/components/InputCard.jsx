@@ -17,62 +17,190 @@ function Mario() {
 }
 
 const SAMPLE_HTML = `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      width: 1200px;
-      height: 630px;
-      background: #0f0f0f;
-      font-family: 'Inter', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-    .card {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-      border: 1px solid rgba(255,161,0,0.3);
-      border-radius: 24px;
-      padding: 64px;
-      max-width: 900px;
-      text-align: center;
-    }
-    .tag {
-      display: inline-block;
-      background: #ffa100;
-      color: #000;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 6px 16px;
-      border-radius: 100px;
-      margin-bottom: 32px;
-    }
-    h1 {
-      color: #fff;
-      font-size: 56px;
-      font-weight: 900;
-      line-height: 1.1;
-      margin-bottom: 24px;
-    }
-    h1 span { color: #ffa100; }
-    p {
-      color: #8892b0;
-      font-size: 20px;
-      line-height: 1.6;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Flowchart</title>
+
+<style>
+html, body{
+    margin:0;
+    padding:0;
+    width:1200px;
+    height:630px;
+    background:#fff;
+    font-family:Arial,sans-serif;
+    overflow:hidden;
+}
+
+.canvas{
+    position:relative;
+    width:1200px;
+    height:630px;
+    background:#fff;
+    overflow:hidden;
+}
+
+/* ---------- CONNECTORS ---------- */
+
+.vline,
+.hline{
+    position:absolute;
+    background:#000;
+    z-index:0;
+}
+
+.vline{
+    width:4px;
+}
+
+.hline{
+    height:4px;
+}
+
+/* ---------- BOXES ---------- */
+
+.box{
+    position:absolute;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    box-sizing:border-box;
+    border:4px solid #000;
+    border-radius:24px;
+    color:#000;
+    font-weight:bold;
+    z-index:1;
+}
+
+.main-q{
+    width:600px;
+    height:80px;
+    left:300px;
+    top:40px;
+    background:#F30A49;
+    font-size:32px;
+    font-style:italic;
+}
+
+.decision-y1{
+    width:120px;
+    height:60px;
+    left:290px;
+    top:180px;
+    background:#D8E9F0;
+    font-size:22px;
+}
+
+.decision-n1{
+    width:120px;
+    height:60px;
+    left:790px;
+    top:180px;
+    background:#D8E9F0;
+    font-size:22px;
+}
+
+.sub-q{
+    width:340px;
+    height:100px;
+    left:180px;
+    top:280px;
+    background:#34B3F1;
+    font-size:24px;
+    line-height:1.3;
+    padding:8px;
+}
+
+.decision-y2{
+    width:120px;
+    height:60px;
+    left:140px;
+    top:440px;
+    background:#D8E9F0;
+    font-size:22px;
+}
+
+.decision-n2{
+    width:120px;
+    height:60px;
+    left:440px;
+    top:440px;
+    background:#D8E9F0;
+    font-size:22px;
+}
+
+.conclusion{
+    width:900px;
+    height:70px;
+    left:150px;
+    top:530px;
+    background:#fff;
+    font-size:32px;
+    font-style:italic;
+}
+</style>
 </head>
+
 <body>
-  <div class="card">
-    <div class="tag">✦ Open Graph Image</div>
-    <h1>Turn HTML into<br><span>pixel-perfect</span> PNGs</h1>
-    <p>Serverless rendering with headless Chromium.<br>Zero JavaScript. Full fidelity.</p>
-  </div>
+
+<div class="canvas">
+
+    <!-- MAIN SPLIT -->
+    <div class="vline" style="left:598px;top:120px;height:30px;"></div>
+    <div class="hline" style="left:348px;top:148px;width:504px;"></div>
+    <div class="vline" style="left:348px;top:150px;height:30px;"></div>
+    <div class="vline" style="left:848px;top:150px;height:30px;"></div>
+
+    <!-- YES -> SUB QUESTION -->
+    <div class="vline" style="left:348px;top:240px;height:40px;"></div>
+
+    <!-- SUB QUESTION SPLIT -->
+    <div class="vline" style="left:348px;top:380px;height:30px;"></div>
+    <div class="hline" style="left:198px;top:408px;width:304px;"></div>
+    <div class="vline" style="left:198px;top:410px;height:30px;"></div>
+    <div class="vline" style="left:498px;top:410px;height:30px;"></div>
+
+    <!-- TO CONCLUSION -->
+    <div class="vline" style="left:198px;top:500px;height:30px;"></div>
+    <div class="vline" style="left:498px;top:500px;height:30px;"></div>
+    <div class="vline" style="left:848px;top:240px;height:290px;"></div>
+
+    <!-- BOXES -->
+    <div class="box main-q">
+        Do you have a problem in your life?
+    </div>
+
+    <div class="box decision-y1">
+        YES
+    </div>
+
+    <div class="box decision-n1">
+        NO
+    </div>
+
+    <div class="box sub-q">
+        CAN YOU DO<br>
+        SOMETHING<br>
+        ABOUT IT?
+    </div>
+
+    <div class="box decision-y2">
+
+    YES
+    </div>
+
+    <div class="box decision-n2">
+        NO
+    </div>
+
+    <div class="box conclusion">
+        Then don't worry.
+    </div>
+
+</div>
+
 </body>
 </html>`;
 
