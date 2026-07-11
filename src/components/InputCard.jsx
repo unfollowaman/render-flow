@@ -76,11 +76,38 @@ const SAMPLE_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-const SAMPLE_MERMAID = `graph TD
-    A[Start] --> B{Is it working?};
-    B -- Yes --> C[Great!];
-    B -- No --> D[Fix it];
-    D --> B;`;
+const SAMPLE_MERMAID = `%%{init: {'theme': 'base', 'themeVariables': {'nodeSpacing': 20, 'rankSpacing': 25}}}%%
+graph TD
+    %% Node Definitions (Rounded Rectangles)
+    Q1("Problem in life?")
+    Y1("YES")
+    N1("NO")
+    Q2("Can you do<br>something?")
+    Y2("YES")
+    N2("NO")
+    A("Don't worry.")
+
+    %% Structural Connections
+    Q1 --> Y1
+    Q1 --> N1
+    Y1 --> Q2
+    Q2 --> Y2
+    Q2 --> N2
+    Y2 --> A
+    N2 --> A
+    N1 --> A
+
+    %% Color Configurations and Sizing Controls
+    style Q1 fill:#F30A49,stroke:#333,stroke-width:1px,color:#000000,font-weight:bold,font-size:10px
+    style Y1 fill:#D8E9F0,stroke:#333,stroke-width:1px,color:#000000,font-weight:bold,font-size:10px
+    style N1 fill:#D8E9F0,stroke:#333,stroke-width:1px,color:#000000,font-weight:bold,font-size:10px
+    style Q2 fill:#34B3F1,stroke:#333,stroke-width:1px,color:#000000,font-weight:bold,font-size:10px
+    style Y2 fill:#D8E9F0,stroke:#333,stroke-width:1px,color:#000000,font-weight:bold,font-size:10px
+    style N2 fill:#D8E9F0,stroke:#333,stroke-width:1px,color:#000000,font-weight:bold,font-size:10px
+    style A fill:#4CAF50,stroke:#333,stroke-width:1px,color:#000000,font-weight:bold,font-size:10px
+
+    %% Global Link Styling
+    linkStyle default stroke:#333,stroke-width:1px;`;
 
 export const InputCard = forwardRef(function InputCard({
   mode,
