@@ -76,20 +76,44 @@ const SAMPLE_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-export const InputCard = forwardRef(function InputCard({ loading, handleConvert, setError }, ref) {
+const SAMPLE_MERMAID = `graph TD
+    A[Start] --> B{Is it working?};
+    B -- Yes --> C[Great!];
+    B -- No --> D[Fix it];
+    D --> B;`;
+
+export const InputCard = forwardRef(function InputCard({
+  mode,
+  setMode,
+  loading,
+  handleConvert,
+  setError,
+  mermaidLoading,
+  setMermaidError,
+  handleMermaidConvert
+}, ref) {
   const [html, setHtml] = useState("");
+  const [mermaid, setMermaid] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
     resetHtml: () => {
       setHtml("");
+    },
+    resetMermaid: () => {
+      setMermaid("");
     }
   }));
 
   const loadSample = () => {
-    setHtml(SAMPLE_HTML);
-    setError(null);
+    if (mode === "html") {
+      setHtml(SAMPLE_HTML);
+      setError(null);
+    } else {
+      setMermaid(SAMPLE_MERMAID);
+      setMermaidError(null);
+    }
   };
 
   const handleFileUpload = (file) => {
@@ -109,15 +133,45 @@ export const InputCard = forwardRef(function InputCard({ loading, handleConvert,
   const handleDrop = (e) => {
     e.preventDefault();
     setDragOver(false);
-    const file = e.dataTransfer.files[0];
-    handleFileUpload(file);
+    if (mode === "html") {
+      const file = e.dataTransfer.files[0];
+      handleFileUpload(file);
+    }
   };
 
   return (
     <div className={`${styles.card} neu-card`}>
+      {/* Mode Toggle */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+        <button
+          className={`${styles.sampleBtn} neu-raised`}
+          style={{
+            flex: 1,
+            background: mode === "html" ? 'rgba(255,161,0,0.1)' : undefined,
+            color: mode === "html" ? '#ffa100' : undefined,
+            border: mode === "html" ? '1px solid rgba(255,161,0,0.3)' : undefined
+          }}
+          onClick={() => setMode("html")}
+        >
+          HTML Mode
+        </button>
+        <button
+          className={`${styles.sampleBtn} neu-raised`}
+          style={{
+            flex: 1,
+            background: mode === "mermaid" ? 'rgba(255,161,0,0.1)' : undefined,
+            color: mode === "mermaid" ? '#ffa100' : undefined,
+            border: mode === "mermaid" ? '1px solid rgba(255,161,0,0.3)' : undefined
+          }}
+          onClick={() => setMode("mermaid")}
+        >
+          Mermaid Mode
+        </button>
+      </div>
+
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>
-          Input HTML
+          {mode === "html" ? "Input HTML" : "Input Mermaid"}
         </h2>
         <button className={`${styles.sampleBtn} neu-raised`} onClick={loadSample}>
           Load sample ↗
@@ -132,15 +186,26 @@ export const InputCard = forwardRef(function InputCard({ loading, handleConvert,
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
         >
-          <textarea
-            className={styles.textarea}
-            value={html}
-            onChange={(e) => { setHtml(e.target.value); setError(null); }}
-            placeholder={`Paste your HTML here…\n\nOr drag & drop a .html file\n\n<!-- Tip: include explicit width/height on body\n     for perfect viewport sizing -->`}
-            spellCheck={false}
-            style={{ background: 'transparent' }}
-          />
-          {dragOver && (
+          {mode === "html" ? (
+            <textarea
+              className={styles.textarea}
+              value={html}
+              onChange={(e) => { setHtml(e.target.value); setError(null); }}
+              placeholder={`Paste your HTML here…\n\nOr drag & drop a .html file\n\n<!-- Tip: include explicit width/height on body\n     for perfect viewport sizing -->`}
+              spellCheck={false}
+              style={{ background: 'transparent' }}
+            />
+          ) : (
+            <textarea
+              className={styles.textarea}
+              value={mermaid}
+              onChange={(e) => { setMermaid(e.target.value); setMermaidError(null); }}
+              placeholder={`Paste your Mermaid code here…`}
+              spellCheck={false}
+              style={{ background: 'transparent' }}
+            />
+          )}
+          {mode === "html" && dragOver && (
             <div className={styles.dropOverlay}>
               <span>📂 Drop .html file here</span>
             </div>
@@ -149,50 +214,71 @@ export const InputCard = forwardRef(function InputCard({ loading, handleConvert,
       </div>
 
       {/* File upload row */}
-      <div className={styles.uploadRow}>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".html,text/html"
-          style={{ display: "none" }}
-          onChange={(e) => handleFileUpload(e.target.files?.[0])}
-        />
-        <button
-          className={`${styles.uploadBtn} neu-raised`}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <span>📁</span> Upload .html file
-        </button>
-        {html && (
-          <span className={`${styles.charCount} neu-recessed`}>
-            {html.length.toLocaleString()} chars
+      {mode === "html" && (
+        <div className={styles.uploadRow}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".html,text/html"
+            style={{ display: "none" }}
+            onChange={(e) => handleFileUpload(e.target.files?.[0])}
+          />
+          <button
+            className={`${styles.uploadBtn} neu-raised`}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <span>📁</span> Upload .html file
+          </button>
+          {html && (
+            <span className={`${styles.charCount} neu-recessed`}>
+              {html.length.toLocaleString()} chars
+            </span>
+          )}
+          <span className={styles.uploadHint}>
+            or drag & drop onto the editor above
           </span>
-        )}
-        <span className={styles.uploadHint}>
-          or drag & drop onto the editor above
-        </span>
-      </div>
+        </div>
+      )}
 
       {/* Divider */}
       <div className={styles.divider} />
 
       {/* Convert button */}
-      <button
-        className={`${styles.convertBtn} neu-raised ${loading ? styles.convertBtnLoading : ""}`}
-        onClick={() => handleConvert(html)}
-        disabled={loading || !html.trim()}
-      >
-        {loading ? (
-          <>
-            <Mario />
-            Converting…
-          </>
-        ) : (
-          <>
-            Convert to PNG
-          </>
-        )}
-      </button>
+      {mode === "html" ? (
+        <button
+          className={`${styles.convertBtn} neu-raised ${loading ? styles.convertBtnLoading : ""}`}
+          onClick={() => handleConvert(html)}
+          disabled={loading || !html.trim()}
+        >
+          {loading ? (
+            <>
+              <Mario />
+              Converting…
+            </>
+          ) : (
+            <>
+              Convert to PNG
+            </>
+          )}
+        </button>
+      ) : (
+        <button
+          className={`${styles.convertBtn} neu-raised ${mermaidLoading ? styles.convertBtnLoading : ""}`}
+          onClick={() => handleMermaidConvert(mermaid)}
+          disabled={mermaidLoading || !mermaid.trim()}
+        >
+          {mermaidLoading ? (
+            <>
+              <Mario />
+              Converting…
+            </>
+          ) : (
+            <>
+              Convert to PNG
+            </>
+          )}
+        </button>
+      )}
     </div>
   );
 })
