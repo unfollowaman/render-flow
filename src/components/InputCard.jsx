@@ -237,6 +237,8 @@ graph TD
     %% Global Link Styling
     linkStyle default stroke:#333,stroke-width:1px;`;
 
+const SAMPLE_LATEX = "x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}";
+
 export const InputCard = forwardRef(function InputCard({
   mode,
   setMode,
@@ -245,10 +247,14 @@ export const InputCard = forwardRef(function InputCard({
   setError,
   mermaidLoading,
   setMermaidError,
-  handleMermaidConvert
+  handleMermaidConvert,
+  latexLoading,
+  setLatexError,
+  handleLatexConvert
 }, ref) {
   const [html, setHtml] = useState("");
   const [mermaid, setMermaid] = useState("");
+  const [latex, setLatex] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -258,6 +264,9 @@ export const InputCard = forwardRef(function InputCard({
     },
     resetMermaid: () => {
       setMermaid("");
+    },
+    resetLatex: () => {
+      setLatex("");
     }
   }));
 
@@ -265,9 +274,12 @@ export const InputCard = forwardRef(function InputCard({
     if (mode === "html") {
       setHtml(SAMPLE_HTML);
       setError(null);
-    } else {
+    } else if (mode === "mermaid") {
       setMermaid(SAMPLE_MERMAID);
       setMermaidError(null);
+    } else {
+      setLatex(SAMPLE_LATEX);
+      setLatexError(null);
     }
   };
 
@@ -322,11 +334,23 @@ export const InputCard = forwardRef(function InputCard({
         >
           Mermaid Mode
         </button>
+        <button
+          className={`${styles.sampleBtn} neu-raised`}
+          style={{
+            flex: 1,
+            background: mode === "latex" ? 'rgba(255,161,0,0.1)' : undefined,
+            color: mode === "latex" ? '#ffa100' : undefined,
+            border: mode === "latex" ? '1px solid rgba(255,161,0,0.3)' : undefined
+          }}
+          onClick={() => setMode("latex")}
+        >
+          LaTeX Mode
+        </button>
       </div>
 
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>
-          {mode === "html" ? "Input HTML" : "Input Mermaid"}
+          {mode === "html" ? "Input HTML" : mode === "mermaid" ? "Input Mermaid" : "Input LaTeX"}
         </h2>
         <button className={`${styles.sampleBtn} neu-raised`} onClick={loadSample}>
           Load sample ↗
@@ -350,12 +374,21 @@ export const InputCard = forwardRef(function InputCard({
               spellCheck={false}
               style={{ background: 'transparent' }}
             />
-          ) : (
+          ) : mode === "mermaid" ? (
             <textarea
               className={styles.textarea}
               value={mermaid}
               onChange={(e) => { setMermaid(e.target.value); setMermaidError(null); }}
               placeholder={`Paste your Mermaid code here…`}
+              spellCheck={false}
+              style={{ background: 'transparent' }}
+            />
+          ) : (
+            <textarea
+              className={styles.textarea}
+              value={latex}
+              onChange={(e) => { setLatex(e.target.value); setLatexError(null); }}
+              placeholder={`Paste your LaTeX math code here…`}
               spellCheck={false}
               style={{ background: 'transparent' }}
             />
@@ -416,13 +449,30 @@ export const InputCard = forwardRef(function InputCard({
             </>
           )}
         </button>
-      ) : (
+      ) : mode === "mermaid" ? (
         <button
           className={`${styles.convertBtn} neu-raised ${mermaidLoading ? styles.convertBtnLoading : ""}`}
           onClick={() => handleMermaidConvert(mermaid)}
           disabled={mermaidLoading || !mermaid.trim()}
         >
           {mermaidLoading ? (
+            <>
+              <Mario />
+              Converting…
+            </>
+          ) : (
+            <>
+              Convert to PNG
+            </>
+          )}
+        </button>
+      ) : (
+        <button
+          className={`${styles.convertBtn} neu-raised ${latexLoading ? styles.convertBtnLoading : ""}`}
+          onClick={() => handleLatexConvert(latex)}
+          disabled={latexLoading || !latex.trim()}
+        >
+          {latexLoading ? (
             <>
               <Mario />
               Converting…
