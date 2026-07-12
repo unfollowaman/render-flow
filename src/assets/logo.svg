@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Scan-frame corner brackets -->
+  <path d="M 40 80 L 40 40 L 80 40" fill="none" stroke="#111111" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 216 80 L 216 40 L 176 40" fill="none" stroke="#111111" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 40 176 L 40 216 L 80 216" fill="none" stroke="#111111" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 216 176 L 216 216 L 176 216" fill="none" stroke="#111111" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Bottom Layer -->
+  <polygon points="128,140 200,172 128,204 56,172" fill="#FFB300" opacity="0.9" stroke="#C07A00" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- Middle Layer -->
+  <polygon points="128,96 200,128 128,160 56,128" fill="#FFFFFF" opacity="0.75" stroke="#999999" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- Top Layer -->
+  <polygon points="128,52 200,84 128,116 56,84" fill="#FFB300" opacity="0.9" stroke="#C07A00" stroke-width="6" stroke-linejoin="round"/>
+</svg>

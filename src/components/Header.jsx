@@ -1,11 +1,12 @@
 import styles from "../styles/Home.module.css";
+import logoIcon from "../assets/logo.svg";
 
 export function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.headerInner}>
         <div className={styles.logo}>
-          <span className={styles.logoMushroom}>🍄</span>
+          <img src={logoIcon} alt="Logo" className={styles.logoIcon} />
           <span className={styles.logoText}>html2png</span>
         </div>
         <nav className={styles.nav}>

@@ -37,9 +37,10 @@
   gap: 10px;
 }
 
-.logoMushroom {
-  font-size: 22px;
-  line-height: 1;
+.logoIcon {
+  width: 28px;
+  height: 28px;
+  display: block;
 }
 
 .logoText {
