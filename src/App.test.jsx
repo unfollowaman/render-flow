@@ -4,6 +4,6 @@ import { expect, test } from 'vitest';
 
 test('renders App component', () => {
   render(<App />);
-  const headerElement = screen.getByText(/html2png/i);
+  const headerElement = screen.getByText(/Render Flow/i);
   expect(headerElement).toBeTruthy();
 });

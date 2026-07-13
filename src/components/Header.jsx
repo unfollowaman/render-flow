@@ -7,7 +7,7 @@ export function Header() {
       <div className={styles.headerInner}>
         <div className={styles.logo}>
           <img src={logoIcon} alt="Logo" className={styles.logoIcon} />
-          <span className={styles.logoText}>html2png</span>
+          <span className={styles.logoText}>render-flow</span>
         </div>
         <nav className={styles.nav}>
           <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>

@@ -1,6 +1,6 @@
-# HTML to PNG Converter
+# Render Flow
 
-![HTML to PNG Converter](./readme-preview.jpg)
+![Render Flow](./readme-preview.jpg)
 
 ## Objective
 
