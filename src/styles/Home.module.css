@@ -160,24 +160,27 @@
 
 .heroWordRoller {
   --roller-steps: 3;
-  --roller-step-duration: 1s;
+  --roller-step-duration: 2.35s;
   display: inline-grid;
-  height: 1.05em;
+  width: 4.9em;
+  height: 1.18em;
   line-height: 1.05;
   overflow: hidden;
   color: #000;
+  text-align: left;
   vertical-align: bottom;
 }
 
 .heroWordRoller span {
   grid-area: 1 / 1;
   display: block;
-  height: 1.05em;
+  width: max-content;
+  min-width: 100%;
+  height: 1.18em;
   line-height: 1.05;
   opacity: 0;
-  filter: blur(10px);
-  transform: translateY(100%);
-  animation: rollHeroWord calc(var(--roller-steps) * var(--roller-step-duration)) ease-in-out infinite;
+  transform: translateY(110%);
+  animation: rollHeroWord calc(var(--roller-steps) * var(--roller-step-duration)) cubic-bezier(0.55, 0, 0.2, 1) infinite;
 }
 
 .heroWordRoller span:nth-child(2) {
@@ -189,24 +192,36 @@
 }
 
 .heroStaticText {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  color: #ffa100;
   line-height: inherit;
+  white-space: nowrap;
+}
+
+.heroStaticUnderline {
+  display: block;
+  width: 100%;
+  height: 0.08em;
+  min-height: 4px;
+  margin-top: 0.08em;
+  background: #ffa100;
+  border-radius: 999px;
 }
 
 @keyframes rollHeroWord {
   0% {
     opacity: 0;
-    filter: blur(10px);
-    transform: translateY(100%);
+    transform: translateY(110%);
   }
-  8%, 30% {
+  9%, 38% {
     opacity: 1;
-    filter: blur(0);
     transform: translateY(0);
   }
-  33.333%, 100% {
+  47%, 100% {
     opacity: 0;
-    filter: blur(10px);
-    transform: translateY(-100%);
+    transform: translateY(-110%);
   }
 }
 
@@ -829,6 +844,20 @@
 @media (max-width: 600px) {
   .hero {
     padding: 48px 20px 40px;
+  }
+  .heroTitle {
+    font-size: clamp(38px, 11vw, 52px);
+  }
+  .heroConverterLine {
+    flex-wrap: wrap;
+    row-gap: 0.08em;
+  }
+  .heroWordRoller {
+    width: 4.9em;
+    height: 1.22em;
+  }
+  .heroWordRoller span {
+    height: 1.22em;
   }
   .pixelCell:nth-child(n+65) {
     display: none;

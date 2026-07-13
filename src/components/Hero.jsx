@@ -16,7 +16,10 @@ export function Hero() {
               <span>HTML</span>
               <span>LaTeX</span>
             </span>
-            <span className={styles.heroStaticText}>Code to Image</span>
+            <span className={styles.heroStaticText}>
+              <span>Code to Image</span>
+              <span className={styles.heroStaticUnderline} aria-hidden="true" />
+            </span>
           </span>
         </h1>
         <p className={styles.heroDesc}>
