@@ -10,7 +10,14 @@ export function Hero() {
         <h1 className={styles.heroTitle}>
           Render Flow
           <br />
-          <span className={styles.heroAccent}>Converter</span>
+          <span className={styles.heroConverterLine}>
+            <span className={styles.heroWordRoller} aria-label="Mermaid HTML LaTeX">
+              <span>Mermaid</span>
+              <span>HTML</span>
+              <span>LaTeX</span>
+            </span>
+            <span className={styles.heroStaticText}>Code to Image</span>
+          </span>
         </h1>
         <p className={styles.heroDesc}>
           Paste raw HTML. Get a PNG back — rendered entirely in your browser. No server, no uploads, no waiting.
