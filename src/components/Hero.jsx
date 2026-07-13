@@ -8,7 +8,7 @@ export function Hero() {
     <section className={styles.hero}>
       <div className={styles.heroContent}>
         <h1 className={styles.heroTitle}>
-          HTML to PNG
+          Render Flow
           <br />
           <span className={styles.heroAccent}>Converter</span>
         </h1>
