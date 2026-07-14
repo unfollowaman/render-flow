@@ -145,7 +145,7 @@
   font-weight: 900;
   line-height: 1.05;
   letter-spacing: -0.03em;
-  color: #012b1b;
+  color: #ffa100;
   margin-bottom: 20px;
 }
 
@@ -154,9 +154,9 @@
   align-items: center;
   justify-content: center;
   gap: 0.28em;
-  color: #012b1b;
+  color: #ffa100;
   line-height: inherit;
-  font-size: 30%;
+  font-size: 40%;
 }
 
 .heroWordRoller {
@@ -168,7 +168,7 @@
   width: 4.9em;
   height: 1.18em;
   line-height: 1.05;
-  color: #ffa100;
+  color: color: #012b1b;
   text-align: center;
   vertical-align: bottom;
   perspective: 9em;
@@ -232,7 +232,7 @@
   height: 0.08em;
   min-height: 4px;
   margin-top: 0.08em;
-  background: #012b1b;
+  background: #ffa100;
   border-radius: 999px;
 }
 
