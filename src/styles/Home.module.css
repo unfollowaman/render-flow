@@ -160,15 +160,39 @@
 
 .heroWordRoller {
   --roller-steps: 3;
-  --roller-step-duration: 2.35s;
+  --roller-step-duration: 2.65s;
+  --roller-cycle: calc(var(--roller-steps) * var(--roller-step-duration));
+  --roller-radius: 0.74em;
   display: inline-grid;
   width: 4.9em;
   height: 1.18em;
   line-height: 1.05;
-  overflow: hidden;
   color: #000;
   text-align: left;
   vertical-align: bottom;
+  perspective: 9em;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+  overflow: visible;
+}
+
+.heroWordRoller::before {
+  content: "";
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 1.18em;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255, 161, 0, 0.16), rgba(1, 43, 27, 0.08)),
+    radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.2), rgba(1, 43, 27, 0.08) 60%, transparent 72%);
+  box-shadow:
+    inset 0 0.08em 0.18em rgba(255, 255, 255, 0.36),
+    inset 0 -0.12em 0.24em rgba(1, 43, 27, 0.18),
+    0 0.16em 0.36em rgba(1, 43, 27, 0.12);
+  opacity: 0.24;
+  transform: translateZ(-0.42em) rotateX(90deg) scaleX(1.02);
+  transform-style: preserve-3d;
+  pointer-events: none;
 }
 
 .heroWordRoller span {
@@ -178,17 +202,19 @@
   min-width: 100%;
   height: 1.18em;
   line-height: 1.05;
-  opacity: 0;
-  transform: translateY(110%);
-  animation: rollHeroWord calc(var(--roller-steps) * var(--roller-step-duration)) cubic-bezier(0.55, 0, 0.2, 1) infinite;
+  backface-visibility: hidden;
+  transform-origin: 50% 50% calc(-1 * var(--roller-radius));
+  transform-style: preserve-3d;
+  will-change: transform, opacity, filter;
+  animation: rotaryHeroWord var(--roller-cycle) cubic-bezier(0.7, 0, 0.2, 1) infinite;
 }
 
 .heroWordRoller span:nth-child(2) {
-  animation-delay: var(--roller-step-duration);
+  animation-delay: calc(var(--roller-cycle) / -3);
 }
 
 .heroWordRoller span:nth-child(3) {
-  animation-delay: calc(var(--roller-step-duration) * 2);
+  animation-delay: calc(var(--roller-cycle) / -1.5);
 }
 
 .heroStaticText {
@@ -210,24 +236,36 @@
   border-radius: 999px;
 }
 
-@keyframes rollHeroWord {
-  0% {
-    opacity: 0;
-    transform: translateY(110%);
-  }
-  9%, 38% {
+@keyframes rotaryHeroWord {
+  0%, 20% {
     opacity: 1;
-    transform: translateY(0);
+    filter: blur(0);
+    transform: rotateX(0deg) translateZ(var(--roller-radius));
   }
-  47%, 100% {
-    opacity: 0;
-    transform: translateY(-110%);
+  31%, 53.333% {
+    opacity: 0.15;
+    filter: blur(6px);
+    transform: rotateX(120deg) translateZ(var(--roller-radius));
+  }
+  64.333%, 86.666% {
+    opacity: 0.15;
+    filter: blur(6px);
+    transform: rotateX(240deg) translateZ(var(--roller-radius));
+  }
+  97.666%, 100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: rotateX(360deg) translateZ(var(--roller-radius));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .heroWordRoller span {
     animation: none;
+  }
+
+  .heroWordRoller span {
+    opacity: 0;
   }
 
   .heroWordRoller span:first-child {
