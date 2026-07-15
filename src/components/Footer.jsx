@@ -1,4 +1,7 @@
 import styles from "../styles/Home.module.css";
+import githubIcon from "../assets/social/github.svg";
+import twitterXIcon from "../assets/social/twitterx.svg";
+import gmailIcon from "../assets/social/gmail.svg";
 
 const FOOTER_BADGES = [
   "YOUR CODE STAYS ON YOUR DEVICE, ALWAYS",
@@ -7,6 +10,24 @@ const FOOTER_BADGES = [
   "FROM CODE TO IMAGE FASTER THAN A PAGE REFRESH",
   "FREE, AND IT STAYS THAT WAY",
   "BUILT FOR PEOPLE WHO'D RATHER BE CODING",
+];
+
+const SOCIAL_LINKS = [
+  {
+    label: "Github",
+    href: "https://github.com/unfollowaman",
+    icon: githubIcon,
+  },
+  {
+    label: "Twitter",
+    href: "https://x.com/unfollowaman",
+    icon: twitterXIcon,
+  },
+  {
+    label: "Gmail",
+    href: "mailto:unfollowaman@gmail.com",
+    icon: gmailIcon,
+  },
 ];
 
 export function Footer() {
@@ -30,8 +51,23 @@ export function Footer() {
           ))}
         </div>
       </div>
-      <div className={styles.footerInner}>
-        <span>@unfollowaman</span>
+      <div className={styles.footerSocialShell}>
+        <div className={styles.footerSocialRow} aria-label="Social links">
+          {SOCIAL_LINKS.map(({ label, href, icon }) => (
+            <a
+              key={label}
+              className={styles.footerSocialLink}
+              href={href}
+              target={href.startsWith("mailto:") ? undefined : "_blank"}
+              rel={href.startsWith("mailto:") ? undefined : "noopener"}
+              aria-label={label}
+            >
+              <img src={icon} alt="" className={styles.footerSocialIcon} />
+              <span>{label}</span>
+            </a>
+          ))}
+        </div>
+        <div className={styles.footerHandle}>@unfollowaman</div>
       </div>
     </footer>
   );
