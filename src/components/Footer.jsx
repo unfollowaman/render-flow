@@ -1,7 +1,4 @@
 import styles from "../styles/Home.module.css";
-import githubIcon from "../assets/social/github.svg";
-import twitterXIcon from "../assets/social/twitterx.svg";
-import gmailIcon from "../assets/social/gmail.svg";
 
 const FOOTER_BADGES = [
   "YOUR CODE STAYS ON YOUR DEVICE, ALWAYS",
@@ -16,17 +13,17 @@ const SOCIAL_LINKS = [
   {
     label: "Github",
     href: "https://github.com/unfollowaman",
-    icon: githubIcon,
+    icon: "https://img.icons8.com/fluency/48/github.png",
   },
   {
     label: "Twitter",
     href: "https://x.com/unfollowaman",
-    icon: twitterXIcon,
+    icon: "https://img.icons8.com/ios/50/twitterx--v2.png",
   },
   {
     label: "Gmail",
     href: "mailto:unfollowaman@gmail.com",
-    icon: gmailIcon,
+    icon: "https://img.icons8.com/color/48/gmail-new.png",
   },
 ];
 
