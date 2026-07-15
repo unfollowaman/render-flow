@@ -23,13 +23,13 @@ export function Hero() {
           </span>
         </h1>
         <p className={styles.heroDesc}>
-          Paste raw HTML. Get a PNG back — rendered entirely in your browser. No server, no uploads, no waiting.
+          Paste your HTML, Mermaid diagram, or LaTeX. Get back a clean PNG in seconds — rendered right there in your browser tab. That's the whole process.
         </p>
         <div className={styles.heroMeta}>
-          <span>⚡ Client-side</span>
-          <span>🎨 CSS3 + Flexbox + Grid</span>
-          <span>🔒 Nothing leaves your browser</span>
-          <span>🌐 No server needed</span>
+          <span>⚡ Instant results</span>
+          <span>🎨 HTML, Mermaid & LaTeX</span>
+          <span>🔒 Stays on your device</span>
+          <span>🌐 Just open and use</span>
         </div>
       </div>
 
