@@ -514,32 +514,29 @@
   font-size: 16px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  border-radius: 12px;
+  border-radius: 17px;
+  background: #f7f8f7;
+  border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  transition: all 0.2s;
+  box-shadow:
+    12px 12px 26px rgba(174, 181, 177, 0.26),
+    -12px -12px 26px rgba(255, 255, 255, 0.95),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.9);
+  transition: transform 180ms ease, box-shadow 180ms ease, color 180ms ease;
   position: relative;
   overflow: hidden;
 }
 
-.convertBtn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0);
-  transition: background 0.15s;
-}
-
-.convertBtn:hover:not(:disabled)::before {
-  background: rgba(255, 255, 255, 0.1);
-}
-
 .convertBtn:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: var(--neu-raised-shadow-hover);
+  transform: translateY(-2px);
+  box-shadow:
+    16px 16px 30px rgba(174, 181, 177, 0.3),
+    -16px -16px 30px rgba(255, 255, 255, 1),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 .convertBtn:active:not(:disabled) {
@@ -851,7 +848,7 @@
 }
 
 .footerSocialShell {
-  max-width: 756px;
+  max-width: 500px;
   margin: 0 auto;
   padding: 13px;
   border-radius: 30px;
@@ -876,16 +873,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  width: min(100%, 147px);
+  gap: 8px;
+  width: 100%;
+  max-width: 130px;
   margin: 0 auto;
-  padding: 13px 18px;
+  padding: 10px 12px;
   border-radius: 17px;
   background: #f7f8f7;
   color: #4d4f53;
   text-decoration: none;
   font-family: 'Montserrat', sans-serif;
-  font-size: clamp(11px, 1.4vw, 15px);
+  font-size: clamp(10px, 1.2vw, 14px);
   font-weight: 600;
   letter-spacing: 0.01em;
   box-shadow:
@@ -926,8 +924,8 @@
 }
 
 .footerSocialIcon {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
   flex: 0 0 auto;
 }
@@ -937,16 +935,25 @@
   align-items: center;
   justify-content: center;
   min-height: 60px;
-  border-radius: 21px;
+  border-radius: 17px;
   background: #f7f8f7;
   box-shadow:
-    inset 6px 6px 14px rgba(174, 181, 177, 0.22),
-    inset -6px -6px 14px rgba(255, 255, 255, 0.92),
-    1px 1px 0 rgba(255, 255, 255, 0.9);
+    12px 12px 26px rgba(174, 181, 177, 0.26),
+    -12px -12px 26px rgba(255, 255, 255, 0.95),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.9);
   font-family: 'Montserrat', sans-serif;
   font-size: clamp(13px, 1.54vw, 18px);
   font-weight: 700;
   color: #686b70;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.footerHandle:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    16px 16px 30px rgba(174, 181, 177, 0.3),
+    -16px -16px 30px rgba(255, 255, 255, 1),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 /* ── DESKTOP & ABOVE ─────────────────────────── */
@@ -999,21 +1006,24 @@
     padding-inline: 14px;
   }
   .footerSocialShell {
-    width: min(92%, 360px);
+    width: 92%;
     border-radius: 24px;
     padding: 12px;
   }
   .footerSocialRow {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
     padding: 8px 0 18px;
   }
   .footerSocialLink {
     width: 100%;
-    max-width: 220px;
+    max-width: none;
+    padding: 8px 4px;
+    gap: 4px;
   }
   .footerSocialLink:not(:last-child)::after {
-    display: none;
+    display: block;
+    height: 40px;
   }
   .footerHandle {
     min-height: 50px;

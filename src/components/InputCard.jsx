@@ -434,7 +434,7 @@ export const InputCard = forwardRef(function InputCard({
       {/* Convert button */}
       {mode === "html" ? (
         <button
-          className={`${styles.convertBtn} neu-raised ${loading ? styles.convertBtnLoading : ""}`}
+          className={`${styles.convertBtn} ${loading ? styles.convertBtnLoading : ""}`}
           onClick={() => handleConvert(html)}
           disabled={loading || !html.trim()}
         >
@@ -451,7 +451,7 @@ export const InputCard = forwardRef(function InputCard({
         </button>
       ) : mode === "mermaid" ? (
         <button
-          className={`${styles.convertBtn} neu-raised ${mermaidLoading ? styles.convertBtnLoading : ""}`}
+          className={`${styles.convertBtn} ${mermaidLoading ? styles.convertBtnLoading : ""}`}
           onClick={() => handleMermaidConvert(mermaid)}
           disabled={mermaidLoading || !mermaid.trim()}
         >
@@ -468,7 +468,7 @@ export const InputCard = forwardRef(function InputCard({
         </button>
       ) : (
         <button
-          className={`${styles.convertBtn} neu-raised ${latexLoading ? styles.convertBtnLoading : ""}`}
+          className={`${styles.convertBtn} ${latexLoading ? styles.convertBtnLoading : ""}`}
           onClick={() => handleLatexConvert(latex)}
           disabled={latexLoading || !latex.trim()}
         >
