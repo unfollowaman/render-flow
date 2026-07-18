@@ -411,25 +411,26 @@ export const InputCard = forwardRef(function InputCard({
             style={{ display: "none" }}
             onChange={(e) => handleFileUpload(e.target.files?.[0])}
           />
-          <button
-            className={`${styles.uploadBtn} neu-raised`}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <span>📁</span> Upload .html file
-          </button>
-          {html && (
-            <span className={`${styles.charCount} neu-recessed`}>
-              {html.length.toLocaleString()} chars
-            </span>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <button
+              className={`${styles.uploadBtn} neu-raised`}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <span>📁</span> Upload .html file
+            </button>
+            {html && (
+              <span className={`${styles.charCount} neu-recessed`}>
+                {html.length.toLocaleString()} chars
+              </span>
+            )}
+          </div>
           <span className={styles.uploadHint}>
             or drag & drop onto the editor above
           </span>
         </div>
       )}
 
-      {/* Divider */}
-      <div className={styles.divider} />
+
 
       {/* Convert button */}
       {mode === "html" ? (
