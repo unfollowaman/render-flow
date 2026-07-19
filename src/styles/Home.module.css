@@ -419,7 +419,7 @@
   min-height: 280px;
   border: none;
   border-radius: 12px;
-  padding: 16px 18px;
+  padding: 24px;
   font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
   font-size: 13px;
   line-height: 1.6;
@@ -431,7 +431,7 @@
 }
 
 .textarea::placeholder {
-  color: #a0aaa6;
+  color: #5a6a64;
   font-style: italic;
 }
 
