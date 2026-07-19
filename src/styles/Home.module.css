@@ -114,7 +114,7 @@
   gap: 8px;
   background: rgba(255, 161, 0, 0.12);
   border: 1.5px solid rgba(255, 161, 0, 0.35);
-  color: #012b1b;
+  color: var(--text);
   font-family: 'Montserrat', sans-serif;
   font-size: 12px;
   font-weight: 700;
@@ -850,23 +850,17 @@
 }
 
 .footerSocialShell {
-  max-width: 500px;
+  max-width: 320px;
   margin: 0 auto;
-  padding: 13px;
+  padding: 8px;
   border-radius: 30px;
-  background: #f7f8f7;
-  box-shadow:
-    18px 18px 42px rgba(174, 181, 177, 0.28),
-    -18px -18px 42px rgba(255, 255, 255, 0.95),
-    inset 1px 1px 0 rgba(255, 255, 255, 0.85),
-    inset -1px -1px 0 rgba(174, 181, 177, 0.12);
 }
 
 .footerSocialRow {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 0;
+  gap: 16px;
   padding: 10px 0 15px;
 }
 
@@ -876,9 +870,8 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  width: 100%;
-  max-width: 130px;
-  margin: 0 auto;
+  width: auto;
+  margin: 0;
   padding: 10px 12px;
   border-radius: 17px;
   background: #f7f8f7;
@@ -897,17 +890,6 @@
 
 .footerSocialLink:not(:last-child) {
   position: relative;
-}
-
-.footerSocialLink:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  right: calc(-50% + 1px);
-  top: 50%;
-  width: 1px;
-  height: 57px;
-  transform: translateY(-50%);
-  background: linear-gradient(to bottom, transparent, rgba(1, 43, 27, 0.13), transparent);
 }
 
 .footerSocialLink:hover,
@@ -936,26 +918,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 60px;
-  border-radius: 17px;
-  background: #f7f8f7;
-  box-shadow:
-    12px 12px 26px rgba(174, 181, 177, 0.26),
-    -12px -12px 26px rgba(255, 255, 255, 0.95),
-    inset 1px 1px 0 rgba(255, 255, 255, 0.9);
   font-family: 'Montserrat', sans-serif;
-  font-size: clamp(13px, 1.54vw, 18px);
-  font-weight: 700;
-  color: #686b70;
-  transition: transform 180ms ease, box-shadow 180ms ease;
-}
-
-.footerHandle:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    16px 16px 30px rgba(174, 181, 177, 0.3),
-    -16px -16px 30px rgba(255, 255, 255, 1),
-    inset 1px 1px 0 rgba(255, 255, 255, 0.95);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-top: 8px;
 }
 
 /* ── DESKTOP & ABOVE ─────────────────────────── */
@@ -1008,26 +975,17 @@
     padding-inline: 14px;
   }
   .footerSocialShell {
-    width: 92%;
-    border-radius: 24px;
-    padding: 12px;
+    width: 100%;
+    padding: 0;
   }
   .footerSocialRow {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 4px;
-    padding: 8px 0 18px;
+    gap: 8px;
+    padding: 8px 0 16px;
+    flex-wrap: wrap;
   }
   .footerSocialLink {
-    width: 100%;
-    max-width: none;
-    padding: 8px 4px;
-    gap: 4px;
-  }
-  .footerSocialLink:not(:last-child)::after {
-    display: block;
-    height: 40px;
-  }
-  .footerHandle {
-    min-height: 50px;
+    width: auto;
+    padding: 8px 12px;
+    gap: 6px;
   }
 }
