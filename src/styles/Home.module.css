@@ -311,6 +311,8 @@
   flex-direction: column;
   opacity: 0.04;
   pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent 35%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 35%, black 100%);
 }
 
 .pixelGrid {
