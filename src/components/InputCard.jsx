@@ -311,7 +311,7 @@ export const InputCard = forwardRef(function InputCard({
       {/* Mode Toggle */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
         <button
-          className={`${styles.sampleBtn} neu-raised`}
+          className={`${styles.sampleBtn} ${mode === "html" ? "neu-recessed" : "neu-raised"}`}
           style={{
             flex: 1,
             background: mode === "html" ? 'rgba(255,161,0,0.1)' : undefined,
@@ -323,7 +323,7 @@ export const InputCard = forwardRef(function InputCard({
           HTML Mode
         </button>
         <button
-          className={`${styles.sampleBtn} neu-raised`}
+          className={`${styles.sampleBtn} ${mode === "mermaid" ? "neu-recessed" : "neu-raised"}`}
           style={{
             flex: 1,
             background: mode === "mermaid" ? 'rgba(255,161,0,0.1)' : undefined,
@@ -335,7 +335,7 @@ export const InputCard = forwardRef(function InputCard({
           Mermaid Mode
         </button>
         <button
-          className={`${styles.sampleBtn} neu-raised`}
+          className={`${styles.sampleBtn} ${mode === "latex" ? "neu-recessed" : "neu-raised"}`}
           style={{
             flex: 1,
             background: mode === "latex" ? 'rgba(255,161,0,0.1)' : undefined,

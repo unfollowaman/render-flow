@@ -26,10 +26,10 @@ export function Hero() {
           Paste your HTML, Mermaid diagram, or LaTeX. Get back a clean PNG in seconds — rendered right there in your browser tab. That's the whole process.
         </p>
         <div className={styles.heroMeta}>
-          <span>⚡ Instant results</span>
-          <span>🎨 HTML, Mermaid & LaTeX</span>
-          <span>🔒 Stays on your device</span>
-          <span>🌐 Just open and use</span>
+          <span className="neu-raised">⚡ Instant results</span>
+          <span className="neu-raised">🎨 HTML, Mermaid & LaTeX</span>
+          <span className="neu-raised">🔒 Stays on your device</span>
+          <span className="neu-raised">🌐 Just open and use</span>
         </div>
       </div>
 
