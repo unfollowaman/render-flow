@@ -38,6 +38,7 @@
   background: var(--neu-raised-bg);
   border: var(--neu-border);
   box-shadow: var(--neu-raised-shadow);
+  outline: 0.25px solid #000000;
 }
 .neu-raised::before {
   content: '';
@@ -47,6 +48,7 @@
   z-index: -1;
   pointer-events: none;
   box-shadow: var(--neu-recessed-shadow);
+  outline: 0.25px solid #000000;
 }
 
 .neu-card {
@@ -55,6 +57,7 @@
   background: var(--neu-raised-bg);
   border: var(--neu-border);
   box-shadow: var(--neu-raised-shadow);
+  outline: 0.25px solid #000000;
 }
 .neu-card::before {
   content: '';
@@ -64,6 +67,7 @@
   z-index: -1;
   pointer-events: none;
   box-shadow: var(--neu-recessed-shadow);
+  outline: 0.25px solid #000000;
 }
 
 .neu-recessed {
@@ -71,6 +75,7 @@
   position: relative;
   background: var(--neu-recessed-bg);
   box-shadow: var(--neu-recessed-shadow);
+  outline: 0.25px solid #000000;
 }
 .neu-recessed::before {
   content: '';
@@ -82,6 +87,7 @@
   box-shadow: var(--neu-raised-shadow);
   background: var(--neu-raised-bg);
   border: var(--neu-border);
+  outline: 0.25px solid #000000;
 }
 
 html {
