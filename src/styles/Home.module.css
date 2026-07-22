@@ -874,13 +874,13 @@
   gap: 8px;
   width: auto;
   margin: 0;
-  padding: 10px 12px;
+  padding: 13px 18px;
   border-radius: 17px;
   background: #f7f8f7;
   color: #4d4f53;
   text-decoration: none;
   font-family: 'Montserrat', sans-serif;
-  font-size: clamp(10px, 1.2vw, 14px);
+  font-size: clamp(9px, 1vw, 12px);
   font-weight: 600;
   letter-spacing: 0.01em;
   box-shadow:
@@ -910,8 +910,8 @@
 }
 
 .footerSocialIcon {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   object-fit: contain;
   flex: 0 0 auto;
 }
@@ -987,7 +987,7 @@
   }
   .footerSocialLink {
     width: auto;
-    padding: 8px 12px;
+    padding: 11px 16px;
     gap: 6px;
   }
 }
