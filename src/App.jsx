@@ -1,7 +1,7 @@
 import { useRef, useEffect } from "react";
 import styles from "./styles/Home.module.css";
 
-import { Header, Hero, Footer, InputCard, LoadingCard, ErrorCard, OutputCard } from "./components";
+import { Header, Hero, Footer, InputCard, ErrorCard, OutputCard } from "./components";
 import { useHtmlToPngConversion } from "./hooks/useHtmlToPngConversion";
 import { useMermaidToPngConversion } from "./hooks/useMermaidToPngConversion";
 import { useLatexToPngConversion } from "./hooks/useLatexToPngConversion";
@@ -83,9 +83,6 @@ export default function App() {
             setLatexError={setLatexError}
             handleLatexConvert={handleLatexConvert}
           />
-
-          {/* ── LOADING STATE ──────────────────────── */}
-          {activeLoading && <LoadingCard />}
 
           {/* ── ERROR ──────────────────────────────── */}
           {activeError && <ErrorCard error={activeError} />}
