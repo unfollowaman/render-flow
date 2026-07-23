@@ -876,17 +876,13 @@
   margin: 0;
   padding: 13px 18px;
   border-radius: 17px;
-  background: #f7f8f7;
   color: #4d4f53;
   text-decoration: none;
   font-family: 'Montserrat', sans-serif;
   font-size: clamp(9px, 1vw, 12px);
   font-weight: 600;
   letter-spacing: 0.01em;
-  box-shadow:
-    12px 12px 26px rgba(174, 181, 177, 0.26),
-    -12px -12px 26px rgba(255, 255, 255, 0.95),
-    inset 1px 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: var(--neu-raised-shadow), 0 0 0 1px rgba(0, 0, 0, 0.15);
   transition: transform 180ms ease, box-shadow 180ms ease, color 180ms ease;
 }
 
@@ -897,11 +893,8 @@
 .footerSocialLink:hover,
 .footerSocialLink:focus-visible {
   color: #012b1b;
-  transform: translateY(-2px);
-  box-shadow:
-    16px 16px 30px rgba(174, 181, 177, 0.3),
-    -16px -16px 30px rgba(255, 255, 255, 1),
-    inset 1px 1px 0 rgba(255, 255, 255, 0.95);
+  transform: translateY(-3px);
+  box-shadow: var(--neu-raised-shadow-hover), 0 0 0 1px rgba(0, 0, 0, 0.15);
 }
 
 .footerSocialLink:focus-visible {
