@@ -84,6 +84,14 @@ export function useMermaidToPngConversion({ outputRef }) {
         throw new Error('Unable to determine dimensions from Mermaid SVG.');
       }
 
+      const DPI_SCALE = 2;
+      const finalWidth = intrinsicWidth * DPI_SCALE;
+      const finalHeight = intrinsicHeight * DPI_SCALE;
+
+      if (finalWidth * finalHeight > 200000000) {
+        throw new Error('Diagram is too large to render (exceeds maximum canvas size). Try simplifying the diagram or reducing the number of nodes.');
+      }
+
       // Step 4: Create object URL
       // Re-applying the blob logic since I accidentally deleted it when investigating the taint issue.
       const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
@@ -112,9 +120,6 @@ export function useMermaidToPngConversion({ outputRef }) {
 
       // Step 6: Create canvas and draw
       const canvas = document.createElement('canvas');
-      const DPI_SCALE = 2;
-      const finalWidth = intrinsicWidth * DPI_SCALE;
-      const finalHeight = intrinsicHeight * DPI_SCALE;
 
       canvas.width = finalWidth;
       canvas.height = finalHeight;
