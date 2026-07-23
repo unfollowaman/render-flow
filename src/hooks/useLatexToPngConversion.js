@@ -118,6 +118,14 @@ export function useLatexToPngConversion({ outputRef }) {
       serializer = new XMLSerializer();
       const finalSvgString = serializer.serializeToString(svgElement);
 
+      const DPI_SCALE = 2; // Matches Mermaid pipeline
+      const finalWidth = intrinsicWidth * DPI_SCALE;
+      const finalHeight = intrinsicHeight * DPI_SCALE;
+
+      if (finalWidth * finalHeight > 200000000) {
+        throw new Error('Formula is too large to render (exceeds maximum canvas size). Try simplifying the expression or breaking it into smaller parts.');
+      }
+
       // Step 4: Create object URL
       const svgBlob = new Blob([finalSvgString], { type: 'image/svg+xml;charset=utf-8' });
       objectUrl = URL.createObjectURL(svgBlob);
@@ -137,9 +145,6 @@ export function useLatexToPngConversion({ outputRef }) {
 
       // Step 6: Create canvas and draw
       const canvas = document.createElement('canvas');
-      const DPI_SCALE = 2; // Matches Mermaid pipeline
-      const finalWidth = intrinsicWidth * DPI_SCALE;
-      const finalHeight = intrinsicHeight * DPI_SCALE;
 
       canvas.width = finalWidth;
       canvas.height = finalHeight;
