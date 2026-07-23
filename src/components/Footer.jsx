@@ -53,7 +53,7 @@ export function Footer() {
           {SOCIAL_LINKS.map(({ label, href, icon }) => (
             <a
               key={label}
-              className={styles.footerSocialLink}
+              className={`${styles.footerSocialLink} neu-raised`}
               href={href}
               target={href.startsWith("mailto:") ? undefined : "_blank"}
               rel={href.startsWith("mailto:") ? undefined : "noopener"}
