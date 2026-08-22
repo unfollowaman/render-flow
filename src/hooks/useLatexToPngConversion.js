@@ -47,7 +47,8 @@ export function useLatexToPngConversion({ outputRef }) {
       try {
         htmlContent = katex.renderToString(latexString, {
             displayMode: true,
-            throwOnError: true
+            throwOnError: true,
+            trust: false
         });
       } catch (renderError) {
         if (myRequestId === latestRequestIdRef.current) {
