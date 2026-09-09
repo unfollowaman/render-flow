@@ -166,11 +166,6 @@ export function useNotesToPngConversion({ outputRef } = {}) {
         };
       });
 
-      itemsToMeasure.forEach((item) => {
-        const height = measureHeight(item.element, containerCss);
-        console.log('NOTES_MODE_HEIGHT_DEBUG', item.id, height);
-      });
-
       const { pages: pageItemIds, overflowItems } = await paginateRows(itemsToMeasure, {
         usableHeightPerPage,
         columnsPerRow: 2,
@@ -178,7 +173,6 @@ export function useNotesToPngConversion({ outputRef } = {}) {
         unit: 'mm',
         containerCss
       });
-      console.log('NOTES_MODE_DEBUG', JSON.stringify({ items: itemsToMeasure.map(i => ({ id: i.id, heightMm: i.heightMm })), result: { pages: pageItemIds, overflowItems } }));
 
       if (myRequestId !== latestRequestIdRef.current) return;
 
