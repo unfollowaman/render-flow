@@ -403,7 +403,7 @@ export function paginate(items = [], options = {}) {
 
 /**
  * Filters items and pairs eligible items into row objects.
- * Handles oversized items by pushing their IDs to overflowItems.
+ * Handles oversized items by pushing their IDs to overflowItems in a single pass.
  *
  * @param {Array<{id: string|number, height: number, rawItem: Object}>} measuredItems
  * @param {number} usableHeightPerPage
@@ -412,49 +412,37 @@ export function paginate(items = [], options = {}) {
  */
 function buildRowsFromMeasuredItems(measuredItems, usableHeightPerPage, columnsPerRow) {
   const overflowItems = [];
-  const eligibleItems = [];
+  const rows = [];
+  let currentChunk = [];
+  let currentMaxHeight = 0;
 
-  // Filter individually oversized items first
-  for (const item of measuredItems) {
+  for (let i = 0; i < measuredItems.length; i++) {
+    const item = measuredItems[i];
     if (item.height > usableHeightPerPage) {
       overflowItems.push(item.id);
-    } else {
-      eligibleItems.push(item);
+      continue;
+    }
+
+    currentChunk.push(item);
+    if (item.height > currentMaxHeight) {
+      currentMaxHeight = item.height;
+    }
+
+    if (currentChunk.length === columnsPerRow) {
+      rows.push({
+        items: currentChunk,
+        height: currentMaxHeight,
+      });
+      currentChunk = [];
+      currentMaxHeight = 0;
     }
   }
 
-  const rows = [];
-  let i = 0;
-  while (i < eligibleItems.length) {
-    if (columnsPerRow === 1 || i === eligibleItems.length - 1) {
-      rows.push({
-        items: [eligibleItems[i]],
-        height: eligibleItems[i].height,
-      });
-      i += 1;
-    } else {
-      const itemA = eligibleItems[i];
-      const itemB = eligibleItems[i + 1];
-      const rowHeight = Math.max(itemA.height, itemB.height);
-
-      if (rowHeight > usableHeightPerPage) {
-        if (itemB.height > usableHeightPerPage) {
-          overflowItems.push(itemB.id);
-          eligibleItems.splice(i + 1, 1);
-          continue;
-        } else if (itemA.height > usableHeightPerPage) {
-          overflowItems.push(itemA.id);
-          eligibleItems.splice(i, 1);
-          continue;
-        }
-      }
-
-      rows.push({
-        items: [itemA, itemB],
-        height: rowHeight,
-      });
-      i += 2;
-    }
+  if (currentChunk.length > 0) {
+    rows.push({
+      items: currentChunk,
+      height: currentMaxHeight,
+    });
   }
 
   return { rows, overflowItems };
