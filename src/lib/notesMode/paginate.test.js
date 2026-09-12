@@ -31,11 +31,12 @@ describe('paginate & measureHeight standalone module', () => {
   let initialBodyChildCount;
 
   beforeEach(() => {
+    clearMeasurementCache();
     initialBodyChildCount = document.body.children.length;
   });
 
   afterEach(() => {
-    // Clean up any lingering body children if any test fails
+    clearMeasurementCache();
   });
 
   test('Test Case 1: Five mock items of 40mm each, usableHeightPerPage: 100mm', async () => {
@@ -101,13 +102,14 @@ describe('paginate & measureHeight standalone module', () => {
     expect(page2Total).toBeLessThanOrEqual(100);
   });
 
-  test('Test Case 4: Hidden measurement container cleanup — no leftover DOM nodes', async () => {
+  test('Test Case 4: Hidden measurement container cleanup — no leftover DOM nodes after cache clear', async () => {
     const initialCount = document.body.children.length;
 
     const singleEl = createMockElement(25);
     const measured = measureHeight(singleEl, { fontSize: '14px' }, 'mm');
     expect(measured).toBeCloseTo(25, 2);
-    expect(document.body.children.length).toBe(initialCount);
+    // Persistent measurement container remains attached during measurement session
+    expect(document.body.children.length).toBe(initialCount + 1);
 
     const items = [
       { id: 'c1', element: createMockElement(30) },
@@ -116,6 +118,8 @@ describe('paginate & measureHeight standalone module', () => {
     ];
 
     await paginate(items, { usableHeightPerPage: 100, unit: 'mm' });
+    // Clear measurement cache removes persistent off-screen container completely
+    clearMeasurementCache();
     expect(document.body.children.length).toBe(initialCount);
   });
 
@@ -289,14 +293,15 @@ describe('measureHeight caching & performance benchmark', () => {
     expect(hPx).toBeGreaterThan(hMm);
   });
 
-  test('clearMeasurementCache invalidates element cache', () => {
+  test('clearMeasurementCache invalidates element cache and resets persistent container when called without arguments', () => {
     const el = createMockElement(35);
     const appendSpy = vi.spyOn(document.body, 'appendChild');
 
     measureHeight(el, { width: '80mm' }, 'mm');
     const count1 = appendSpy.mock.calls.length;
 
-    clearMeasurementCache(el);
+    // Full clear removes container from DOM
+    clearMeasurementCache();
     measureHeight(el, { width: '80mm' }, 'mm');
     const count2 = appendSpy.mock.calls.length;
 
