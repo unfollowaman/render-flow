@@ -5,6 +5,27 @@ import { NotesBlockRenderer, ContinuationLabel } from '../../components/NotesBlo
 
 let elementMeasurementCache = new WeakMap();
 let cachedPxPerMm = null;
+let measurementContainer = null;
+
+/**
+ * Returns or creates the module-scoped persistent off-screen measurement container.
+ * Ensures container is attached to document.body.
+ */
+function getMeasurementContainer() {
+  if (typeof document === 'undefined') return null;
+
+  if (!measurementContainer || !measurementContainer.parentNode) {
+    measurementContainer = document.createElement('div');
+    measurementContainer.style.position = 'absolute';
+    measurementContainer.style.visibility = 'hidden';
+    measurementContainer.style.top = '-9999px';
+    measurementContainer.style.left = '-9999px';
+    measurementContainer.style.pointerEvents = 'none';
+    document.body.appendChild(measurementContainer);
+  }
+
+  return measurementContainer;
+}
 
 /**
  * Clears the measurement cache for a specific element or completely resets the cache if no element is provided.
@@ -17,6 +38,10 @@ export function clearMeasurementCache(element) {
   } else {
     elementMeasurementCache = new WeakMap();
     cachedPxPerMm = null;
+    if (measurementContainer && measurementContainer.parentNode) {
+      measurementContainer.parentNode.removeChild(measurementContainer);
+    }
+    measurementContainer = null;
   }
 }
 
@@ -81,12 +106,10 @@ export function measureHeight(element, containerCss = null, unit = 'mm') {
     }
   }
 
-  const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.visibility = 'hidden';
-  container.style.top = '-9999px';
-  container.style.left = '-9999px';
-  container.style.pointerEvents = 'none';
+  const container = getMeasurementContainer();
+
+  // Reset base container style before applying custom containerCss
+  container.style.cssText = 'position: absolute; visibility: hidden; top: -9999px; left: -9999px; pointer-events: none;';
 
   if (containerCss) {
     if (typeof containerCss === 'object') {
@@ -95,8 +118,6 @@ export function measureHeight(element, containerCss = null, unit = 'mm') {
       container.style.cssText += `; ${containerCss}`;
     }
   }
-
-  document.body.appendChild(container);
 
   // Measure 1mm conversion factor inside the container context
   const pxPerMm = unit === 'mm' ? getPixelsPerMm(container) : 1;
@@ -118,12 +139,9 @@ export function measureHeight(element, containerCss = null, unit = 'mm') {
     }
   }
 
-  // Clean up DOM nodes immediately
+  // Clean up measured element from container
   if (element.parentNode === container) {
     container.removeChild(element);
-  }
-  if (container.parentNode === document.body) {
-    document.body.removeChild(container);
   }
 
   const resultHeight = unit === 'mm' ? heightPx / pxPerMm : heightPx;

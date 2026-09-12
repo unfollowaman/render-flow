@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { QuestionSolutionCard } from '../components/NotesModeCard';
-import { measureHeight } from '../lib/notesMode/paginate';
+import { measureHeight, clearMeasurementCache } from '../lib/notesMode/paginate';
 
 describe('Notes Mode Pagination & DOM Measurement Verification', () => {
   const containerCss = {
@@ -68,7 +68,8 @@ describe('Notes Mode Pagination & DOM Measurement Verification', () => {
     expect(graphMarkup.length).toBeGreaterThan(textMarkup.length);
   });
 
-  test('Test Case 4: Hidden measurement containers created during process are fully removed from DOM', () => {
+  test('Test Case 4: Hidden measurement containers created during process are fully removed from DOM after cache reset', () => {
+    clearMeasurementCache();
     const initialChildCount = document.body.children.length;
 
     const item = {
@@ -82,7 +83,9 @@ describe('Notes Mode Pagination & DOM Measurement Verification', () => {
     el.innerHTML = html;
 
     measureHeight(el.firstElementChild, containerCss, 'mm');
+    expect(document.body.children.length).toBe(initialChildCount + 1);
 
+    clearMeasurementCache();
     expect(document.body.children.length).toBe(initialChildCount);
   });
 });
