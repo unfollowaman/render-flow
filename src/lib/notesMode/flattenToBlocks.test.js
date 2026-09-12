@@ -76,4 +76,45 @@ describe('flattenToBlocks', () => {
       rawItem: chapterJson.pages[0].items[1]
     });
   });
+
+  test('handles edge cases safely in pages structure', () => {
+    const edgeJson = {
+      pages: [
+        null,
+        {},
+        { items: null },
+        { items: [] },
+        {
+          items: [
+            { question: [{ type: 'text', content: 'Valid Q' }] }
+          ]
+        }
+      ]
+    };
+
+    const blocks = flattenToBlocks(edgeJson);
+    expect(blocks.length).toBe(1);
+    expect(blocks[0].id).toBe('item-1-header');
+    expect(blocks[0].content).toEqual([{ type: 'text', content: 'Valid Q' }]);
+  });
+
+  test('benchmark performance for large chapter json', () => {
+    const largeJson = {
+      pages: Array.from({ length: 1000 }, (_, pIdx) => ({
+        items: Array.from({ length: 10 }, (_, iIdx) => ({
+          question: [{ type: 'text', content: `Q ${pIdx}-${iIdx}` }],
+          solution: [{ type: 'text', content: `A ${pIdx}-${iIdx}` }]
+        }))
+      }))
+    };
+
+    const iterations = 50;
+    const start = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      flattenToBlocks(largeJson);
+    }
+    const end = performance.now();
+    const duration = end - start;
+    console.log(`[Benchmark flattenToBlocks] Total: ${duration.toFixed(2)}ms for ${iterations} runs (${(duration / iterations).toFixed(4)}ms/run)`);
+  });
 });

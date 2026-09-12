@@ -19,16 +19,15 @@ export function flattenToBlocks(parsedJson) {
     items = parsedJson;
   } else if (parsedJson && Array.isArray(parsedJson.pages)) {
     let itemCounter = 0;
-    parsedJson.pages.forEach((page) => {
-      if (Array.isArray(page.items)) {
-        page.items.forEach((item) => {
-          itemCounter += 1;
-          items.push({
-            ...item,
-            id: item.id || `item-${itemCounter}`,
-          });
-        });
-      }
+    items = parsedJson.pages.flatMap((page) => {
+      if (!page || !Array.isArray(page.items)) return [];
+      return page.items.map((item) => {
+        itemCounter += 1;
+        return {
+          ...item,
+          id: item.id || `item-${itemCounter}`,
+        };
+      });
     });
   } else if (parsedJson && Array.isArray(parsedJson.items)) {
     items = parsedJson.items;
