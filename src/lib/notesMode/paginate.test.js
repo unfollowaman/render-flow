@@ -332,6 +332,22 @@ describe('measureHeight caching & performance benchmark', () => {
 
     expect(durationCached).toBeLessThanOrEqual(durationUncached);
   });
+
+  test('benchmark paginateRows for 10,000 items', async () => {
+    const items = Array.from({ length: 10000 }, (_, i) => ({
+      id: `item-${i}`,
+      element: createMockElement(i % 100 === 0 ? 300 : 20 + (i % 5) * 10),
+    }));
+
+    const t0 = performance.now();
+    const result = await paginateRows(items, { usableHeightPerPage: 225, chunkSize: 10000 });
+    const duration = performance.now() - t0;
+
+    console.log(`[Benchmark paginateRows] 10,000 items -> Duration: ${duration.toFixed(2)}ms`);
+
+    expect(result.pages.length).toBeGreaterThan(0);
+    expect(result.overflowItems.length).toBe(100); // 10,000 / 100 = 100 oversized items
+  });
 });
 
 describe('flowBlocksIntoColumns XSS Sanitization', () => {
