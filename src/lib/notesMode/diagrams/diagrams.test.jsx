@@ -6,7 +6,6 @@ import {
   coordinatePlane,
   Point,
   point,
-  LineSegment,
   lineSegment,
   Shape,
   shape,
