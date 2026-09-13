@@ -1,9 +1,20 @@
-import { forwardRef, useState } from "react";
+import { forwardRef, useState, useEffect } from "react";
 import styles from "../styles/Home.module.css";
 import downloadIcon from "../assets/download-icon.png";
 
 export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsFullscreen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isFullscreen]);
 
   const baseAltText =
     mode === "mermaid"
@@ -37,16 +48,37 @@ export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
           <img
             src={result.image}
             alt={baseAltText}
+            role="button"
+            tabIndex={0}
+            aria-label={`${baseAltText} - Click to enlarge`}
             className={styles.previewImage}
             style={{ maxWidth: "100%", cursor: "pointer" }}
-              onClick={() => setIsFullscreen(true)}
-            />
+            onClick={() => setIsFullscreen(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setIsFullscreen(true);
+              }
+            }}
+          />
           </div>
         </div>
       </div>
 
       {isFullscreen && (
-        <div className={styles.fullscreenOverlay} onClick={() => setIsFullscreen(false)}>
+        <div
+          className={styles.fullscreenOverlay}
+          role="button"
+          tabIndex={0}
+          aria-label="Close fullscreen preview"
+          onClick={() => setIsFullscreen(false)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
+              e.preventDefault();
+              setIsFullscreen(false);
+            }
+          }}
+        >
           <img
             src={result.image}
             alt={`${baseAltText} (fullscreen view)`}
