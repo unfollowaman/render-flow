@@ -49,7 +49,7 @@ describe('OutputCard', () => {
   it('opens and closes fullscreen overlay when preview image is clicked', () => {
     render(<OutputCard result={mockResult} onReset={() => {}} mode="html" />);
 
-    const previewImg = screen.getByAltText('Rendered HTML output');
+    const previewImg = screen.getByRole('button', { name: /Rendered HTML output - Click to enlarge/i });
     expect(screen.queryByAltText('Rendered HTML output (fullscreen view)')).toBeNull();
 
     // Open fullscreen
@@ -60,6 +60,29 @@ describe('OutputCard', () => {
     // Close fullscreen by clicking overlay
     const overlay = fullscreenImg.parentElement;
     fireEvent.click(overlay);
+    expect(screen.queryByAltText('Rendered HTML output (fullscreen view)')).toBeNull();
+  });
+
+  it('opens and closes fullscreen overlay with keyboard navigation (Enter, Space, Escape)', () => {
+    render(<OutputCard result={mockResult} onReset={() => {}} mode="html" />);
+
+    const previewImg = screen.getByRole('button', { name: /Rendered HTML output - Click to enlarge/i });
+
+    // Open via Enter key
+    fireEvent.keyDown(previewImg, { key: 'Enter' });
+    expect(screen.getByAltText('Rendered HTML output (fullscreen view)')).toBeTruthy();
+
+    // Close via Escape key
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(screen.queryByAltText('Rendered HTML output (fullscreen view)')).toBeNull();
+
+    // Open via Space key
+    fireEvent.keyDown(previewImg, { key: ' ' });
+    expect(screen.getByAltText('Rendered HTML output (fullscreen view)')).toBeTruthy();
+
+    // Close via overlay keyboard interaction
+    const overlay = screen.getByRole('button', { name: /Close fullscreen preview/i });
+    fireEvent.keyDown(overlay, { key: 'Escape' });
     expect(screen.queryByAltText('Rendered HTML output (fullscreen view)')).toBeNull();
   });
 
