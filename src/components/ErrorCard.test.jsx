@@ -11,8 +11,10 @@ describe('ErrorCard', () => {
     const errorMessage = 'Invalid HTML structure';
     const { container } = render(<ErrorCard error={errorMessage} />);
 
+    expect(screen.getByRole('alert')).toBeTruthy();
     expect(screen.getByText('Rendering failed')).toBeTruthy();
-    expect(screen.getByText('⚠')).toBeTruthy();
+    const iconElement = screen.getByText('⚠');
+    expect(iconElement.getAttribute('aria-hidden')).toBe('true');
     expect(screen.getByText(errorMessage)).toBeTruthy();
 
     const cardElement = container.querySelector('.neu-card');
