@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import DOMPurify from 'dompurify';
 import { createIsolatedIframe } from '../utils/createIsolatedIframe';
 
 export function useLatexToPngConversion({ outputRef }) {
@@ -66,6 +67,8 @@ export function useLatexToPngConversion({ outputRef }) {
 
       document.body.appendChild(iframe);
 
+      const sanitizedHtml = DOMPurify.sanitize(htmlContent);
+
       const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
       iframeDoc.open();
       iframeDoc.write(`
@@ -75,7 +78,7 @@ export function useLatexToPngConversion({ outputRef }) {
         </head>
         <body style="margin: 0; padding: 0;">
           <div id="latex-container" style="display: inline-block; margin: 0; padding: 0;">
-            ${htmlContent}
+            ${sanitizedHtml}
           </div>
         </body>
         </html>
