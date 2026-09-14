@@ -45,20 +45,20 @@ describe('useMermaidToPngConversion security configuration', () => {
 });
 
 describe('arrayBufferToBase64', () => {
-  it('correctly converts empty ArrayBuffer', () => {
+  it('correctly converts empty ArrayBuffer', async () => {
     const buffer = new Uint8Array([]).buffer;
-    expect(arrayBufferToBase64(buffer)).toBe('');
+    expect(await arrayBufferToBase64(buffer)).toBe('');
   });
 
-  it('correctly converts small ArrayBuffer', () => {
+  it('correctly converts small ArrayBuffer', async () => {
     const text = 'Hello, World!';
     const encoder = new TextEncoder();
     const bytes = encoder.encode(text);
     const expected = btoa(text);
-    expect(arrayBufferToBase64(bytes.buffer)).toBe(expected);
+    expect(await arrayBufferToBase64(bytes.buffer)).toBe(expected);
   });
 
-  it('correctly converts large ArrayBuffer spanning multiple chunks', () => {
+  it('correctly converts large ArrayBuffer spanning multiple chunks', async () => {
     // Generate 100KB of random-ish bytes
     const size = 100 * 1024;
     const bytes = new Uint8Array(size);
@@ -66,10 +66,10 @@ describe('arrayBufferToBase64', () => {
       bytes[i] = i % 256;
     }
     const expected = Buffer.from(bytes).toString('base64');
-    expect(arrayBufferToBase64(bytes.buffer)).toBe(expected);
+    expect(await arrayBufferToBase64(bytes.buffer)).toBe(expected);
   });
 
-  it('benchmark arrayBufferToBase64 performance', () => {
+  it('benchmark arrayBufferToBase64 performance', async () => {
     // Generate 2MB buffer simulating font file sizes
     const size = 2 * 1024 * 1024;
     const bytes = new Uint8Array(size);
@@ -78,12 +78,12 @@ describe('arrayBufferToBase64', () => {
     }
 
     // Warmup
-    arrayBufferToBase64(bytes.buffer);
+    await arrayBufferToBase64(bytes.buffer);
 
     const iterations = 50;
     const start = performance.now();
     for (let i = 0; i < iterations; i++) {
-      arrayBufferToBase64(bytes.buffer);
+      await arrayBufferToBase64(bytes.buffer);
     }
     const totalTime = performance.now() - start;
     const avgTime = totalTime / iterations;

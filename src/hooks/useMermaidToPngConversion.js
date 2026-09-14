@@ -5,15 +5,17 @@ let cachedStyleString = null;
 let fontLoadingPromise = null;
 
 export function arrayBufferToBase64(buffer) {
-  const bytes = new Uint8Array(buffer);
-  const len = bytes.byteLength;
-  const chunk = 16384; // 16KB chunks to avoid stack overflow
-  const chunks = [];
-  for (let i = 0; i < len; i += chunk) {
-    const sub = bytes.subarray(i, Math.min(i + chunk, len));
-    chunks.push(String.fromCharCode.apply(null, sub));
-  }
-  return btoa(chunks.join(''));
+  return new Promise((resolve, reject) => {
+    const blob = new Blob([buffer]);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      const base64 = dataUrl.substring(dataUrl.indexOf(',') + 1);
+      resolve(base64);
+    };
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(blob);
+  });
 }
 
 async function loadFontsAndBuildStyleString() {
@@ -59,7 +61,7 @@ async function loadFontsAndBuildStyleString() {
           throw new Error(`Failed to fetch font from ${font.url}`);
         }
         const buffer = await response.arrayBuffer();
-        const base64 = arrayBufferToBase64(buffer);
+        const base64 = await arrayBufferToBase64(buffer);
         return {
           ...font,
           base64,
