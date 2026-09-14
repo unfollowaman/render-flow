@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import { useHtmlToPngConversion } from './useHtmlToPngConversion'
+import { useHtmlToPngConversion, waitForFontsAndImages } from './useHtmlToPngConversion'
 
 vi.mock('html-to-image', () => ({
   toPng: vi.fn().mockResolvedValue('data:image/png;base64,fake')
@@ -77,5 +77,63 @@ describe('useHtmlToPngConversion XSS Sanitization', () => {
     expect(writtenContent).toContain('<h1>Title</h1>')
     expect(writtenContent).toContain('<img src="x">')
     expect(writtenContent).toContain('<a>Malicious Link</a>')
+  })
+})
+
+describe('waitForFontsAndImages performance & functionality', () => {
+  it('handles HTMLCollection, Array, and null doc.images correctly', async () => {
+    // Test with real HTMLCollection
+    const div = document.createElement('div')
+    const img1 = document.createElement('img')
+    img1.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+    div.appendChild(img1)
+
+    const docMock = {
+      images: div.getElementsByTagName('img'),
+      fonts: { ready: Promise.resolve() },
+      body: document.createElement('body')
+    }
+
+    await waitForFontsAndImages(docMock, 50)
+    expect(img1).toBeTruthy()
+
+    // Test with missing doc.images
+    const docNoImages = {
+      fonts: { ready: Promise.resolve() },
+      body: document.createElement('body')
+    }
+    await waitForFontsAndImages(docNoImages, 50)
+  })
+
+  it('benchmark direct HTMLCollection iteration vs Array.from', () => {
+    const container = document.createElement('div')
+    for (let i = 0; i < 2000; i++) {
+      const img = document.createElement('img')
+      img.src = `http://example.com/img${i}.png`
+      container.appendChild(img)
+    }
+    const htmlCollection = container.getElementsByTagName('img')
+
+    // Direct iteration
+    const startDirect = performance.now()
+    let countDirect = 0
+    for (const img of htmlCollection || []) {
+      if (img.src) countDirect++
+    }
+    const durationDirect = performance.now() - startDirect
+
+    // Array.from iteration
+    const startArrayFrom = performance.now()
+    let countArrayFrom = 0
+    const imagesArr = Array.from(htmlCollection || [])
+    for (const img of imagesArr) {
+      if (img.src) countArrayFrom++
+    }
+    const durationArrayFrom = performance.now() - startArrayFrom
+
+    console.log(`[Benchmark HTMLCollection iteration] 2000 elements -> Direct: ${durationDirect.toFixed(2)}ms, Array.from: ${durationArrayFrom.toFixed(2)}ms`)
+
+    expect(countDirect).toBe(2000)
+    expect(countArrayFrom).toBe(2000)
   })
 })

@@ -35,7 +35,7 @@ export async function waitForFontsAndImages(doc, timeoutMs = 5000) {
     }
 
     // Wait for images
-    const images = Array.from(doc.images || [])
+    const images = doc.images || []
     for (const img of images) {
       if (!img.complete) {
         promises.push(
