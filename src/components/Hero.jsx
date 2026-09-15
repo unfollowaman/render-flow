@@ -11,10 +11,11 @@ export function Hero() {
           Render Flow
           <br />
           <span className={styles.heroConverterLine}>
-            <span className={styles.heroWordRoller} aria-label="Mermaid HTML LaTeX">
-              <span>Mermaid</span>
+            <span className={styles.heroWordRoller} aria-label="HTML Mermaid LaTeX JSON">
               <span>HTML</span>
+              <span>Mermaid</span>
               <span>LaTeX</span>
+              <span>JSON</span>
             </span>
             <span className={styles.heroStaticText}>
               <span>Code to Image</span>

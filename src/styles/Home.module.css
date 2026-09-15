@@ -159,7 +159,7 @@
 }
 
 .heroWordRoller {
-  --roller-steps: 3;
+  --roller-steps: 4;
   --roller-step-duration: 2.65s;
   --roller-cycle: calc(var(--roller-steps) * var(--roller-step-duration));
   --roller-radius: 0.74em;
@@ -209,11 +209,15 @@
 }
 
 .heroWordRoller span:nth-child(2) {
-  animation-delay: calc(var(--roller-cycle) / -3);
+  animation-delay: calc(var(--roller-cycle) * -3 / 4);
 }
 
 .heroWordRoller span:nth-child(3) {
-  animation-delay: calc(var(--roller-cycle) / -1.5);
+  animation-delay: calc(var(--roller-cycle) / -2);
+}
+
+.heroWordRoller span:nth-child(4) {
+  animation-delay: calc(var(--roller-cycle) / -4);
 }
 
 .heroStaticText {
@@ -236,22 +240,27 @@
 }
 
 @keyframes rotaryHeroWord {
-  0%, 20% {
+  0%, 15% {
     opacity: 1;
     filter: blur(0);
     transform: rotateX(0deg) translateZ(var(--roller-radius));
   }
-  31%, 53.333% {
+  23.25%, 40% {
     opacity: 0.15;
     filter: blur(6px);
-    transform: rotateX(120deg) translateZ(var(--roller-radius));
+    transform: rotateX(90deg) translateZ(var(--roller-radius));
   }
-  64.333%, 86.666% {
+  48.25%, 65% {
     opacity: 0.15;
     filter: blur(6px);
-    transform: rotateX(240deg) translateZ(var(--roller-radius));
+    transform: rotateX(180deg) translateZ(var(--roller-radius));
   }
-  97.666%, 100% {
+  73.25%, 90% {
+    opacity: 0.15;
+    filter: blur(6px);
+    transform: rotateX(270deg) translateZ(var(--roller-radius));
+  }
+  98.25%, 100% {
     opacity: 1;
     filter: blur(0);
     transform: rotateX(360deg) translateZ(var(--roller-radius));

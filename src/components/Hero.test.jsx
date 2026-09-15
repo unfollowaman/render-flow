@@ -14,11 +14,12 @@ describe('Hero', () => {
     expect(screen.getByText('Render Flow')).toBeTruthy();
     expect(screen.getByText('Code to Image')).toBeTruthy();
 
-    const wordRoller = screen.getByLabelText('Mermaid HTML LaTeX');
+    const wordRoller = screen.getByLabelText('HTML Mermaid LaTeX JSON');
     expect(wordRoller).toBeTruthy();
-    expect(screen.getByText('Mermaid')).toBeTruthy();
     expect(screen.getByText('HTML')).toBeTruthy();
+    expect(screen.getByText('Mermaid')).toBeTruthy();
     expect(screen.getByText('LaTeX')).toBeTruthy();
+    expect(screen.getByText('JSON')).toBeTruthy();
   });
 
   it('renders description paragraph', () => {
