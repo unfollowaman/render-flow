@@ -358,6 +358,12 @@
   padding: 32px;
 }
 
+.modeSelector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
 .cardHeader {
   display: flex;
   align-items: center;
@@ -848,6 +854,11 @@
   }
   .card {
     padding: 24px 20px;
+  }
+  .modeSelector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
   .downloadRow {
     flex-direction: column;
