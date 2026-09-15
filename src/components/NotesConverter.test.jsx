@@ -144,13 +144,13 @@ describe('NotesConverter & Notes Mode integration', () => {
 
     expect(await screen.findByLabelText('Input HTML')).toBeTruthy();
 
-    const notesButtons = screen.getAllByRole('button', { name: 'Notes Mode' });
-    fireEvent.click(notesButtons[0]);
+    const notesTab = screen.getByRole('tab', { name: 'Notes Mode' });
+    fireEvent.click(notesTab);
 
     expect(await screen.findByLabelText('Input Notes JSON')).toBeTruthy();
 
-    const htmlButtons = screen.getAllByRole('button', { name: 'HTML Mode' });
-    fireEvent.click(htmlButtons[0]);
+    const htmlTab = screen.getByRole('tab', { name: 'HTML Mode' });
+    fireEvent.click(htmlTab);
 
     expect(await screen.findByLabelText('Input HTML')).toBeTruthy();
   });

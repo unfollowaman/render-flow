@@ -622,10 +622,12 @@ export const InputCard = forwardRef(function InputCard({
   return (
     <div className={`${styles.card} neu-card`} ref={cardRef}>
       {/* Mode Toggle */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+      <div role="tablist" aria-label="Input mode selector" style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
         {Object.values(MODE_CONFIGS).map((cfg) => (
           <button
             key={cfg.mode}
+            role="tab"
+            aria-selected={mode === cfg.mode}
             className={`${styles.sampleBtn} ${mode === cfg.mode ? "neu-recessed" : "neu-raised"}`}
             style={{
               flex: 1,
