@@ -39,27 +39,30 @@ describe('InputCard', () => {
   });
 
   describe('Mode Switching and Workspace Rendering', () => {
-    it('renders mode toggle buttons and calls setMode on click', () => {
+    it('renders mode toggle tablist and tabs with correct ARIA attributes', () => {
       const setMode = vi.fn();
-      render(<InputCard {...defaultProps} setMode={setMode} />);
+      render(<InputCard {...defaultProps} mode="html" setMode={setMode} />);
 
-      const htmlBtn = screen.getByRole('button', { name: 'HTML Mode' });
-      const mermaidBtn = screen.getByRole('button', { name: 'Mermaid Mode' });
-      const latexBtn = screen.getByRole('button', { name: 'LaTeX Mode' });
-      const notesBtn = screen.getByRole('button', { name: 'Notes Mode' });
+      const tabList = screen.getByRole('tablist', { name: 'Input mode selector' });
+      expect(tabList).toBeTruthy();
 
-      expect(htmlBtn).toBeTruthy();
-      expect(mermaidBtn).toBeTruthy();
-      expect(latexBtn).toBeTruthy();
-      expect(notesBtn).toBeTruthy();
+      const htmlTab = screen.getByRole('tab', { name: 'HTML Mode' });
+      const mermaidTab = screen.getByRole('tab', { name: 'Mermaid Mode' });
+      const latexTab = screen.getByRole('tab', { name: 'LaTeX Mode' });
+      const notesTab = screen.getByRole('tab', { name: 'Notes Mode' });
 
-      fireEvent.click(mermaidBtn);
+      expect(htmlTab.getAttribute('aria-selected')).toBe('true');
+      expect(mermaidTab.getAttribute('aria-selected')).toBe('false');
+      expect(latexTab.getAttribute('aria-selected')).toBe('false');
+      expect(notesTab.getAttribute('aria-selected')).toBe('false');
+
+      fireEvent.click(mermaidTab);
       expect(setMode).toHaveBeenCalledWith('mermaid');
 
-      fireEvent.click(latexBtn);
+      fireEvent.click(latexTab);
       expect(setMode).toHaveBeenCalledWith('latex');
 
-      fireEvent.click(notesBtn);
+      fireEvent.click(notesTab);
       expect(setMode).toHaveBeenCalledWith('notes');
     });
 
