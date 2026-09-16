@@ -331,7 +331,7 @@ const NotesConverter = forwardRef(function NotesConverter(
               disabled={isExportingPng}
               onClick={handleDownloadPng}
             >
-              <img src={downloadIcon} alt="Download" className={styles.downloadIcon} />
+              <img src={downloadIcon} alt="" aria-hidden="true" className={styles.downloadIcon} />
               {isExportingPng ? "Exporting PNG..." : "Download Page as PNG"}
             </button>
 

@@ -96,15 +96,20 @@ describe('OutputCard', () => {
     expect(handleReset).toHaveBeenCalledTimes(1);
   });
 
-  it('triggers image download on Download PNG button click', () => {
+  it('triggers image download on Download PNG button click and marks icon as decorative', () => {
     const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
 
-    render(<OutputCard result={mockResult} onReset={() => {}} mode="html" />);
+    const { container } = render(<OutputCard result={mockResult} onReset={() => {}} mode="html" />);
 
     const downloadButton = screen.getByRole('button', { name: /Download PNG/i });
     fireEvent.click(downloadButton);
 
     expect(clickSpy).toHaveBeenCalledTimes(1);
+
+    const iconImg = container.querySelector('button img');
+    expect(iconImg).not.toBeNull();
+    expect(iconImg.getAttribute('alt')).toBe('');
+    expect(iconImg.getAttribute('aria-hidden')).toBe('true');
   });
 
   it('handles download safely when result or result.image is missing', () => {
