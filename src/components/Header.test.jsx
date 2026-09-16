@@ -26,10 +26,17 @@ describe('Header', () => {
     expect(githubLink.getAttribute('target')).toBe('_blank');
     expect(githubLink.getAttribute('rel')).toBe('noopener');
 
-    const deployLink = screen.getByRole('link', { name: 'Deploy' });
-    expect(deployLink).toBeTruthy();
-    expect(deployLink.getAttribute('href')).toBe('https://pages.github.com');
-    expect(deployLink.getAttribute('target')).toBe('_blank');
-    expect(deployLink.getAttribute('rel')).toBe('noopener');
+    const docsLink = screen.getByRole('link', { name: 'Docs' });
+    expect(docsLink).toBeTruthy();
+    expect(docsLink.getAttribute('href')).toBe('docs.html');
+    expect(docsLink.getAttribute('aria-current')).toBeNull();
+  });
+
+  it('marks Docs as active when activePage is "docs"', () => {
+    render(<Header activePage="docs" />);
+
+    const docsLink = screen.getByRole('link', { name: 'Docs' });
+    expect(docsLink).toBeTruthy();
+    expect(docsLink.getAttribute('aria-current')).toBe('page');
   });
 });

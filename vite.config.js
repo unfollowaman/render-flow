@@ -1,32 +1,33 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
 function inlineCssPlugin() {
   return {
     name: 'inline-css-plugin',
     enforce: 'post',
     generateBundle(options, bundle) {
-      let indexHtmlKey = null;
       let cssKey = null;
 
       for (const [key] of Object.entries(bundle)) {
-        if (key.endsWith('index.html')) indexHtmlKey = key;
         if (key.startsWith('assets/index-') && key.endsWith('.css')) cssKey = key;
       }
 
-      if (indexHtmlKey && cssKey) {
-        const htmlFile = bundle[indexHtmlKey];
+      if (cssKey) {
         const cssFile = bundle[cssKey];
-
         const cssContent = cssFile.source;
         const cssFileName = cssKey.split('/').pop();
         const escapedFileName = cssFileName.replace('.', '\\.');
         const linkRegex = new RegExp('<link[^>]*href=["\'][^"\']*' + escapedFileName + '["\'][^>]*>', 'g');
 
-        htmlFile.source = htmlFile.source.replace(
-          linkRegex,
-          `<style>${cssContent}</style>`
-        );
+        for (const [key, file] of Object.entries(bundle)) {
+          if (key.endsWith('.html')) {
+            file.source = file.source.replace(
+              linkRegex,
+              `<style>${cssContent}</style>`
+            );
+          }
+        }
 
         delete bundle[cssKey];
       }
@@ -50,6 +51,10 @@ export default defineConfig({
       },
     },
     rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        docs: resolve(__dirname, 'docs.html'),
+      },
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
