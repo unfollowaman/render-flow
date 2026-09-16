@@ -1,11 +1,49 @@
+// Performance optimization: Avoid dual string scanning passes (str.replace)
+// by matching all occurrences in a single exec pass and constructing the result via slice string builder.
 async function replaceAsync(str, regex, asyncFn) {
+  const matches = [];
   const promises = [];
-  str.replace(regex, (match, ...args) => {
-    promises.push(asyncFn(match, ...args));
-  });
-  const data = await Promise.all(promises);
-  let index = 0;
-  return str.replace(regex, () => data[index++]);
+
+  const flags = regex.flags.includes('g') ? regex.flags : regex.flags + 'g';
+  const rx = new RegExp(regex.source, flags);
+
+  let match;
+  while ((match = rx.exec(str)) !== null) {
+    matches.push(match);
+    const args = [...match];
+    args.push(match.index, str);
+    if (match.groups !== undefined) {
+      args.push(match.groups);
+    }
+    promises.push(asyncFn(...args));
+
+    // Guard against zero-width match infinite loop
+    if (match.index === rx.lastIndex) {
+      rx.lastIndex++;
+    }
+
+    // Break after first match if original regex was non-global
+    if (!regex.flags.includes('g')) {
+      break;
+    }
+  }
+
+  if (matches.length === 0) {
+    return str;
+  }
+
+  const replacements = await Promise.all(promises);
+
+  let result = '';
+  let lastIndex = 0;
+  for (let i = 0; i < matches.length; i++) {
+    const m = matches[i];
+    result += str.slice(lastIndex, m.index) + replacements[i];
+    lastIndex = m.index + m[0].length;
+  }
+  result += str.slice(lastIndex);
+
+  return result;
 }
 
 export function isPrivateOrLoopbackHost(hostname) {

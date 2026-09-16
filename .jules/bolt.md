@@ -1,0 +1,3 @@
+## 2025-09-16 - Single-Pass Async Regex String Replacement Optimization
+**Learning:** Standard double-pass `replaceAsync` patterns (`str.replace(regex, fn)` to collect promises followed by `str.replace(regex, fn)` to insert results) scan large text inputs twice, doubling regex matching overhead. Refactoring to a single `exec()` loop with string slice builder improves performance by ~40% while preserving standard `String.prototype.replace` parameter semantics and non-global regex behavior.
+**Action:** Use single-pass `RegExp.prototype.exec()` and `str.slice()` string builder when implementing async regex string replacement helpers.
