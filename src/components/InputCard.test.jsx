@@ -280,6 +280,33 @@ describe('InputCard', () => {
       expect(handleMermaidConvert).toHaveBeenCalledWith('graph TD\n  A-->B');
     });
 
+    it('triggers conversion when Ctrl+Enter or Cmd+Enter is pressed inside textarea', () => {
+      const handleConvert = vi.fn();
+      render(<InputCard {...defaultProps} mode="html" handleConvert={handleConvert} />);
+
+      const textarea = screen.getByLabelText('Input HTML');
+      fireEvent.change(textarea, { target: { value: '<h1>Test Shortcuts</h1>' } });
+
+      // Press Ctrl+Enter
+      fireEvent.keyDown(textarea, { key: 'Enter', ctrlKey: true });
+      expect(handleConvert).toHaveBeenCalledWith('<h1>Test Shortcuts</h1>');
+
+      // Press Cmd+Enter (metaKey)
+      fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true });
+      expect(handleConvert).toHaveBeenCalledTimes(2);
+    });
+
+    it('triggers notes generation when Ctrl+Enter is pressed inside Notes Mode textarea', () => {
+      const handleNotesGenerate = vi.fn();
+      render(<InputCard {...defaultProps} mode="notes" handleNotesGenerate={handleNotesGenerate} />);
+
+      const textarea = screen.getByLabelText('Input Notes JSON');
+      fireEvent.change(textarea, { target: { value: '{"test": 123}' } });
+
+      fireEvent.keyDown(textarea, { key: 'Enter', ctrlKey: true });
+      expect(handleNotesGenerate).toHaveBeenCalledWith('{"test": 123}');
+    });
+
     it('triggers handleLatexConvert when Convert to PNG is clicked in LaTeX mode', () => {
       const handleLatexConvert = vi.fn();
       render(<InputCard {...defaultProps} mode="latex" handleLatexConvert={handleLatexConvert} />);

@@ -358,6 +358,14 @@ const Workspace = forwardRef(function Workspace({
               setError(null);
               if (setHtmlWarning) setHtmlWarning(null);
             }}
+            onKeyDown={(e) => {
+              if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                e.preventDefault();
+                if (!loading && value.trim()) {
+                  handleConvert(value);
+                }
+              }
+            }}
             placeholder={modeConfig.placeholder}
             spellCheck={false}
             style={{ background: 'transparent' }}
@@ -427,6 +435,7 @@ const Workspace = forwardRef(function Workspace({
         className={`${styles.convertBtn} ${loading ? styles.convertBtnLoading : ""}`}
         onClick={() => handleConvert(value)}
         disabled={loading || !value.trim()}
+        title="Convert to PNG (Ctrl+Enter or ⌘+Enter)"
       >
         {loading ? "Converting…" : "Convert to PNG"}
       </button>
@@ -499,6 +508,14 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
             onChange={(e) => {
               setValue(e.target.value);
             }}
+            onKeyDown={(e) => {
+              if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                e.preventDefault();
+                if (!loading && value.trim()) {
+                  handleNotesGenerate(value);
+                }
+              }
+            }}
             placeholder={modeConfig.placeholder}
             spellCheck={false}
             style={{ background: 'transparent' }}
@@ -539,6 +556,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
           style={{ flex: '1 1 200px', height: '48px', margin: 0 }}
           onClick={() => handleNotesGenerate(value)}
           disabled={loading || !value.trim()}
+          title="Generate (Ctrl+Enter or ⌘+Enter)"
         >
           {loading ? "Generating…" : "Generate"}
         </button>
