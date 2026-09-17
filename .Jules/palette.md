@@ -9,3 +9,7 @@
 ## 2025-05-18 - Multi-platform Keyboard Shortcut Pattern for Textarea Submission
 **Learning:** In text editors/code input cards, users expect standard IDE shortcuts (`Ctrl+Enter` on Windows/Linux, `Cmd+Enter` / `e.metaKey` on macOS) to trigger submit actions without needing to tab out or click buttons. Pair this with `title` attributes on submit buttons to make the shortcut discoverable.
 **Action:** Check `(e.ctrlKey || e.metaKey) && e.key === "Enter"` in textarea `onKeyDown` handlers and add shortcut descriptions in submit button tooltips.
+
+## 2025-05-18 - Modal Overlay React Portals & Stacking Context Isolation
+**Learning:** Fixed overlay modals rendered inside nested layout containers with `position: relative` and low `z-index` (e.g. `<main style={{ z-index: 2 }}>`) become trapped within that container's local stacking context, causing higher `z-index` header elements (e.g. `<header style={{ z-index: 100 }}>`) to overlap modal controls.
+**Action:** Render modal overlays via `createPortal(..., document.body)` so they mount at root DOM level, escaping local parent stacking contexts and ensuring overlay controls sit unobstructed above fixed/sticky headers.
