@@ -252,6 +252,19 @@
   max-width: 100%;
   height: auto;
   background: transparent !important;
+  overflow: visible;
+}
+
+.diagramSvg svg foreignObject {
+  overflow: visible;
+}
+
+.diagramSvg svg foreignObject > div {
+  word-break: normal;
+  overflow-wrap: break-word;
+  white-space: normal;
+  box-sizing: border-box;
+  padding: 2px 4px;
 }
 
 .diagramCaption {
