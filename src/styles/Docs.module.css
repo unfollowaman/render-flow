@@ -252,6 +252,26 @@
   max-width: 100%;
   height: auto;
   background: transparent !important;
+  overflow: visible;
+}
+
+.diagramSvg svg foreignObject {
+  overflow: visible;
+}
+
+.diagramSvg svg foreignObject > div {
+  word-break: normal;
+  overflow-wrap: break-word;
+  white-space: normal;
+  box-sizing: border-box;
+  padding: 2px 4px;
+}
+
+.diagramSvg svg :global(.node) rect,
+.diagramSvg svg :global(rect.label-container),
+.diagramSvg svg :global(.basic.label-container) {
+  rx: 8px !important;
+  ry: 8px !important;
 }
 
 .diagramCaption {
