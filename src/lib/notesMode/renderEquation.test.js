@@ -1,8 +1,11 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import katex from 'katex';
-import { renderEquation } from './renderEquation';
+import { renderEquation, clearEquationCache } from './renderEquation';
 
 describe('renderEquation LaTeX-to-rendered-equation utility', () => {
+  beforeEach(() => {
+    clearEquationCache();
+  });
   it('1. Inline equation: "x^2 + y^2 = r^2" renders correctly with displayMode: false', () => {
     const res = renderEquation('x^2 + y^2 = r^2', { displayMode: false });
     expect(res.error).toBe(false);
@@ -82,5 +85,46 @@ describe('renderEquation LaTeX-to-rendered-equation utility', () => {
     });
 
     spy.mockRestore();
+  });
+
+  it('10. Caching & Performance: caches identical equations and avoids repeated KaTeX calls', () => {
+    const latex = '\\int_{0}^{\\infty} e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}';
+    const spy = vi.spyOn(katex, 'renderToString');
+
+    const res1 = renderEquation(latex, { displayMode: true });
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    const res2 = renderEquation(latex, { displayMode: true });
+    // Second call should hit cache and NOT invoke katex.renderToString again
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(res2.html).toBe(res1.html);
+    expect(res2.element.innerHTML).toBe(res1.element.innerHTML);
+
+    // clearEquationCache resets cache
+    clearEquationCache();
+    renderEquation(latex, { displayMode: true });
+    expect(spy).toHaveBeenCalledTimes(2);
+
+    spy.mockRestore();
+  });
+
+  it('11. Benchmark: measures performance speedup from equation caching', () => {
+    clearEquationCache();
+    const latex = '\\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}';
+
+    // First call (uncached)
+    const t0 = performance.now();
+    renderEquation(latex, { displayMode: true });
+    const uncachedDuration = performance.now() - t0;
+
+    // Subsequent 100 calls (cached)
+    const t1 = performance.now();
+    for (let i = 0; i < 100; i++) {
+      renderEquation(latex, { displayMode: true });
+    }
+    const cached100Duration = performance.now() - t1;
+
+    console.log(`[Benchmark renderEquation] 1 uncached: ${uncachedDuration.toFixed(2)}ms vs 100 cached: ${cached100Duration.toFixed(2)}ms`);
+    expect(cached100Duration).toBeLessThan(uncachedDuration * 10);
   });
 });

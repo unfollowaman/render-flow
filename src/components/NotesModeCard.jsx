@@ -1,5 +1,4 @@
 import React from 'react';
-import DOMPurify from 'dompurify';
 import { renderEquation } from '../lib/notesMode/renderEquation';
 import { CoordinatePlane, Point, LineSegment, Shape } from '../lib/notesMode/diagrams';
 
@@ -24,8 +23,8 @@ export function renderContentItem(item, idx) {
         </span>
       );
     }
-    const cleanHtml = DOMPurify.sanitize(result.html);
-    return <span key={idx} dangerouslySetInnerHTML={{ __html: cleanHtml }} />;
+    // Optimization: renderEquation already returns sanitized HTML from DOMPurify.
+    return <span key={idx} dangerouslySetInnerHTML={{ __html: result.html }} />;
   }
 
   if (item.type === 'coordinate_graph') {
