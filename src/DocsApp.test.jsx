@@ -56,7 +56,7 @@ describe('DocsApp', () => {
     expect(creditsLinks.some((l) => l.getAttribute('href') === '#credits-stack')).toBe(true);
   });
 
-  it('renders all section headings and verbatim copy', () => {
+  it('renders all section headings and deepened copy', () => {
     render(<DocsApp />);
 
     // Overview
@@ -77,10 +77,46 @@ describe('DocsApp', () => {
       )
     ).toBeTruthy();
 
-    // Pipelines
-    expect(screen.getByText(/html-to-image/)).toBeTruthy();
-    expect(screen.getByText(/mermaid.js/)).toBeTruthy();
-    expect(screen.getAllByText(/KaTeX/).length).toBeGreaterThanOrEqual(2);
+    // Deepened How it works copy
+    expect(
+      screen.getByText(
+        /An iframe provides structural isolation without needing a server-side sandbox/i
+      )
+    ).toBeTruthy();
+
+    // Deepened Render pipelines copy
+    expect(
+      screen.getByText(
+        /Target dimensions are read from explicit width and height properties on the body element/i
+      )
+    ).toBeTruthy();
+    expect(
+      screen.getByText(
+        /Custom fonts are base64-encoded and embedded inline directly inside the SVG/i
+      )
+    ).toBeTruthy();
+    expect(
+      screen.getByText(
+        /Rendering takes place in a container separated from global page styles/i
+      )
+    ).toBeTruthy();
+    expect(
+      screen.getByText(
+        /A size guardrail caps any single conversion's canvas at 200 million pixels/i
+      )
+    ).toBeTruthy();
+
+    // Deepened Privacy & security copy
+    expect(
+      screen.getByText(
+        /This isolation is designed to protect your browser tab from your own pasted code/i
+      )
+    ).toBeTruthy();
+
+    // Overview Diagram Caption
+    expect(
+      screen.getByText("Every mode follows this same shape — only step 2 differs.")
+    ).toBeTruthy();
 
     // Credits links
     const unfollowLink = screen.getByRole('link', { name: '@unfollowaman' });
