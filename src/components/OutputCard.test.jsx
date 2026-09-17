@@ -63,6 +63,18 @@ describe('OutputCard', () => {
     expect(screen.queryByAltText('Rendered HTML output (fullscreen view)')).toBeNull();
   });
 
+  it('closes fullscreen overlay when explicit close button is clicked', () => {
+    render(<OutputCard result={mockResult} onReset={() => {}} mode="html" />);
+
+    const previewImg = screen.getByRole('button', { name: /Rendered HTML output - Click to enlarge/i });
+    fireEvent.click(previewImg);
+    expect(screen.getByAltText('Rendered HTML output (fullscreen view)')).toBeTruthy();
+
+    const closeBtn = screen.getByRole('button', { name: /Close fullscreen preview/i });
+    fireEvent.click(closeBtn);
+    expect(screen.queryByAltText('Rendered HTML output (fullscreen view)')).toBeNull();
+  });
+
   it('opens and closes fullscreen overlay with keyboard navigation (Enter, Space, Escape)', () => {
     render(<OutputCard result={mockResult} onReset={() => {}} mode="html" />);
 
@@ -81,7 +93,7 @@ describe('OutputCard', () => {
     expect(screen.getByAltText('Rendered HTML output (fullscreen view)')).toBeTruthy();
 
     // Close via overlay keyboard interaction
-    const overlay = screen.getByRole('button', { name: /Close fullscreen preview/i });
+    const overlay = screen.getByRole('button', { name: /Close preview overlay/i });
     fireEvent.keyDown(overlay, { key: 'Escape' });
     expect(screen.queryByAltText('Rendered HTML output (fullscreen view)')).toBeNull();
   });
@@ -96,7 +108,7 @@ describe('OutputCard', () => {
     expect(handleReset).toHaveBeenCalledTimes(1);
   });
 
-  it('triggers image download on Download PNG button click and marks icon as decorative', () => {
+  it('triggers image download on Download PNG button click and updates text feedback', () => {
     const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
 
     const { container } = render(<OutputCard result={mockResult} onReset={() => {}} mode="html" />);
@@ -105,6 +117,7 @@ describe('OutputCard', () => {
     fireEvent.click(downloadButton);
 
     expect(clickSpy).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('✓ Downloaded!')).toBeTruthy();
 
     const iconImg = container.querySelector('button img');
     expect(iconImg).not.toBeNull();
