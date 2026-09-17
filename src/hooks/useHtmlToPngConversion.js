@@ -20,6 +20,15 @@ function extractDimensions(html) {
   const width = widthMatch ? parseInt(widthMatch, 10) : null
   const height = heightMatch ? parseInt(heightMatch, 10) : null
 
+  console.log('STRESS-DIAG 1: Regex dimension extraction', {
+    bodyWidthMatch,
+    bodyHeightMatch,
+    inlineWidthMatch,
+    inlineHeightMatch,
+    extractedWidth: width,
+    extractedHeight: height,
+  })
+
   return { width, height }
 }
 
@@ -179,13 +188,22 @@ export function useHtmlToPngConversion({ outputRef }) {
         throw new Error(`Dimensions too large: requested ${finalWidth}x${finalHeight} exceeds maximum supported area of ${MAX_AREA} total pixels.`)
       }
 
+      console.log('STRESS-DIAG 2: Applying iframe dimensions', {
+        explicitWidth,
+        explicitHeight,
+        scrollWidth,
+        scrollHeight,
+        applyingWidth: finalWidth + 'px',
+        applyingHeight: finalHeight + 'px',
+      })
+
       iframe.style.width = finalWidth + 'px'
       iframe.style.height = finalHeight + 'px'
 
       await new Promise(resolve => setTimeout(resolve, 0))
       // Capture with html-to-image (lazy loaded)
       const { toPng } = await import('html-to-image')
-      const dataUrl = await toPng(iframe.contentDocument.body, {
+      const options = {
         width: finalWidth,
         height: finalHeight,
         style: {
@@ -193,7 +211,15 @@ export function useHtmlToPngConversion({ outputRef }) {
           padding: '0',
         },
         backgroundColor: null,
+      }
+
+      console.log('STRESS-DIAG 3: Options passed to html-to-image (toPng)', {
+        width: finalWidth,
+        height: finalHeight,
+        options,
       })
+
+      const dataUrl = await toPng(iframe.contentDocument.body, options)
 
       if (myRequestId === latestRequestIdRef.current) {
         setResult({ image: dataUrl, width: finalWidth, height: finalHeight })
