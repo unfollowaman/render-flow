@@ -1,6 +1,70 @@
-import React from "react";
+import React, { useEffect, useRef, useState, useId } from "react";
 import styles from "./styles/Docs.module.css";
 import { Header, Footer } from "./components";
+
+function StaticMermaidDiagram({ chart, caption }) {
+  const containerRef = useRef(null);
+  const [svgHtml, setSvgHtml] = useState("");
+  const uniqueId = "doc-mermaid-" + useId().replace(/:/g, "");
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function renderDiagram() {
+      try {
+        const mermaidModule = await import("mermaid");
+        const mermaid = mermaidModule.default || mermaidModule;
+
+        mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: "strict",
+          theme: "base",
+          themeVariables: {
+            fontFamily: "'Montserrat', sans-serif",
+            fontSize: "14px",
+            primaryColor: "#f2f2f4",
+            primaryTextColor: "#012b1b",
+            primaryBorderColor: "#012b1b",
+            lineColor: "#012b1b",
+            secondaryColor: "#ffa100",
+            tertiaryColor: "#e8e8ea",
+            background: "transparent",
+            mainBkg: "#f2f2f4",
+            nodeBorder: "#012b1b",
+            clusterBkg: "#e8e8ea",
+            clusterBorder: "#012b1b",
+            defaultLinkColor: "#012b1b",
+            titleColor: "#012b1b",
+            edgeLabelBackground: "#e8e8ea",
+          },
+        });
+
+        const { svg } = await mermaid.render(uniqueId, chart);
+        if (!isCancelled) {
+          setSvgHtml(svg);
+        }
+      } catch (err) {
+        console.error("Failed to render docs Mermaid diagram:", err);
+      }
+    }
+
+    renderDiagram();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [chart, uniqueId]);
+
+  return (
+    <div className={styles.diagramContainer} ref={containerRef}>
+      <div
+        className={styles.diagramSvg}
+        dangerouslySetInnerHTML={{ __html: svgHtml }}
+      />
+      {caption && <div className={styles.diagramCaption}>{caption}</div>}
+    </div>
+  );
+}
 
 export default function DocsApp() {
   const handleMobileNavChange = (e) => {
@@ -101,6 +165,10 @@ export default function DocsApp() {
               <p className={styles.smallNote}>
                 Four modes are available: HTML, Mermaid, LaTeX, and Notes <span className={styles.badge}>IN DEVELOPMENT</span>.
               </p>
+              <StaticMermaidDiagram
+                chart={`flowchart TD\n    A["Paste code"] --> B["Render Flow processes it in your browser"]\n    B --> C["PNG delivered"]`}
+                caption="Every mode follows this same shape — only step 2 differs."
+              />
             </section>
 
             {/* Using each mode Section */}
@@ -111,16 +179,25 @@ export default function DocsApp() {
               <p className={styles.paragraph}>
                 Paste any HTML, or drop a <code className={styles.inlineCode}>.html</code> file. Include explicit <code className={styles.inlineCode}>width</code> and <code className={styles.inlineCode}>height</code> on the <code className={styles.inlineCode}>body</code> — without it, Render Flow has to guess the canvas size.
               </p>
+              <StaticMermaidDiagram
+                chart={`flowchart TD\n    A["Paste HTML"] --> B["Extract width/height from body"]\n    B --> C["Write into hidden iframe"]\n    C --> D["Wait for fonts and images to load"]\n    D --> E["html-to-image captures the iframe"]\n    E --> F["PNG delivered"]`}
+              />
 
               <h3 className={styles.subSectionTitle}>Mermaid Mode</h3>
               <p className={styles.paragraph}>
                 Paste standard Mermaid syntax. Diagrams render with embedded fonts, so text stays sharp in the exported PNG.
               </p>
+              <StaticMermaidDiagram
+                chart={`flowchart TD\n    A["Paste Mermaid syntax"] --> B["mermaid.js builds an SVG"]\n    B --> C["Fonts embedded inline in the SVG"]\n    C --> D["SVG rasterized to canvas"]\n    D --> E["PNG delivered"]`}
+              />
 
               <h3 className={styles.subSectionTitle}>LaTeX Mode</h3>
               <p className={styles.paragraph}>
                 Paste LaTeX math. It's rendered with KaTeX, so most common packages and symbols are supported.
               </p>
+              <StaticMermaidDiagram
+                chart={`flowchart TD\n    A["Paste LaTeX"] --> B["KaTeX typesets the math"]\n    B --> C["Isolated from page stylesheets"]\n    C --> D["Rendered to canvas"]\n    D --> E["PNG delivered"]`}
+              />
 
               <h3 className={styles.subSectionTitle}>
                 Notes Mode <span className={styles.badge}>IN DEVELOPMENT</span>
@@ -136,6 +213,9 @@ export default function DocsApp() {
               <p className={styles.paragraph}>
                 When you hit Convert to PNG, your code never leaves your device. Render Flow builds the output entirely in memory, using a hidden, isolated iframe as a sandbox — the same technique browsers use to keep ads or embeds from interfering with the rest of a page.
               </p>
+              <p className={styles.paragraph}>
+                An iframe provides structural isolation without needing a server-side sandbox: any malicious or broken code executed during rendering can only affect your own browser tab, never a remote server, because no server exists. Every conversion is completely stateless, with no background caching layer or persistent storage between runs.
+              </p>
               <div className={styles.callout}>
                 Nothing is uploaded, cached, or stored. Refresh the tab and it's gone — every conversion starts clean.
               </div>
@@ -149,17 +229,17 @@ export default function DocsApp() {
               </p>
               <ul className={styles.list}>
                 <li>
-                  <strong>HTML</strong> — <code className={styles.inlineCode}>html-to-image</code> renders the sandboxed iframe's contents directly to a PNG data URL.
+                  <strong>HTML</strong> — <code className={styles.inlineCode}>html-to-image</code> renders the sandboxed iframe's contents directly to a PNG data URL. Target dimensions are read from explicit width and height properties on the body element before writing to the iframe, ensuring canvas sizing is known up front rather than inferred post-render.
                 </li>
                 <li>
-                  <strong>Mermaid</strong> — <code className={styles.inlineCode}>mermaid.js</code> builds an SVG, which is then rasterized to canvas and exported as PNG.
+                  <strong>Mermaid</strong> — <code className={styles.inlineCode}>mermaid.js</code> builds an SVG, which is then rasterized to canvas and exported as PNG. Custom fonts are base64-encoded and embedded inline directly inside the SVG's own <code className={styles.inlineCode}>&lt;style&gt;</code> block before rasterization so exported text does not rely on local system fonts.
                 </li>
                 <li>
-                  <strong>LaTeX</strong> — KaTeX typesets the math, isolated from the page's own stylesheets to avoid font-loading conflicts.
+                  <strong>LaTeX</strong> — KaTeX typesets the math, isolated from the page's own stylesheets to avoid font-loading conflicts. Rendering takes place in a container separated from global page styles, eliminating cross-origin font-loading errors that surfaced during development.
                 </li>
               </ul>
-              <p className={styles.smallNote}>
-                Large inputs are capped before rendering — a guardrail prevents any single conversion from creating a canvas larger than 200 million pixels, which would otherwise crash the tab.
+              <p className={styles.paragraph}>
+                A size guardrail caps any single conversion's canvas at 200 million pixels before creation, to prevent a runaway render from crashing the tab.
               </p>
             </section>
 
@@ -168,6 +248,9 @@ export default function DocsApp() {
               <h2 className={styles.sectionTitle}>Privacy & security</h2>
               <p className={styles.paragraph}>
                 Isolation here is structural, not a backend policy: your HTML runs inside a hidden iframe on your own machine, so anything unusual in the code can only affect your own browser tab — never a server, and never anyone else's session.
+              </p>
+              <p className={styles.paragraph}>
+                This isolation is designed to protect your browser tab from your own pasted code. It is not a claim about defending against network-level attacks or multi-user threats, since there is no network layer or multi-user interaction involved in the first place.
               </p>
             </section>
 
