@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { renderContentArray, renderContentItem } from './NotesModeCard';
 
-export function ContinuationLabel({ questionNumber }) {
+// Performance optimization: Memoize ContinuationLabel to avoid re-renders during page/zoom transitions.
+export const ContinuationLabel = memo(function ContinuationLabel({ questionNumber }) {
   return (
     <div
       className="continuation-label-block"
@@ -24,9 +25,10 @@ export function ContinuationLabel({ questionNumber }) {
       <span>Q{questionNumber} (continued)</span>
     </div>
   );
-}
+});
 
-export function QuestionHeaderBlock({ block }) {
+// Performance optimization: Memoize QuestionHeaderBlock to prevent expensive content re-rendering during layout shifts.
+export const QuestionHeaderBlock = memo(function QuestionHeaderBlock({ block }) {
   const { questionNumber, content } = block;
   return (
     <div
@@ -73,9 +75,10 @@ export function QuestionHeaderBlock({ block }) {
       </div>
     </div>
   );
-}
+});
 
-export function SolutionFirstBlock({ block }) {
+// Performance optimization: Memoize SolutionFirstBlock to prevent re-rendering math equations and complex elements.
+export const SolutionFirstBlock = memo(function SolutionFirstBlock({ block }) {
   const { element } = block;
   return (
     <div
@@ -130,9 +133,10 @@ export function SolutionFirstBlock({ block }) {
       </div>
     </div>
   );
-}
+});
 
-export function SolutionRestBlock({ block }) {
+// Performance optimization: Memoize SolutionRestBlock to prevent re-rendering when parent container or page state changes.
+export const SolutionRestBlock = memo(function SolutionRestBlock({ block }) {
   const { element } = block;
   return (
     <div
@@ -157,9 +161,10 @@ export function SolutionRestBlock({ block }) {
       </div>
     </div>
   );
-}
+});
 
-export function NotesBlockRenderer({ block, isTopOfColumn = false }) {
+// Performance optimization: Memoize NotesBlockRenderer to prevent wasteful block tree re-renders across pagination state updates.
+export const NotesBlockRenderer = memo(function NotesBlockRenderer({ block, isTopOfColumn = false }) {
   if (!block) return null;
 
   const showContinuation = isTopOfColumn && block.type !== 'question-header';
@@ -172,6 +177,6 @@ export function NotesBlockRenderer({ block, isTopOfColumn = false }) {
       {block.type === 'solution-rest' && <SolutionRestBlock block={block} />}
     </div>
   );
-}
+});
 
 export default NotesBlockRenderer;
