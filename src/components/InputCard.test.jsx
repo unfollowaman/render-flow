@@ -367,7 +367,8 @@ describe('InputCard', () => {
       expect(handleNotesGenerate).toHaveBeenCalledWith('{"chapter": "Test"}');
 
       // Click Clear
-      const clearBtn = screen.getByRole('button', { name: 'Clear' });
+      const clearBtn = screen.getByRole('button', { name: 'Clear notes input text' });
+      expect(clearBtn).toBeTruthy();
       fireEvent.click(clearBtn);
       expect(textarea.value).toBe('');
       expect(handleNotesReset).toHaveBeenCalledTimes(1);
