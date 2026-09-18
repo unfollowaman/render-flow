@@ -20,7 +20,7 @@ describe('Header', () => {
   it('renders navigation links with correct attributes', () => {
     render(<Header />);
 
-    const githubLink = screen.getByRole('link', { name: 'GitHub' });
+    const githubLink = screen.getByRole('link', { name: 'GitHub (opens in a new tab)' });
     expect(githubLink).toBeTruthy();
     expect(githubLink.getAttribute('href')).toBe('https://github.com');
     expect(githubLink.getAttribute('target')).toBe('_blank');
