@@ -66,6 +66,8 @@ describe("NotesConverter Export and Zoom Functionality", () => {
       expect(linkClickSpy).toHaveBeenCalled();
     });
 
+    expect(await screen.findByText("✓ Downloaded!")).toBeTruthy();
+
     const htmlToImage = await import("html-to-image");
     expect(htmlToImage.toPng).toHaveBeenCalled();
     const optionsPassed = htmlToImage.toPng.mock.calls[0][1];
@@ -200,5 +202,20 @@ describe("NotesConverter Export and Zoom Functionality", () => {
     }
     expect(screen.getByText("150%")).toBeTruthy();
     expect(zoomInBtn.disabled).toBe(true);
+  });
+
+  test("Test Case 7: Zoom reset button has proper aria-label", async () => {
+    render(<NotesConverter mode="notes" setMode={() => {}} />);
+
+    const textarea = screen.getByLabelText("Input Notes JSON");
+    fireEvent.change(textarea, { target: { value: sampleSinglePageJson } });
+
+    const generateBtn = screen.getByRole("button", { name: /Generate/i });
+    fireEvent.click(generateBtn);
+
+    expect(await screen.findByText("Export Test Chapter")).toBeTruthy();
+
+    const resetButton = screen.getByRole("button", { name: "Reset zoom level to 100%" });
+    expect(resetButton).toBeTruthy();
   });
 });
