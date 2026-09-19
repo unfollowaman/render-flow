@@ -543,6 +543,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
 
         <button
           type="button"
+          aria-label="Clear notes input text"
           className={`${styles.sampleBtn} neu-raised`}
           style={{ color: '#e53e3e' }}
           onClick={handleClear}
