@@ -20,6 +20,7 @@ const NotesConverter = forwardRef(function NotesConverter(
   const [exportError, setExportError] = useState(null);
   const [isExportingPng, setIsExportingPng] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [isDownloaded, setIsDownloaded] = useState(false);
 
   const pageRef = useRef(null);
 
@@ -96,6 +97,8 @@ const NotesConverter = forwardRef(function NotesConverter(
       link.href = dataUrl;
       link.download = `notes-page-${currentPageIndex + 1}-${Date.now()}.png`;
       link.click();
+      setIsDownloaded(true);
+      setTimeout(() => setIsDownloaded(false), 2000);
     } catch (err) {
       setExportError(err.message || "Failed to export page as PNG.");
     } finally {
@@ -300,6 +303,7 @@ const NotesConverter = forwardRef(function NotesConverter(
                 className="neu-raised"
                 disabled={zoom === DEFAULT_ZOOM}
                 onClick={handleZoomReset}
+                aria-label="Reset zoom level to 100%"
                 style={{
                   padding: "6px 10px",
                   borderRadius: "6px",
@@ -334,7 +338,11 @@ const NotesConverter = forwardRef(function NotesConverter(
               onClick={handleDownloadPng}
             >
               <img src={downloadIcon} alt="" aria-hidden="true" className={styles.downloadIcon} />
-              {isExportingPng ? "Exporting PNG..." : "Download Page as PNG"}
+              {isExportingPng
+                ? "Exporting PNG..."
+                : isDownloaded
+                ? "✓ Downloaded!"
+                : "Download Page as PNG"}
             </button>
 
             <button

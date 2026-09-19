@@ -13,3 +13,7 @@
 ## 2025-05-18 - Modal Overlay React Portals & Stacking Context Isolation
 **Learning:** Fixed overlay modals rendered inside nested layout containers with `position: relative` and low `z-index` (e.g. `<main style={{ z-index: 2 }}>`) become trapped within that container's local stacking context, causing higher `z-index` header elements (e.g. `<header style={{ z-index: 100 }}>`) to overlap modal controls.
 **Action:** Render modal overlays via `createPortal(..., document.body)` so they mount at root DOM level, escaping local parent stacking contexts and ensuring overlay controls sit unobstructed above fixed/sticky headers.
+
+## 2025-05-18 - Export Action Download Feedback Consistency
+**Learning:** In export/download actions where file generation runs asynchronously, displaying temporary visual confirmation ("✓ Downloaded!") upon completion reassures users that their file was generated and saved without requiring them to inspect browser download popups.
+**Action:** Always provide a 2-second success state (e.g. `isDownloaded`) on export buttons following asynchronous file save actions.
