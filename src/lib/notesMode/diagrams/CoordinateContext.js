@@ -66,28 +66,36 @@ export const LABEL_OFFSETS = {
 /**
  * Computes an optimal label position offset for a point given neighbor coordinates
  * to avoid label collision.
+ *
+ * Performance optimization: Single-pass zero-allocation repulsion vector calculation.
+ * Replaces intermediate array filter allocations and double Math.hypot calls per neighbor with
+ * squared Euclidean distance checks (dx*dx + dy*dy <= threshold^2) and Math.sqrt only for close points.
  */
 export function resolveLabelPosition(x, y, neighbors = [], threshold = 1.5) {
-  const closeNeighbors = neighbors.filter(
-    (n) => Math.hypot(n.x - x, n.y - y) <= threshold && !(n.x === x && n.y === y)
-  );
-
-  if (closeNeighbors.length === 0) {
+  if (!neighbors || neighbors.length === 0) {
     return 'top-right';
   }
 
-  // Calculate net vector pointing away from close neighbors in data space
+  const thresholdSq = threshold * threshold;
   let vecX = 0;
   let vecY = 0;
-  for (const n of closeNeighbors) {
+  let closeCount = 0;
+
+  for (let i = 0; i < neighbors.length; i++) {
+    const n = neighbors[i];
     const dx = x - n.x;
     const dy = y - n.y;
-    const dist = Math.hypot(dx, dy) || 0.001;
-    vecX += dx / dist;
-    vecY += dy / dist;
+    const distSq = dx * dx + dy * dy;
+
+    if (distSq <= thresholdSq && distSq > 0) {
+      const dist = Math.sqrt(distSq) || 0.001;
+      vecX += dx / dist;
+      vecY += dy / dist;
+      closeCount++;
+    }
   }
 
-  if (vecX === 0 && vecY === 0) {
+  if (closeCount === 0 || (vecX === 0 && vecY === 0)) {
     return 'top-right';
   }
 
