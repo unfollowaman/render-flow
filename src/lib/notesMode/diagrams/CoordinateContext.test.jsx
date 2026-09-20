@@ -184,5 +184,22 @@ describe('CoordinateContext Helpers & Hooks', () => {
       // Custom threshold (2.5) includes neighbor -> dx = -2, dy = 0 -> vecX < 0, vecY = 0 -> top-left
       expect(resolveLabelPosition(0, 0, neighbors, 2.5)).toBe('top-left');
     });
+
+    it('benchmark resolveLabelPosition performance for 10,000 resolving iterations', () => {
+      const neighbors = Array.from({ length: 20 }, (_, i) => ({
+        x: Math.cos((i * Math.PI) / 10) * (0.5 + (i % 3) * 0.5),
+        y: Math.sin((i * Math.PI) / 10) * (0.5 + (i % 3) * 0.5)
+      }));
+
+      const t0 = performance.now();
+      for (let i = 0; i < 10000; i++) {
+        resolveLabelPosition(0, 0, neighbors, 1.5);
+      }
+      const duration = performance.now() - t0;
+
+      console.log(`[Benchmark resolveLabelPosition] 10,000 calls -> Duration: ${duration.toFixed(2)}ms`);
+
+      expect(duration).toBeLessThan(100);
+    });
   });
 });
