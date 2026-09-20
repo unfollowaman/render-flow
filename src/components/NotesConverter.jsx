@@ -256,6 +256,7 @@ const NotesConverter = forwardRef(function NotesConverter(
                 disabled={zoom <= MIN_ZOOM}
                 onClick={handleZoomOut}
                 aria-label="Zoom out"
+                title="Decrease zoom level"
                 style={{
                   padding: "6px 12px",
                   borderRadius: "6px",
@@ -286,6 +287,7 @@ const NotesConverter = forwardRef(function NotesConverter(
                 disabled={zoom >= MAX_ZOOM}
                 onClick={handleZoomIn}
                 aria-label="Zoom in"
+                title="Increase zoom level"
                 style={{
                   padding: "6px 12px",
                   borderRadius: "6px",
@@ -304,6 +306,7 @@ const NotesConverter = forwardRef(function NotesConverter(
                 disabled={zoom === DEFAULT_ZOOM}
                 onClick={handleZoomReset}
                 aria-label="Reset zoom level to 100%"
+                title="Reset zoom to 100%"
                 style={{
                   padding: "6px 10px",
                   borderRadius: "6px",
@@ -336,6 +339,7 @@ const NotesConverter = forwardRef(function NotesConverter(
               className={`${styles.downloadBtn} neu-raised`}
               disabled={isExportingPng}
               onClick={handleDownloadPng}
+              title="Download current page as PNG"
             >
               <img src={downloadIcon} alt="" aria-hidden="true" className={styles.downloadIcon} />
               {isExportingPng
@@ -350,6 +354,7 @@ const NotesConverter = forwardRef(function NotesConverter(
               className={`${styles.downloadBtn} neu-raised`}
               disabled={isPrinting}
               onClick={handlePrintAll}
+              title="Print or export all document pages as PDF"
             >
               Print / Export All Pages
             </button>

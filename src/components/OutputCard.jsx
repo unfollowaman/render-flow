@@ -122,14 +122,23 @@ export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
         )}
 
       <div className={styles.downloadRow}>
-        <button className={`${styles.downloadBtn} neu-raised`} onClick={handleDownload}>
+        <button
+          className={`${styles.downloadBtn} neu-raised`}
+          onClick={handleDownload}
+          title="Download rendered PNG"
+        >
           <img src={downloadIcon} alt="" aria-hidden="true" className={styles.downloadIcon} />
           {isDownloaded ? "✓ Downloaded!" : "Download PNG"}
         </button>
         <span className={styles.downloadHint}>
           {result.width} × {result.height} · PNG · 1x scale
         </span>
-        <button className={`${styles.resetBtn} neu-raised`} onClick={onReset}>
+        <button
+          className={`${styles.resetBtn} neu-raised`}
+          onClick={onReset}
+          title="Reset preview and clear input"
+          aria-label="Reset workspace output"
+        >
           Reset
         </button>
       </div>
