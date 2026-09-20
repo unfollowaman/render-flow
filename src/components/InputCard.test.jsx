@@ -333,6 +333,25 @@ describe('InputCard', () => {
       expect(screen.getByText((content) => content.includes("KaTeX parse error"))).toBeTruthy();
     });
 
+    it('renders character count and handles Clear input text button in Workspace', () => {
+      const setError = vi.fn();
+      render(<InputCard {...defaultProps} mode="mermaid" setMermaidError={setError} />);
+
+      const textarea = screen.getByLabelText('Input Mermaid');
+      fireEvent.change(textarea, { target: { value: 'graph TD\n  A-->B' } });
+
+      expect(screen.getByText('16 chars')).toBeTruthy();
+
+      const clearBtn = screen.getByRole('button', { name: 'Clear input text' });
+      expect(clearBtn).toBeTruthy();
+
+      fireEvent.click(clearBtn);
+
+      expect(textarea.value).toBe('');
+      expect(screen.queryByText('16 chars')).toBeNull();
+      expect(setError).toHaveBeenCalledWith(null);
+    });
+
     it('handles Notes Workspace interactions: JSON upload, Validate, Clear, and Generate', async () => {
       const validateNotesJson = vi.fn();
       const handleNotesGenerate = vi.fn();

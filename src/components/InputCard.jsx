@@ -333,6 +333,12 @@ const Workspace = forwardRef(function Workspace({
     }
   };
 
+  const handleClear = () => {
+    setValue("");
+    setError(null);
+    if (setHtmlWarning) setHtmlWarning(null);
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -389,7 +395,7 @@ const Workspace = forwardRef(function Workspace({
         </div>
       )}
 
-      {modeConfig.hasFileUpload && (
+      {modeConfig.hasFileUpload ? (
         <div className={styles.uploadRow}>
           <input
             ref={fileInputRef}
@@ -406,15 +412,43 @@ const Workspace = forwardRef(function Workspace({
               <span>📁</span> Upload .html file
             </button>
             {value && (
-              <span className={`${styles.charCount} neu-recessed`}>
-                {value.length.toLocaleString()} chars
-              </span>
+              <>
+                <span className={`${styles.charCount} neu-recessed`}>
+                  {value.length.toLocaleString()} chars
+                </span>
+                <button
+                  type="button"
+                  aria-label="Clear input text"
+                  className={`${styles.sampleBtn} neu-raised`}
+                  style={{ color: '#e53e3e', padding: '4px 8px', fontSize: '12px' }}
+                  onClick={handleClear}
+                >
+                  Clear
+                </button>
+              </>
             )}
           </div>
           <span className={styles.uploadHint}>
             or drag & drop onto the editor above
           </span>
         </div>
+      ) : (
+        value && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', marginTop: '4px' }}>
+            <span className={`${styles.charCount} neu-recessed`}>
+              {value.length.toLocaleString()} chars
+            </span>
+            <button
+              type="button"
+              aria-label="Clear input text"
+              className={`${styles.sampleBtn} neu-raised`}
+              style={{ color: '#e53e3e', padding: '4px 8px', fontSize: '12px' }}
+              onClick={handleClear}
+            >
+              Clear
+            </button>
+          </div>
+        )
       )}
 
       {htmlWarning && (
