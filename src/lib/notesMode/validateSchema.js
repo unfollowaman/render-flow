@@ -65,13 +65,16 @@ export function validateNotesJson(data) {
   };
 }
 
+// Performance Optimization: Module-scoped constant Sets prevent re-allocating Set objects
+// on every item and content element during JSON validation.
+const KNOWN_ITEM_TYPES = new Set(['question']);
+const ALLOWED_TYPES = new Set(['text', 'equation', 'coordinate_graph']);
+
 /**
  * Validates an individual item on a page.
  * Extended in future phases for equation, graph, summary, etc.
  */
 function validateItem(item, itemPath, errors) {
-  const KNOWN_ITEM_TYPES = new Set(['question']);
-
   if (typeof item.type !== 'string' || !item.type) {
     errors.push({ path: `${itemPath}.type`, message: 'Field "type" is required and must be a string' });
     return;
@@ -127,8 +130,6 @@ function validateContentElement(elem, elemPath, errors) {
     errors.push({ path: elemPath, message: 'Content element must be an object' });
     return;
   }
-
-  const ALLOWED_TYPES = new Set(['text', 'equation', 'coordinate_graph']);
 
   if (typeof elem.type !== 'string' || !ALLOWED_TYPES.has(elem.type)) {
     errors.push({ path: `${elemPath}.type`, message: `Unrecognized content element type: "${elem.type}".` });
