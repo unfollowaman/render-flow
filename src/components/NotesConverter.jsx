@@ -196,6 +196,7 @@ const NotesConverter = forwardRef(function NotesConverter(
                   className="neu-raised"
                   disabled={currentPageIndex === 0}
                   aria-label="Go to previous page"
+                  title={currentPageIndex === 0 ? "Already on the first page" : "Go to previous page"}
                   onClick={() => setCurrentPageIndex((prev) => Math.max(0, prev - 1))}
                   style={{
                     padding: "8px 14px",
@@ -225,6 +226,7 @@ const NotesConverter = forwardRef(function NotesConverter(
                   className="neu-raised"
                   disabled={currentPageIndex >= totalPages - 1}
                   aria-label="Go to next page"
+                  title={currentPageIndex >= totalPages - 1 ? "Already on the last page" : "Go to next page"}
                   onClick={() =>
                     setCurrentPageIndex((prev) => Math.min(totalPages - 1, prev + 1))
                   }
