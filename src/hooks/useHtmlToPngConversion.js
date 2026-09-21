@@ -146,6 +146,22 @@ export function useHtmlToPngConversion({ outputRef }) {
       iframeDoc.write(sanitizedHtml)
       iframeDoc.close()
 
+      const { width: explicitWidth, height: explicitHeight } = extractDimensions(htmlToConvert)
+      if (explicitWidth === null || explicitHeight === null) {
+        const docEl = iframeDoc.documentElement
+        const bodyEl = iframeDoc.body
+        if (docEl) {
+          docEl.style.margin = '0'
+          if (explicitWidth === null) docEl.style.width = 'fit-content'
+          if (explicitHeight === null) docEl.style.height = 'fit-content'
+        }
+        if (bodyEl) {
+          bodyEl.style.margin = '0'
+          if (explicitWidth === null) bodyEl.style.width = 'fit-content'
+          if (explicitHeight === null) bodyEl.style.height = 'fit-content'
+        }
+      }
+
       // Wait for iframe load
       await new Promise((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error('timeout: page took too long to load')), 30000)
@@ -164,11 +180,11 @@ export function useHtmlToPngConversion({ outputRef }) {
       // Wait explicitly for fonts and images in the iframe document
       await waitForFontsAndImages(iframe.contentDocument)
 
-      const scrollWidth = iframe.contentDocument.documentElement.scrollWidth
-      const scrollHeight = iframe.contentDocument.documentElement.scrollHeight
+      const docEl = iframe.contentDocument.documentElement
+      const scrollWidth = docEl ? docEl.scrollWidth : iframe.contentDocument.documentElement.scrollWidth
+      const scrollHeight = docEl ? docEl.scrollHeight : iframe.contentDocument.documentElement.scrollHeight
 
       await new Promise(resolve => setTimeout(resolve, 0))
-      const { width: explicitWidth, height: explicitHeight } = extractDimensions(htmlToConvert)
 
       const finalWidth = explicitWidth !== null ? explicitWidth : scrollWidth
       const finalHeight = explicitHeight !== null ? explicitHeight : scrollHeight
