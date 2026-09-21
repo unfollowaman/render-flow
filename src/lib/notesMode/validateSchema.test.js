@@ -198,4 +198,43 @@ describe('validateNotesJson', () => {
       ]);
     });
   });
+
+  test('Benchmark: measures performance on large document validation', () => {
+    const largeDoc = {
+      chapter: { title: 'Large Benchmark Chapter', subtitle: 'Performance Test' },
+      pages: Array.from({ length: 10 }, (_, pIdx) => ({
+        items: Array.from({ length: 50 }, (_, iIdx) => ({
+          type: 'question',
+          number: pIdx * 50 + iIdx + 1,
+          question: [
+            { type: 'text', content: 'Sample question content text' },
+            { type: 'equation', latex: 'f(x) = ax^2 + bx + c' }
+          ],
+          solution: [
+            { type: 'text', content: 'Step 1 calculation' },
+            {
+              type: 'coordinate_graph',
+              xRange: [-10, 10],
+              yRange: [-10, 10],
+              points: [{ x: 0, y: 0, label: 'Origin' }]
+            }
+          ]
+        }))
+      }))
+    };
+
+    // Warmup
+    validateNotesJson(largeDoc);
+
+    const iterations = 50;
+    const start = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      const res = validateNotesJson(largeDoc);
+      expect(res.valid).toBe(true);
+    }
+    const duration = performance.now() - start;
+
+    console.log(`[Benchmark validateNotesJson] ${iterations} runs on 500 items x 4 content elements: ${duration.toFixed(2)}ms (${(duration / iterations).toFixed(4)}ms/run)`);
+    expect(duration).toBeGreaterThan(0);
+  });
 });
