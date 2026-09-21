@@ -70,7 +70,9 @@ describe('InputCard', () => {
       render(<InputCard {...defaultProps} mode="html" />);
 
       expect(screen.getByText('Input HTML')).toBeTruthy();
-      expect(screen.getByLabelText('Input HTML')).toBeTruthy();
+      const htmlTextarea = screen.getByLabelText('Input HTML');
+      expect(htmlTextarea).toBeTruthy();
+      expect(htmlTextarea.getAttribute('aria-keyshortcuts')).toBe('Control+Enter Meta+Enter');
       expect(screen.queryByLabelText('Input Mermaid')).toBeNull();
       expect(screen.queryByLabelText('Input LaTeX')).toBeNull();
       expect(screen.queryByLabelText('Input Notes JSON')).toBeNull();

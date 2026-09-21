@@ -357,6 +357,7 @@ const Workspace = forwardRef(function Workspace({
         >
           <textarea
             aria-label={modeConfig.ariaLabel}
+            aria-keyshortcuts="Control+Enter Meta+Enter"
             className={styles.textarea}
             value={value}
             onChange={(e) => {
@@ -472,6 +473,7 @@ const Workspace = forwardRef(function Workspace({
         className={`${styles.convertBtn} ${loading ? styles.convertBtnLoading : ""}`}
         onClick={() => handleConvert(value)}
         disabled={loading || !value.trim()}
+        aria-keyshortcuts="Control+Enter Meta+Enter"
         title={
           loading
             ? "Converting…"
@@ -546,6 +548,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
         <div className={styles.dropZone}>
           <textarea
             aria-label={modeConfig.ariaLabel}
+            aria-keyshortcuts="Control+Enter Meta+Enter"
             className={styles.textarea}
             value={value}
             onChange={(e) => {
@@ -603,6 +606,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
           style={{ flex: '1 1 200px', height: '48px', margin: 0 }}
           onClick={() => handleNotesGenerate(value)}
           disabled={loading || !value.trim()}
+          aria-keyshortcuts="Control+Enter Meta+Enter"
           title={
             loading
               ? "Generating…"
