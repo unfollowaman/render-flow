@@ -376,14 +376,31 @@ describe('InputCard', () => {
       expect(screen.getByText((content) => content.includes("KaTeX parse error"))).toBeTruthy();
     });
 
-    it('renders character count and handles Clear input text button in Workspace', () => {
+    it('renders character count and handles Copy and Clear input text buttons in Workspace', async () => {
       const setError = vi.fn();
+      const writeTextMock = vi.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, {
+        clipboard: {
+          writeText: writeTextMock,
+        },
+      });
+
       render(<InputCard {...defaultProps} mode="mermaid" setMermaidError={setError} />);
 
       const textarea = screen.getByLabelText('Input Mermaid');
       fireEvent.change(textarea, { target: { value: 'graph TD\n  A-->B' } });
 
       expect(screen.getByText('16 chars')).toBeTruthy();
+
+      const copyBtn = screen.getByRole('button', { name: 'Copy input text to clipboard' });
+      expect(copyBtn).toBeTruthy();
+
+      await act(async () => {
+        fireEvent.click(copyBtn);
+      });
+
+      expect(writeTextMock).toHaveBeenCalledWith('graph TD\n  A-->B');
+      expect(screen.getByText('✓ Copied!')).toBeTruthy();
 
       const clearBtn = screen.getByRole('button', { name: 'Clear input text' });
       expect(clearBtn).toBeTruthy();
@@ -418,10 +435,26 @@ describe('InputCard', () => {
       const textarea = screen.getByLabelText('Input Notes JSON');
       fireEvent.change(textarea, { target: { value: '{"chapter": "Test"}' } });
 
+      const writeTextMock = vi.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, {
+        clipboard: {
+          writeText: writeTextMock,
+        },
+      });
+
       // Click Validate
       const validateBtn = screen.getByRole('button', { name: 'Validate' });
       fireEvent.click(validateBtn);
       expect(validateNotesJson).toHaveBeenCalledWith('{"chapter": "Test"}');
+
+      // Click Copy
+      const copyNotesBtn = screen.getByRole('button', { name: 'Copy notes input text to clipboard' });
+      expect(copyNotesBtn).toBeTruthy();
+      await act(async () => {
+        fireEvent.click(copyNotesBtn);
+      });
+      expect(writeTextMock).toHaveBeenCalledWith('{"chapter": "Test"}');
+      expect(screen.getByText('✓ Copied!')).toBeTruthy();
 
       // Click Generate
       const generateBtn = screen.getByRole('button', { name: 'Generate' });

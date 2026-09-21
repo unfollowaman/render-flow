@@ -298,6 +298,7 @@ const Workspace = forwardRef(function Workspace({
 }, ref) {
   const [value, setValue] = useState("");
   const [dragOver, setDragOver] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const fileInputRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
@@ -337,6 +338,17 @@ const Workspace = forwardRef(function Workspace({
     setValue("");
     setError(null);
     if (setHtmlWarning) setHtmlWarning(null);
+  };
+
+  const handleCopy = async () => {
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
   };
 
   if (!isVisible) return null;
@@ -420,6 +432,16 @@ const Workspace = forwardRef(function Workspace({
                 </span>
                 <button
                   type="button"
+                  aria-label="Copy input text to clipboard"
+                  title="Copy input text to clipboard"
+                  className={`${styles.sampleBtn} neu-raised`}
+                  style={{ padding: '4px 8px', fontSize: '12px' }}
+                  onClick={handleCopy}
+                >
+                  {isCopied ? "✓ Copied!" : "Copy"}
+                </button>
+                <button
+                  type="button"
                   aria-label="Clear input text"
                   title="Clear input text"
                   className={`${styles.sampleBtn} neu-raised`}
@@ -441,16 +463,28 @@ const Workspace = forwardRef(function Workspace({
             <span className={`${styles.charCount} neu-recessed`}>
               {value.length.toLocaleString()} chars
             </span>
-            <button
-              type="button"
-              aria-label="Clear input text"
-              title="Clear input text"
-              className={`${styles.sampleBtn} neu-raised`}
-              style={{ color: '#e53e3e', padding: '4px 8px', fontSize: '12px' }}
-              onClick={handleClear}
-            >
-              Clear
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                aria-label="Copy input text to clipboard"
+                title="Copy input text to clipboard"
+                className={`${styles.sampleBtn} neu-raised`}
+                style={{ padding: '4px 8px', fontSize: '12px' }}
+                onClick={handleCopy}
+              >
+                {isCopied ? "✓ Copied!" : "Copy"}
+              </button>
+              <button
+                type="button"
+                aria-label="Clear input text"
+                title="Clear input text"
+                className={`${styles.sampleBtn} neu-raised`}
+                style={{ color: '#e53e3e', padding: '4px 8px', fontSize: '12px' }}
+                onClick={handleClear}
+              >
+                Clear
+              </button>
+            </div>
           </div>
         )
       )}
@@ -500,6 +534,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
   handleNotesReset
 }, ref) {
   const [value, setValue] = useState("");
+  const [isCopied, setIsCopied] = useState(false);
   const fileInputRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
@@ -528,6 +563,17 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
   const handleClear = () => {
     setValue("");
     handleNotesReset?.();
+  };
+
+  const handleCopy = async () => {
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
   };
 
   return (
@@ -588,6 +634,18 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
         >
           Validate
         </button>
+
+        {value && (
+          <button
+            type="button"
+            aria-label="Copy notes input text to clipboard"
+            title="Copy notes input text to clipboard"
+            className={`${styles.sampleBtn} neu-raised`}
+            onClick={handleCopy}
+          >
+            {isCopied ? "✓ Copied!" : "Copy"}
+          </button>
+        )}
 
         <button
           type="button"
