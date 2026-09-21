@@ -267,6 +267,47 @@ describe('InputCard', () => {
   });
 
   describe('Mermaid, LaTeX, and Notes Workspace Interactions', () => {
+    it('displays dynamic tooltip titles on convert button depending on loading, empty, and enabled states', () => {
+      const handleMermaidConvert = vi.fn();
+      const { rerender } = render(
+        <InputCard {...defaultProps} mode="mermaid" handleMermaidConvert={handleMermaidConvert} />
+      );
+
+      // Empty state tooltip
+      const convertBtn = screen.getByRole('button', { name: 'Convert to PNG' });
+      expect(convertBtn.getAttribute('title')).toBe('Enter code or load sample to convert (Ctrl+Enter or ⌘+Enter)');
+
+      // Non-empty state tooltip
+      const textarea = screen.getByLabelText('Input Mermaid');
+      fireEvent.change(textarea, { target: { value: 'graph TD\n  A-->B' } });
+      expect(convertBtn.getAttribute('title')).toBe('Convert to PNG (Ctrl+Enter or ⌘+Enter)');
+
+      // Loading state tooltip
+      rerender(
+        <InputCard {...defaultProps} mode="mermaid" mermaidLoading={true} handleMermaidConvert={handleMermaidConvert} />
+      );
+      const loadingConvertBtn = screen.getByRole('button', { name: 'Converting…' });
+      expect(loadingConvertBtn.getAttribute('title')).toBe('Converting…');
+    });
+
+    it('displays dynamic tooltip titles on notes generate button depending on loading, empty, and enabled states', () => {
+      const { rerender } = render(<InputCard {...defaultProps} mode="notes" />);
+
+      // Empty state tooltip
+      const generateBtn = screen.getByRole('button', { name: 'Generate' });
+      expect(generateBtn.getAttribute('title')).toBe('Enter JSON or load sample to generate (Ctrl+Enter or ⌘+Enter)');
+
+      // Non-empty state tooltip
+      const textarea = screen.getByLabelText('Input Notes JSON');
+      fireEvent.change(textarea, { target: { value: '{"test": 123}' } });
+      expect(generateBtn.getAttribute('title')).toBe('Generate (Ctrl+Enter or ⌘+Enter)');
+
+      // Loading state tooltip
+      rerender(<InputCard {...defaultProps} mode="notes" notesLoading={true} />);
+      const loadingGenerateBtn = screen.getByRole('button', { name: 'Generating…' });
+      expect(loadingGenerateBtn.getAttribute('title')).toBe('Generating…');
+    });
+
     it('triggers handleMermaidConvert when Convert to PNG is clicked in Mermaid mode', () => {
       const handleMermaidConvert = vi.fn();
       render(<InputCard {...defaultProps} mode="mermaid" handleMermaidConvert={handleMermaidConvert} />);

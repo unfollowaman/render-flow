@@ -408,6 +408,7 @@ const Workspace = forwardRef(function Workspace({
             <button
               className={`${styles.uploadBtn} neu-raised`}
               onClick={() => fileInputRef.current?.click()}
+              title="Upload .html file from your computer"
             >
               <span>📁</span> Upload .html file
             </button>
@@ -419,6 +420,7 @@ const Workspace = forwardRef(function Workspace({
                 <button
                   type="button"
                   aria-label="Clear input text"
+                  title="Clear input text"
                   className={`${styles.sampleBtn} neu-raised`}
                   style={{ color: '#e53e3e', padding: '4px 8px', fontSize: '12px' }}
                   onClick={handleClear}
@@ -441,6 +443,7 @@ const Workspace = forwardRef(function Workspace({
             <button
               type="button"
               aria-label="Clear input text"
+              title="Clear input text"
               className={`${styles.sampleBtn} neu-raised`}
               style={{ color: '#e53e3e', padding: '4px 8px', fontSize: '12px' }}
               onClick={handleClear}
@@ -469,7 +472,13 @@ const Workspace = forwardRef(function Workspace({
         className={`${styles.convertBtn} ${loading ? styles.convertBtnLoading : ""}`}
         onClick={() => handleConvert(value)}
         disabled={loading || !value.trim()}
-        title="Convert to PNG (Ctrl+Enter or ⌘+Enter)"
+        title={
+          loading
+            ? "Converting…"
+            : !value.trim()
+            ? "Enter code or load sample to convert (Ctrl+Enter or ⌘+Enter)"
+            : "Convert to PNG (Ctrl+Enter or ⌘+Enter)"
+        }
       >
         {loading ? "Converting…" : "Convert to PNG"}
       </button>
@@ -563,6 +572,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
           type="button"
           className={`${styles.uploadBtn} neu-raised`}
           onClick={() => fileInputRef.current?.click()}
+          title="Upload .json file from your computer"
         >
           <span>📁</span> Load JSON
         </button>
@@ -571,6 +581,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
           type="button"
           className={`${styles.sampleBtn} neu-raised`}
           onClick={() => validateNotesJson(value)}
+          title="Validate JSON structure against schema"
         >
           Validate
         </button>
@@ -578,6 +589,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
         <button
           type="button"
           aria-label="Clear notes input text"
+          title="Clear notes input text"
           className={`${styles.sampleBtn} neu-raised`}
           style={{ color: '#e53e3e' }}
           onClick={handleClear}
@@ -591,7 +603,13 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
           style={{ flex: '1 1 200px', height: '48px', margin: 0 }}
           onClick={() => handleNotesGenerate(value)}
           disabled={loading || !value.trim()}
-          title="Generate (Ctrl+Enter or ⌘+Enter)"
+          title={
+            loading
+              ? "Generating…"
+              : !value.trim()
+              ? "Enter JSON or load sample to generate (Ctrl+Enter or ⌘+Enter)"
+              : "Generate (Ctrl+Enter or ⌘+Enter)"
+          }
         >
           {loading ? "Generating…" : "Generate"}
         </button>
@@ -700,7 +718,11 @@ export const InputCard = forwardRef(function InputCard({
         <h2 className={styles.cardTitle}>
           {MODE_CONFIGS[mode].cardTitle}
         </h2>
-        <button className={`${styles.sampleBtn} neu-raised`} onClick={loadSample}>
+        <button
+          className={`${styles.sampleBtn} neu-raised`}
+          onClick={loadSample}
+          title="Load sample code into editor"
+        >
           Load sample ↗
         </button>
       </div>

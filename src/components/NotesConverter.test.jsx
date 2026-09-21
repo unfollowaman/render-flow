@@ -281,16 +281,22 @@ describe('NotesConverter & Notes Mode integration', () => {
     expect(await screen.findByText('Large Doc')).toBeTruthy();
     expect(screen.getByText(/Page 1 of/i)).toBeTruthy();
 
+    const prevBtn = screen.getByRole('button', { name: /Go to previous page/i });
+    expect(prevBtn.getAttribute('aria-label')).toBe('Go to previous page');
+    expect(prevBtn.getAttribute('title')).toBe('Already on the first page');
+
     const nextBtn = screen.getByRole('button', { name: /Go to next page/i });
     expect(nextBtn.getAttribute('aria-label')).toBe('Go to next page');
+    expect(nextBtn.getAttribute('title')).toBe('Go to next page');
+
     fireEvent.click(nextBtn);
     expect(await screen.findByText(/Page 2 of/i)).toBeTruthy();
+    expect(prevBtn.getAttribute('title')).toBe('Go to previous page');
 
     fireEvent.click(nextBtn);
     expect(await screen.findByText(/Page 3 of/i)).toBeTruthy();
+    expect(nextBtn.getAttribute('title')).toBe('Already on the last page');
 
-    const prevBtn = screen.getByRole('button', { name: /Go to previous page/i });
-    expect(prevBtn.getAttribute('aria-label')).toBe('Go to previous page');
     fireEvent.click(prevBtn);
     expect(await screen.findByText(/Page 2 of/i)).toBeTruthy();
   });
