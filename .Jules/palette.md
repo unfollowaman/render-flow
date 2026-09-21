@@ -7,8 +7,8 @@
 **Action:** Always wrap mode switcher tab groups in `role="tablist"` with an `aria-label`, and mark tab buttons with `role="tab"` and dynamic `aria-selected` attributes matching active state.
 
 ## 2025-05-18 - Multi-platform Keyboard Shortcut Pattern for Textarea Submission
-**Learning:** In text editors/code input cards, users expect standard IDE shortcuts (`Ctrl+Enter` on Windows/Linux, `Cmd+Enter` / `e.metaKey` on macOS) to trigger submit actions without needing to tab out or click buttons. Pair this with `title` attributes on submit buttons to make the shortcut discoverable.
-**Action:** Check `(e.ctrlKey || e.metaKey) && e.key === "Enter"` in textarea `onKeyDown` handlers and add shortcut descriptions in submit button tooltips.
+**Learning:** In text editors/code input cards, users expect standard IDE shortcuts (`Ctrl+Enter` on Windows/Linux, `Cmd+Enter` / `e.metaKey` on macOS) to trigger submit actions without needing to tab out or click buttons. Pair this with `title` attributes on submit buttons to make the shortcut discoverable, and `aria-keyshortcuts="Control+Enter Meta+Enter"` on textareas and submit buttons for assistive technologies.
+**Action:** Add `aria-keyshortcuts="Control+Enter Meta+Enter"` to textareas and submission buttons when `Ctrl+Enter` / `Cmd+Enter` shortcuts are enabled.
 
 ## 2025-05-18 - Modal Overlay React Portals & Stacking Context Isolation
 **Learning:** Fixed overlay modals rendered inside nested layout containers with `position: relative` and low `z-index` (e.g. `<main style={{ z-index: 2 }}>`) become trapped within that container's local stacking context, causing higher `z-index` header elements (e.g. `<header style={{ z-index: 100 }}>`) to overlap modal controls.
