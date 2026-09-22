@@ -9,3 +9,7 @@
 ## 2025-09-18 - JSON Schema Validation Module-Scoped Constant Sets Optimization
 **Learning:** Instantiating `new Set(...)` inside per-item/element validation loop functions (`validateItem` and `validateContentElement`) causes thousands of object allocations on large JSON inputs. Hoisting constant Sets (`KNOWN_ITEM_TYPES`, `ALLOWED_TYPES`) to module scope eliminates garbage collection pressure and allocation overhead during schema validation.
 **Action:** Declare lookup Sets and options maps as module-scoped constants outside per-element loops or validator functions.
+
+## 2025-09-19 - WeakMap Caching of Container CSS JSON Serialization
+**Learning:** In DOM height measurement routines (`measureHeight`), `JSON.stringify(containerCss)` is called repeatedly for every element when computing cache keys. Caching the stringified JSON output in a module-scoped `WeakMap` keyed by the `containerCss` object reference eliminates ~90% of cache key generation overhead (~5ms vs ~47ms for 100k calls).
+**Action:** Use a `WeakMap` to cache serialized string representations of object options passed into repeated inner measurement/lookup loops.

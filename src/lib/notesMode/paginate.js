@@ -4,6 +4,7 @@ import DOMPurify from 'dompurify';
 import { NotesBlockRenderer, ContinuationLabel } from '../../components/NotesBlockComponents';
 
 let elementMeasurementCache = new WeakMap();
+let containerCssStringCache = new WeakMap();
 let cachedPxPerMm = null;
 let measurementContainer = null;
 
@@ -37,6 +38,7 @@ export function clearMeasurementCache(element) {
     elementMeasurementCache.delete(element);
   } else {
     elementMeasurementCache = new WeakMap();
+    containerCssStringCache = new WeakMap();
     cachedPxPerMm = null;
     if (measurementContainer && measurementContainer.parentNode) {
       measurementContainer.parentNode.removeChild(measurementContainer);
@@ -47,11 +49,22 @@ export function clearMeasurementCache(element) {
 
 /**
  * Serializes container CSS and unit into a cache key string.
+ * Caches JSON.stringify results for object containerCss references in a WeakMap
+ * to eliminate redundant serialization overhead during DOM height measurements.
  */
 function getCacheKey(containerCss, unit) {
-  const cssKey = containerCss
-    ? (typeof containerCss === 'object' ? JSON.stringify(containerCss) : String(containerCss))
-    : '';
+  let cssKey = '';
+  if (containerCss) {
+    if (typeof containerCss === 'object') {
+      cssKey = containerCssStringCache.get(containerCss);
+      if (!cssKey) {
+        cssKey = JSON.stringify(containerCss);
+        containerCssStringCache.set(containerCss, cssKey);
+      }
+    } else {
+      cssKey = String(containerCss);
+    }
+  }
   return `${cssKey}|${unit}`;
 }
 
