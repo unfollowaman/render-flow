@@ -57,7 +57,11 @@ export function Footer() {
               href={href}
               target={href.startsWith("mailto:") ? undefined : "_blank"}
               rel={href.startsWith("mailto:") ? undefined : "noopener"}
-              aria-label={label}
+              aria-label={
+                href.startsWith("mailto:")
+                  ? `${label} (opens email client)`
+                  : `${label} (opens in a new tab)`
+              }
             >
               <img src={icon} alt="" className={styles.footerSocialIcon} />
               <span>{label}</span>

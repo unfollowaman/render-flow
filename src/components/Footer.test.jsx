@@ -24,19 +24,19 @@ describe('Footer', () => {
     const socialRow = screen.getByLabelText('Social links');
     expect(socialRow).toBeTruthy();
 
-    const githubLink = screen.getByRole('link', { name: 'Github' });
+    const githubLink = screen.getByRole('link', { name: /Github/i });
     expect(githubLink).toBeTruthy();
     expect(githubLink.getAttribute('href')).toBe('https://github.com/unfollowaman');
     expect(githubLink.getAttribute('target')).toBe('_blank');
     expect(githubLink.getAttribute('rel')).toBe('noopener');
 
-    const twitterLink = screen.getByRole('link', { name: 'Twitter' });
+    const twitterLink = screen.getByRole('link', { name: /Twitter/i });
     expect(twitterLink).toBeTruthy();
     expect(twitterLink.getAttribute('href')).toBe('https://x.com/unfollowaman');
     expect(twitterLink.getAttribute('target')).toBe('_blank');
     expect(twitterLink.getAttribute('rel')).toBe('noopener');
 
-    const gmailLink = screen.getByRole('link', { name: 'Gmail' });
+    const gmailLink = screen.getByRole('link', { name: /Gmail/i });
     expect(gmailLink).toBeTruthy();
     expect(gmailLink.getAttribute('href')).toBe('mailto:unfollowaman@gmail.com');
     expect(gmailLink.getAttribute('target')).toBeNull();
