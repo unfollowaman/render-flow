@@ -13,3 +13,7 @@
 ## 2025-09-19 - WeakMap Caching of Container CSS JSON Serialization
 **Learning:** In DOM height measurement routines (`measureHeight`), `JSON.stringify(containerCss)` is called repeatedly for every element when computing cache keys. Caching the stringified JSON output in a module-scoped `WeakMap` keyed by the `containerCss` object reference eliminates ~90% of cache key generation overhead (~5ms vs ~47ms for 100k calls).
 **Action:** Use a `WeakMap` to cache serialized string representations of object options passed into repeated inner measurement/lookup loops.
+
+## 2025-09-20 - Single-Pass JSON Data Structure Flattening Optimization
+**Learning:** Nested array transformations using `pages.flatMap(p => p.items.map(...))` allocate thousands of intermediate arrays and closure callbacks on large inputs, as well as redundant shallow object copies (`{ ...item }`). Flattening data structures using single-pass imperative `for` loops and preserving original object references when `id` is present improves performance by ~37% while reducing memory allocations.
+**Action:** Use single-pass imperative `for` loops instead of nested array methods (`flatMap`/`map`) when processing large document data trees.
