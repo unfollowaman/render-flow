@@ -1,4 +1,4 @@
-import { forwardRef, useState, useEffect } from "react";
+import { forwardRef, useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import styles from "../styles/Home.module.css";
 import downloadIcon from "../assets/download-icon.png";
@@ -6,6 +6,10 @@ import downloadIcon from "../assets/download-icon.png";
 export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDownloaded, setIsDownloaded] = useState(false);
+
+  const imageRef = useRef(null);
+  const closeBtnRef = useRef(null);
+  const wasFullscreenRef = useRef(false);
 
   useEffect(() => {
     if (!isFullscreen) return;
@@ -16,6 +20,15 @@ export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isFullscreen]);
+
+  useEffect(() => {
+    if (isFullscreen) {
+      wasFullscreenRef.current = true;
+      closeBtnRef.current?.focus();
+    } else if (wasFullscreenRef.current) {
+      imageRef.current?.focus();
+    }
   }, [isFullscreen]);
 
   const baseAltText =
@@ -50,6 +63,7 @@ export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
         <div className={styles.previewWrapper} style={{ marginBottom: 0 }}>
           <div className={styles.checkerBg}>
           <img
+            ref={imageRef}
             src={result.image}
             alt={baseAltText}
             role="button"
@@ -85,6 +99,7 @@ export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
             }}
           >
             <button
+              ref={closeBtnRef}
               type="button"
               aria-label="Close fullscreen preview"
               onClick={(e) => {

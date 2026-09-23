@@ -98,6 +98,22 @@ describe('OutputCard', () => {
     expect(screen.queryByAltText('Rendered HTML output (fullscreen view)')).toBeNull();
   });
 
+  it('manages focus when opening and closing fullscreen overlay', () => {
+    render(<OutputCard result={mockResult} onReset={() => {}} mode="html" />);
+
+    const previewImg = screen.getByRole('button', { name: /Rendered HTML output - Click to enlarge/i });
+
+    // Open fullscreen by clicking preview image
+    fireEvent.click(previewImg);
+
+    const closeBtn = screen.getByRole('button', { name: /Close fullscreen preview/i });
+    expect(document.activeElement).toBe(closeBtn);
+
+    // Close fullscreen by clicking close button
+    fireEvent.click(closeBtn);
+    expect(document.activeElement).toBe(previewImg);
+  });
+
   it('triggers onReset when Reset button is clicked', () => {
     const handleReset = vi.fn();
     render(<OutputCard result={mockResult} onReset={handleReset} mode="html" />);
