@@ -17,3 +17,7 @@
 ## 2025-09-20 - Single-Pass JSON Data Structure Flattening Optimization
 **Learning:** Nested array transformations using `pages.flatMap(p => p.items.map(...))` allocate thousands of intermediate arrays and closure callbacks on large inputs, as well as redundant shallow object copies (`{ ...item }`). Flattening data structures using single-pass imperative `for` loops and preserving original object references when `id` is present improves performance by ~37% while reducing memory allocations.
 **Action:** Use single-pass imperative `for` loops instead of nested array methods (`flatMap`/`map`) when processing large document data trees.
+
+## 2025-09-21 - Single-Pass Measured Row Construction Optimization
+**Learning:** In `paginateRows`, transforming items via `items.map(...)` allocated `N` intermediate objects (`{ id, height, rawItem }`) and an array before grouping them into row chunks. Inline-measuring DOM element heights directly during single-pass row construction eliminates temporary object allocations and array copying without changing DOM reflow count or layout behavior.
+**Action:** Measure element properties directly during row chunking loops rather than allocating intermediate mapped arrays of wrapper objects.
