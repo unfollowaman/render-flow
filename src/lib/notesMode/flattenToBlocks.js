@@ -9,35 +9,41 @@
  *
  * Blocks appear in document order, all blocks for question N before question N+1.
  *
+ * OPTIMIZATION: Uses single-pass array traversal with standard for-loops to eliminate
+ * intermediate `flatMap`/`map` array allocations and unnecessary object copying when item.id is set.
+ *
  * @param {Object|Array} parsedJson - Chapter object with pages[].items[] OR an array of items.
  * @returns {Array<Object>} Single ordered array of blocks.
  */
 export function flattenToBlocks(parsedJson) {
-  let items = [];
+  const blocks = [];
+  if (!parsedJson) return blocks;
+
+  let isPagesStructure = false;
+  let itemsArray = null;
 
   if (Array.isArray(parsedJson)) {
-    items = parsedJson;
-  } else if (parsedJson && Array.isArray(parsedJson.pages)) {
-    let itemCounter = 0;
-    items = parsedJson.pages.flatMap((page) => {
-      if (!page || !Array.isArray(page.items)) return [];
-      return page.items.map((item) => {
-        itemCounter += 1;
-        return {
-          ...item,
-          id: item.id || `item-${itemCounter}`,
-        };
-      });
-    });
-  } else if (parsedJson && Array.isArray(parsedJson.items)) {
-    items = parsedJson.items;
+    itemsArray = parsedJson;
+  } else if (Array.isArray(parsedJson.pages)) {
+    isPagesStructure = true;
+  } else if (Array.isArray(parsedJson.items)) {
+    itemsArray = parsedJson.items;
   }
 
-  const blocks = [];
+  let itemCounter = 0;
+  let globalIdx = 0;
 
-  items.forEach((item, idx) => {
-    const questionNumber = item.number !== undefined ? item.number : idx + 1;
-    const qId = item.id || `q${questionNumber}`;
+  const processItem = (item) => {
+    if (!item) return;
+
+    itemCounter += 1;
+    globalIdx += 1;
+
+    const questionNumber = item.number !== undefined ? item.number : globalIdx;
+    const qId = item.id || (isPagesStructure ? `item-${itemCounter}` : `q${questionNumber}`);
+
+    // Preserve item reference; avoid object copy unless id was missing in pages structure
+    const rawItem = (!item.id && isPagesStructure) ? { ...item, id: qId } : item;
 
     // 1. Question Header block
     if (item.question) {
@@ -46,33 +52,41 @@ export function flattenToBlocks(parsedJson) {
         type: 'question-header',
         questionNumber,
         content: item.question,
-        rawItem: item,
+        rawItem,
       });
     }
 
     // 2. Solution blocks
-    if (Array.isArray(item.solution) && item.solution.length > 0) {
-      item.solution.forEach((elem, sIdx) => {
-        if (sIdx === 0) {
-          blocks.push({
-            id: `${qId}-sol-0`,
-            type: 'solution-first',
-            questionNumber,
-            element: elem,
-            rawItem: item,
-          });
-        } else {
-          blocks.push({
-            id: `${qId}-sol-${sIdx}`,
-            type: 'solution-rest',
-            questionNumber,
-            element: elem,
-            rawItem: item,
-          });
-        }
-      });
+    const solution = item.solution;
+    if (Array.isArray(solution) && solution.length > 0) {
+      for (let sIdx = 0; sIdx < solution.length; sIdx++) {
+        blocks.push({
+          id: `${qId}-sol-${sIdx}`,
+          type: sIdx === 0 ? 'solution-first' : 'solution-rest',
+          questionNumber,
+          element: solution[sIdx],
+          rawItem,
+        });
+      }
     }
-  });
+  };
+
+  if (itemsArray) {
+    for (let i = 0; i < itemsArray.length; i++) {
+      processItem(itemsArray[i]);
+    }
+  } else if (isPagesStructure) {
+    const pages = parsedJson.pages;
+    for (let p = 0; p < pages.length; p++) {
+      const page = pages[p];
+      if (page && Array.isArray(page.items)) {
+        const pageItems = page.items;
+        for (let i = 0; i < pageItems.length; i++) {
+          processItem(pageItems[i]);
+        }
+      }
+    }
+  }
 
   return blocks;
 }
