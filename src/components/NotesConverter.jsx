@@ -356,9 +356,9 @@ const NotesConverter = forwardRef(function NotesConverter(
               className={`${styles.downloadBtn} neu-raised`}
               disabled={isPrinting}
               onClick={handlePrintAll}
-              title="Print or export all document pages as PDF"
+              title={isPrinting ? "Preparing print document..." : "Print or export all document pages as PDF"}
             >
-              Print / Export All Pages
+              {isPrinting ? "Preparing print..." : "Print / Export All Pages"}
             </button>
           </div>
 
