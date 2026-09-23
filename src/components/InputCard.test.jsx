@@ -172,7 +172,7 @@ describe('InputCard', () => {
       expect(setMermaidError).toHaveBeenCalledWith(null);
     });
 
-    it('handles file upload for valid HTML files', async () => {
+    it('handles file upload for valid HTML files and announces status via aria-live region', async () => {
       const setError = vi.fn();
       const { container } = render(<InputCard {...defaultProps} mode="html" setError={setError} />);
 
@@ -186,9 +186,13 @@ describe('InputCard', () => {
         expect(textarea.value).toBe('<h1>Uploaded File</h1>');
       });
       expect(setError).toHaveBeenCalledWith(null);
+
+      const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
+      expect(statusRegion).toBeTruthy();
+      expect(statusRegion.textContent).toBe('File "sample.html" loaded successfully.');
     });
 
-    it('displays error when an invalid file type is uploaded in HTML mode', () => {
+    it('displays error and announces invalid file type via aria-live region in HTML mode', () => {
       const setError = vi.fn();
       const { container } = render(<InputCard {...defaultProps} mode="html" setError={setError} />);
 
@@ -198,6 +202,10 @@ describe('InputCard', () => {
       fireEvent.change(fileInput, { target: { files: [file] } });
 
       expect(setError).toHaveBeenCalledWith('Please upload a valid .html file.');
+
+      const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
+      expect(statusRegion).toBeTruthy();
+      expect(statusRegion.textContent).toBe('Please upload a valid .html file.');
     });
 
     it('handles drag over, drag leave, and drop for HTML files', async () => {
@@ -477,6 +485,10 @@ describe('InputCard', () => {
         expect(textarea.value).toBe('{"uploaded": true}');
       });
       expect(handleNotesReset).toHaveBeenCalled();
+
+      const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
+      expect(statusRegion).toBeTruthy();
+      expect(statusRegion.textContent).toBe('File "notes.json" loaded successfully.');
     });
   });
 });

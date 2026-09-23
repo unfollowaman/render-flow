@@ -299,28 +299,34 @@ const Workspace = forwardRef(function Workspace({
   const [value, setValue] = useState("");
   const [dragOver, setDragOver] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState("");
   const fileInputRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
     reset: () => {
       setValue("");
+      setUploadStatus("");
     },
     loadSample: () => {
       setValue(modeConfig.sampleText);
       setError(null);
+      setUploadStatus("");
     }
   }));
 
   const handleFileUpload = (file) => {
     if (!file) return;
     if (!file.name.endsWith(".html") && file.type !== "text/html") {
-      setError("Please upload a valid .html file.");
+      const errMsg = "Please upload a valid .html file.";
+      setError(errMsg);
+      setUploadStatus(errMsg);
       return;
     }
     const reader = new FileReader();
     reader.onload = (e) => {
       setValue(e.target.result);
       setError(null);
+      setUploadStatus(`File "${file.name}" loaded successfully.`);
     };
     reader.readAsText(file);
   };
@@ -337,6 +343,7 @@ const Workspace = forwardRef(function Workspace({
   const handleClear = () => {
     setValue("");
     setError(null);
+    setUploadStatus("");
     if (setHtmlWarning) setHtmlWarning(null);
   };
 
@@ -400,6 +407,10 @@ const Workspace = forwardRef(function Workspace({
             </div>
           )}
         </div>
+      </div>
+
+      <div role="status" aria-live="polite" className="sr-only">
+        {uploadStatus}
       </div>
 
       {failedResources && failedResources.length > 0 && (
@@ -535,16 +546,19 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
 }, ref) {
   const [value, setValue] = useState("");
   const [isCopied, setIsCopied] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState("");
   const fileInputRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
     reset: () => {
       setValue("");
+      setUploadStatus("");
       handleNotesReset?.();
     },
     loadSample: () => {
       setValue(modeConfig.sampleText);
       setNotesError?.(null);
+      setUploadStatus("");
     }
   }));
 
@@ -555,6 +569,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
     const reader = new FileReader();
     reader.onload = (e) => {
       setValue(e.target.result || "");
+      setUploadStatus(`File "${file.name}" loaded successfully.`);
       handleNotesReset?.();
     };
     reader.readAsText(file);
@@ -562,6 +577,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
 
   const handleClear = () => {
     setValue("");
+    setUploadStatus("");
     handleNotesReset?.();
   };
 
@@ -613,6 +629,10 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
             style={{ background: 'transparent' }}
           />
         </div>
+      </div>
+
+      <div role="status" aria-live="polite" className="sr-only">
+        {uploadStatus}
       </div>
 
       {/* Action Buttons Row */}
