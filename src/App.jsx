@@ -1,12 +1,12 @@
-import React, { useRef, useEffect, useState, Suspense } from "react";
+import { useRef, useEffect, useState, Suspense, lazy } from "react";
 import styles from "./styles/Home.module.css";
 
 import { Header, Hero, Footer } from "./components";
 
-const HtmlConverter = React.lazy(() => import("./components/HtmlConverter"));
-const MermaidConverter = React.lazy(() => import("./components/MermaidConverter"));
-const LatexConverter = React.lazy(() => import("./components/LatexConverter"));
-const NotesConverter = React.lazy(() => import("./components/NotesConverter"));
+const HtmlConverter = lazy(() => import("./components/HtmlConverter"));
+const MermaidConverter = lazy(() => import("./components/MermaidConverter"));
+const LatexConverter = lazy(() => import("./components/LatexConverter"));
+const NotesConverter = lazy(() => import("./components/NotesConverter"));
 
 export default function App() {
   const outputRef = useRef(null);
