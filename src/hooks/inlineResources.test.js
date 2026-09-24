@@ -41,6 +41,87 @@ describe('inlineResources Security & Functionality', () => {
       expect(isPrivateOrLoopbackHost('router.home.arpa')).toBe(true);
     });
 
+    it('handles falsy and empty inputs safely', () => {
+      expect(isPrivateOrLoopbackHost(null)).toBe(true);
+      expect(isPrivateOrLoopbackHost(undefined)).toBe(true);
+      expect(isPrivateOrLoopbackHost('')).toBe(true);
+    });
+
+    it('handles uppercase and mixed-case hostnames', () => {
+      expect(isPrivateOrLoopbackHost('LOCALHOST')).toBe(true);
+      expect(isPrivateOrLoopbackHost('Sub.Localhost')).toBe(true);
+      expect(isPrivateOrLoopbackHost('SERVICE.LOCAL')).toBe(true);
+      expect(isPrivateOrLoopbackHost('EXAMPLE.COM')).toBe(false);
+      expect(isPrivateOrLoopbackHost('[FE80::1]')).toBe(true);
+    });
+
+    it('blocks invalid IPv4 addresses with octets > 255', () => {
+      expect(isPrivateOrLoopbackHost('256.0.0.1')).toBe(true);
+      expect(isPrivateOrLoopbackHost('192.168.1.300')).toBe(true);
+      expect(isPrivateOrLoopbackHost('999.999.999.999')).toBe(true);
+    });
+
+    it('tests precise IPv4 private and reserved boundary ranges', () => {
+      // 10.0.0.0/8
+      expect(isPrivateOrLoopbackHost('9.255.255.255')).toBe(false);
+      expect(isPrivateOrLoopbackHost('10.0.0.0')).toBe(true);
+      expect(isPrivateOrLoopbackHost('10.255.255.255')).toBe(true);
+      expect(isPrivateOrLoopbackHost('11.0.0.0')).toBe(false);
+
+      // 172.16.0.0/12
+      expect(isPrivateOrLoopbackHost('172.15.255.255')).toBe(false);
+      expect(isPrivateOrLoopbackHost('172.16.0.0')).toBe(true);
+      expect(isPrivateOrLoopbackHost('172.31.255.255')).toBe(true);
+      expect(isPrivateOrLoopbackHost('172.32.0.0')).toBe(false);
+
+      // 192.168.0.0/16
+      expect(isPrivateOrLoopbackHost('192.167.255.255')).toBe(false);
+      expect(isPrivateOrLoopbackHost('192.168.0.0')).toBe(true);
+      expect(isPrivateOrLoopbackHost('192.168.255.255')).toBe(true);
+      expect(isPrivateOrLoopbackHost('192.169.0.0')).toBe(false);
+
+      // CGNAT 100.64.0.0/10
+      expect(isPrivateOrLoopbackHost('100.63.255.255')).toBe(false);
+      expect(isPrivateOrLoopbackHost('100.64.0.0')).toBe(true);
+      expect(isPrivateOrLoopbackHost('100.127.255.255')).toBe(true);
+      expect(isPrivateOrLoopbackHost('100.128.0.0')).toBe(false);
+
+      // Documentation / Benchmarking ranges
+      expect(isPrivateOrLoopbackHost('192.0.0.1')).toBe(true);
+      expect(isPrivateOrLoopbackHost('192.0.2.1')).toBe(true);
+      expect(isPrivateOrLoopbackHost('198.51.100.1')).toBe(true);
+      expect(isPrivateOrLoopbackHost('203.0.113.1')).toBe(true);
+
+      // Multicast and reserved
+      expect(isPrivateOrLoopbackHost('224.0.0.1')).toBe(true);
+      expect(isPrivateOrLoopbackHost('239.255.255.255')).toBe(true);
+      expect(isPrivateOrLoopbackHost('255.255.255.255')).toBe(true);
+    });
+
+    it('handles IPv6 edge cases and IPv4-mapped IPv6 formats', () => {
+      // Unspecified and loopback
+      expect(isPrivateOrLoopbackHost('::')).toBe(true);
+      expect(isPrivateOrLoopbackHost('0:0:0:0:0:0:0:0')).toBe(true);
+      expect(isPrivateOrLoopbackHost('0:0:0:0:0:0:0:1')).toBe(true);
+
+      // Link-local prefixes
+      expect(isPrivateOrLoopbackHost('fe80::1')).toBe(true);
+      expect(isPrivateOrLoopbackHost('fe90::1')).toBe(true);
+      expect(isPrivateOrLoopbackHost('fea0::1')).toBe(true);
+      expect(isPrivateOrLoopbackHost('feb0::1')).toBe(true);
+
+      // IPv4-mapped IPv6 dotted quad
+      expect(isPrivateOrLoopbackHost('::ffff:10.0.0.1')).toBe(true);
+      expect(isPrivateOrLoopbackHost('::ffff:8.8.8.8')).toBe(false);
+      expect(isPrivateOrLoopbackHost('0:0:0:0:0:ffff:192.168.1.1')).toBe(true);
+      expect(isPrivateOrLoopbackHost('0:0:0:0:0:ffff:8.8.8.8')).toBe(false);
+
+      // IPv4-mapped IPv6 hex
+      expect(isPrivateOrLoopbackHost('::ffff:0a00:0001')).toBe(true); // 10.0.0.1
+      expect(isPrivateOrLoopbackHost('::ffff:0808:0808')).toBe(false); // 8.8.8.8
+      expect(isPrivateOrLoopbackHost('0:0:0:0:0:ffff:0a00:0001')).toBe(true);
+    });
+
     it('allows public domain names and public IP addresses', () => {
       expect(isPrivateOrLoopbackHost('example.com')).toBe(false);
       expect(isBlockedUrl('https://example.com/logo.png')).toBe(false);
