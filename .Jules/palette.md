@@ -17,3 +17,7 @@
 ## 2025-05-18 - Export Action Download Feedback Consistency
 **Learning:** In export/download actions where file generation runs asynchronously, displaying temporary visual confirmation ("✓ Downloaded!") upon completion reassures users that their file was generated and saved without requiring them to inspect browser download popups.
 **Action:** Always provide a 2-second success state (e.g. `isDownloaded`) on export buttons following asynchronous file save actions.
+
+## 2025-05-18 - Screen Reader Status Announcements for Async Exports
+**Learning:** Visual-only feedback on export buttons (like "Exporting..." or "✓ Downloaded!") is invisible to screen reader users unless paired with a visually hidden (`sr-only`) `role="status"` live region (`aria-live="polite"`). Differentiating multiple status regions on a single page using descriptive `aria-label`s prevents query collisions in Testing Library and screen readers.
+**Action:** Include a dedicated `<div role="status" aria-label="..." aria-live="polite" className="sr-only">` to announce workflow state transitions for asynchronous export/download and print preparation actions.

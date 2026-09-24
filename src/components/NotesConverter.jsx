@@ -21,6 +21,7 @@ const NotesConverter = forwardRef(function NotesConverter(
   const [isExportingPng, setIsExportingPng] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const [isDownloaded, setIsDownloaded] = useState(false);
+  const [exportStatus, setExportStatus] = useState("");
 
   const pageRef = useRef(null);
 
@@ -71,6 +72,7 @@ const NotesConverter = forwardRef(function NotesConverter(
     if (!pageRef.current) return;
     setExportError(null);
     setIsExportingPng(true);
+    setExportStatus("Exporting page as PNG...");
 
     try {
       const pageEl = pageRef.current;
@@ -98,9 +100,12 @@ const NotesConverter = forwardRef(function NotesConverter(
       link.download = `notes-page-${currentPageIndex + 1}-${Date.now()}.png`;
       link.click();
       setIsDownloaded(true);
+      setExportStatus("Page exported as PNG successfully!");
       setTimeout(() => setIsDownloaded(false), 2000);
     } catch (err) {
-      setExportError(err.message || "Failed to export page as PNG.");
+      const errMsg = err.message || "Failed to export page as PNG.";
+      setExportError(errMsg);
+      setExportStatus("Export failed.");
     } finally {
       setIsExportingPng(false);
     }
@@ -110,9 +115,11 @@ const NotesConverter = forwardRef(function NotesConverter(
   const handlePrintAll = () => {
     setExportError(null);
     setIsPrinting(true);
+    setExportStatus("Preparing print document...");
 
     const handleAfterPrint = () => {
       setIsPrinting(false);
+      setExportStatus("Print dialog closed.");
       window.removeEventListener("afterprint", handleAfterPrint);
     };
 
@@ -152,6 +159,10 @@ const NotesConverter = forwardRef(function NotesConverter(
         handleNotesGenerate={handleNotesGenerate}
         handleNotesReset={handleNotesReset}
       />
+      <div role="status" aria-label="Export status" aria-live="polite" className="sr-only">
+        {exportStatus}
+      </div>
+
       {notesError && <ErrorCard error={notesError} />}
       {exportError && <ErrorCard error={exportError} />}
 
