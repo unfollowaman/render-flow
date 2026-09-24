@@ -221,4 +221,42 @@ describe("NotesConverter Export and Zoom Functionality", () => {
     const resetButton = screen.getByRole("button", { name: "Reset zoom level to 100%" });
     expect(resetButton).toBeTruthy();
   });
+
+  test("Test Case 8: Screen reader status announcements update during PNG export and print", async () => {
+    render(<NotesConverter mode="notes" setMode={() => {}} />);
+
+    const textarea = screen.getByLabelText("Input Notes JSON");
+    fireEvent.change(textarea, { target: { value: sampleSinglePageJson } });
+
+    const generateBtn = screen.getByRole("button", { name: /Generate/i });
+    fireEvent.click(generateBtn);
+
+    expect(await screen.findByText("Export Test Chapter")).toBeTruthy();
+
+    const statusContainer = screen.getByRole("status", { name: "Export status" });
+    expect(statusContainer).toBeTruthy();
+
+    const linkClickSpy = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+    const downloadBtn = screen.getByRole("button", { name: /Download Page as PNG/i });
+
+    fireEvent.click(downloadBtn);
+
+    await waitFor(() => {
+      expect(statusContainer.textContent).toBe("Page exported as PNG successfully!");
+    });
+
+    const printBtn = screen.getByRole("button", { name: /Print \/ Export All Pages/i });
+    const printSpy = vi.spyOn(window, "print").mockImplementation(() => {});
+
+    fireEvent.click(printBtn);
+    expect(statusContainer.textContent).toBe("Preparing print document...");
+
+    fireEvent(window, new Event("afterprint"));
+    await waitFor(() => {
+      expect(statusContainer.textContent).toBe("Print dialog closed.");
+    });
+
+    linkClickSpy.mockRestore();
+    printSpy.mockRestore();
+  });
 });
