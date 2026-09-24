@@ -781,6 +781,7 @@ export const InputCard = forwardRef(function InputCard({
             key={cfg.mode}
             role="tab"
             aria-selected={mode === cfg.mode}
+            title={`Switch to ${cfg.label}`}
             className={`${styles.sampleBtn} ${mode === cfg.mode ? "neu-recessed" : "neu-raised"}`}
             style={{
               flex: 1,

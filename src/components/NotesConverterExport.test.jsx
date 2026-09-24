@@ -122,6 +122,8 @@ describe("NotesConverter Export and Zoom Functionality", () => {
 
     fireEvent.click(printBtn);
 
+    expect(screen.getByText("Preparing print...")).toBeTruthy();
+
     await waitFor(() => {
       const printContainer = document.querySelector(".print-only-container");
       expect(printContainer).toBeTruthy();
@@ -135,6 +137,7 @@ describe("NotesConverter Export and Zoom Functionality", () => {
     await waitFor(() => {
       const printContainerAfter = document.querySelector(".print-only-container");
       expect(printContainerAfter).toBeNull();
+      expect(screen.getByText("Print / Export All Pages")).toBeTruthy();
     });
 
     printSpy.mockRestore();
