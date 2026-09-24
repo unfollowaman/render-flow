@@ -139,6 +139,9 @@ describe('OutputCard', () => {
     expect(iconImg).not.toBeNull();
     expect(iconImg.getAttribute('alt')).toBe('');
     expect(iconImg.getAttribute('aria-hidden')).toBe('true');
+
+    const statusRegion = screen.getByRole('status', { name: /Output status/i });
+    expect(statusRegion.textContent).toBe('PNG image downloaded successfully.');
   });
 
   it('handles download safely when result or result.image is missing', () => {
