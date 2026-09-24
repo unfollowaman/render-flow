@@ -6,6 +6,7 @@ import downloadIcon from "../assets/download-icon.png";
 export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDownloaded, setIsDownloaded] = useState(false);
+  const [downloadStatus, setDownloadStatus] = useState("");
 
   const imageRef = useRef(null);
   const closeBtnRef = useRef(null);
@@ -45,11 +46,18 @@ export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
     link.download = `render-${Date.now()}.png`;
     link.click();
     setIsDownloaded(true);
-    setTimeout(() => setIsDownloaded(false), 2000);
+    setDownloadStatus("PNG image downloaded successfully.");
+    setTimeout(() => {
+      setIsDownloaded(false);
+      setDownloadStatus("");
+    }, 2000);
   };
 
   return (
     <div className={`${styles.card} neu-card`} ref={ref}>
+      <div role="status" aria-label="Output status" aria-live="polite" className="sr-only">
+        {downloadStatus}
+      </div>
       <div className={styles.cardHeader}>
         <h2 className={styles.cardTitle}>
           Preview
