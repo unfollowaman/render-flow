@@ -7,6 +7,7 @@ let elementMeasurementCache = new WeakMap();
 let containerCssStringCache = new WeakMap();
 let cachedPxPerMm = null;
 let measurementContainer = null;
+let lastAppliedCssKey = null;
 
 /**
  * Returns or creates the module-scoped persistent off-screen measurement container.
@@ -23,6 +24,7 @@ function getMeasurementContainer() {
     measurementContainer.style.left = '-9999px';
     measurementContainer.style.pointerEvents = 'none';
     document.body.appendChild(measurementContainer);
+    lastAppliedCssKey = null;
   }
 
   return measurementContainer;
@@ -40,6 +42,7 @@ export function clearMeasurementCache(element) {
     elementMeasurementCache = new WeakMap();
     containerCssStringCache = new WeakMap();
     cachedPxPerMm = null;
+    lastAppliedCssKey = null;
     if (measurementContainer && measurementContainer.parentNode) {
       measurementContainer.parentNode.removeChild(measurementContainer);
     }
@@ -121,15 +124,20 @@ export function measureHeight(element, containerCss = null, unit = 'mm') {
 
   const container = getMeasurementContainer();
 
-  // Reset base container style before applying custom containerCss
-  container.style.cssText = 'position: absolute; visibility: hidden; top: -9999px; left: -9999px; pointer-events: none;';
+  // Performance Optimization: Cache container CSS key to avoid resetting container.style.cssText
+  // and performing redundant Object.assign / style string parses when measuring multiple elements with identical containerCss.
+  const currentCssKey = getCacheKey(containerCss, '');
+  if (lastAppliedCssKey !== currentCssKey) {
+    container.style.cssText = 'position: absolute; visibility: hidden; top: -9999px; left: -9999px; pointer-events: none;';
 
-  if (containerCss) {
-    if (typeof containerCss === 'object') {
-      Object.assign(container.style, containerCss);
-    } else if (typeof containerCss === 'string') {
-      container.style.cssText += `; ${containerCss}`;
+    if (containerCss) {
+      if (typeof containerCss === 'object') {
+        Object.assign(container.style, containerCss);
+      } else if (typeof containerCss === 'string') {
+        container.style.cssText += `; ${containerCss}`;
+      }
     }
+    lastAppliedCssKey = currentCssKey;
   }
 
   // Measure 1mm conversion factor inside the container context

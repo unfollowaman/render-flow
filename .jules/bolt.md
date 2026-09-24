@@ -21,3 +21,7 @@
 ## 2025-09-21 - Single-Pass Measured Row Construction Optimization
 **Learning:** In `paginateRows`, transforming items via `items.map(...)` allocated `N` intermediate objects (`{ id, height, rawItem }`) and an array before grouping them into row chunks. Inline-measuring DOM element heights directly during single-pass row construction eliminates temporary object allocations and array copying without changing DOM reflow count or layout behavior.
 **Action:** Measure element properties directly during row chunking loops rather than allocating intermediate mapped arrays of wrapper objects.
+
+## 2025-09-22 - Container Style Application Caching Optimization
+**Learning:** Resetting and re-applying container CSS styles via `container.style.cssText` or `Object.assign(container.style, containerCss)` on every DOM element height measurement causes redundant style string parsing and property re-assignments when measuring multiple elements under identical container styling contexts. Caching the last applied CSS key (`lastAppliedCssKey`) on the measurement container eliminates redundant style writes and reduces measurement overhead when paginating document blocks.
+**Action:** Cache applied container style keys when performing sequential DOM height measurements to avoid unnecessary style mutations.
