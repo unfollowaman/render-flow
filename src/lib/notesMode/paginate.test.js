@@ -293,6 +293,18 @@ describe('measureHeight caching & performance benchmark', () => {
     expect(hPx).toBeGreaterThan(hMm);
   });
 
+  test('measureHeight reuses applied container styles when containerCss remains unchanged', () => {
+    const el1 = createMockElement(30);
+    const el2 = createMockElement(40);
+    const cssObj = { width: '80mm', boxSizing: 'border-box' };
+
+    const h1 = measureHeight(el1, cssObj, 'mm');
+    const h2 = measureHeight(el2, cssObj, 'mm');
+
+    expect(h1).toBeCloseTo(30, 1);
+    expect(h2).toBeCloseTo(40, 1);
+  });
+
   test('clearMeasurementCache invalidates element cache and resets persistent container when called without arguments', () => {
     const el = createMockElement(35);
     const appendSpy = vi.spyOn(document.body, 'appendChild');
