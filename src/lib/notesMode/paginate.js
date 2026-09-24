@@ -415,30 +415,35 @@ export function paginate(items = [], options = {}) {
 }
 
 /**
- * Filters items and pairs eligible items into row objects.
- * Handles oversized items by pushing their IDs to overflowItems in a single pass.
+ * Measures DOM items and pairs eligible items into row objects in a single pass.
+ * OPTIMIZATION: Measures element height directly and constructs row chunks on the fly,
+ * eliminating the intermediate `.map()` array allocation and temporary wrapper objects.
  *
- * @param {Array<{id: string|number, height: number, rawItem: Object}>} measuredItems
+ * @param {Array<{id: string|number, element: HTMLElement}>} items
  * @param {number} usableHeightPerPage
  * @param {number} columnsPerRow
+ * @param {Object|string} containerCss
+ * @param {string} unit
  * @returns {{ rows: Array<{items: Array<Object>, height: number}>, overflowItems: Array<string|number> }}
  */
-function buildRowsFromMeasuredItems(measuredItems, usableHeightPerPage, columnsPerRow) {
+function buildRowsFromMeasuredItems(items, usableHeightPerPage, columnsPerRow, containerCss, unit) {
   const overflowItems = [];
   const rows = [];
   let currentChunk = [];
   let currentMaxHeight = 0;
 
-  for (let i = 0; i < measuredItems.length; i++) {
-    const item = measuredItems[i];
-    if (item.height > usableHeightPerPage) {
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const height = measureHeight(item.element, containerCss, unit);
+
+    if (height > usableHeightPerPage) {
       overflowItems.push(item.id);
       continue;
     }
 
     currentChunk.push(item);
-    if (item.height > currentMaxHeight) {
-      currentMaxHeight = item.height;
+    if (height > currentMaxHeight) {
+      currentMaxHeight = height;
     }
 
     if (currentChunk.length === columnsPerRow) {
@@ -562,16 +567,12 @@ export async function paginateRows(items = [], options = {}) {
     return { pages: [], overflowItems: [] };
   }
 
-  const measuredItems = items.map((item) => ({
-    id: item.id,
-    height: measureHeight(item.element, containerCss, unit),
-    rawItem: item,
-  }));
-
   const { rows, overflowItems } = buildRowsFromMeasuredItems(
-    measuredItems,
+    items,
     usableHeightPerPage,
-    columnsPerRow
+    columnsPerRow,
+    containerCss,
+    unit
   );
 
   const pages = await packRowsIntoPages(rows, {
