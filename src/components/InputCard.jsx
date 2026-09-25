@@ -310,7 +310,7 @@ const Workspace = forwardRef(function Workspace({
     loadSample: () => {
       setValue(modeConfig.sampleText);
       setError(null);
-      setUploadStatus("");
+      setUploadStatus(`Sample ${modeConfig.label} code loaded successfully.`);
     }
   }));
 
@@ -558,7 +558,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
     loadSample: () => {
       setValue(modeConfig.sampleText);
       setNotesError?.(null);
-      setUploadStatus("");
+      setUploadStatus(`Sample ${modeConfig.label} code loaded successfully.`);
     }
   }));
 
@@ -760,6 +760,8 @@ export const InputCard = forwardRef(function InputCard({
     }
   }));
 
+  const [sampleLoaded, setSampleLoaded] = useState(false);
+
   const loadSample = () => {
     if (mode === "html") {
       htmlRef.current?.loadSample();
@@ -770,6 +772,8 @@ export const InputCard = forwardRef(function InputCard({
     } else if (mode === "notes") {
       notesRef.current?.loadSample();
     }
+    setSampleLoaded(true);
+    setTimeout(() => setSampleLoaded(false), 2000);
   };
 
   return (
@@ -806,7 +810,7 @@ export const InputCard = forwardRef(function InputCard({
           onClick={loadSample}
           title="Load sample code into editor"
         >
-          Load sample ↗
+          {sampleLoaded ? "✓ Sample loaded" : "Load sample ↗"}
         </button>
       </div>
 
