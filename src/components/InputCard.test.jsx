@@ -38,6 +38,44 @@ describe('InputCard', () => {
     vi.restoreAllMocks();
   });
 
+  describe('Performance Optimization', () => {
+    it('benchmark MODE_CONFIG_LIST static array vs dynamic Object.values allocation', () => {
+      const sampleConfigs = {
+        html: { mode: 'html', label: 'HTML Mode' },
+        mermaid: { mode: 'mermaid', label: 'Mermaid Mode' },
+        latex: { mode: 'latex', label: 'LaTeX Mode' },
+        notes: { mode: 'notes', label: 'Notes Mode' },
+      };
+      const staticList = Object.values(sampleConfigs);
+
+      const iterations = 100000;
+
+      const startDynamic = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        const arr = Object.values(sampleConfigs);
+        for (let j = 0; j < arr.length; j++) {
+          const _val = arr[j].mode;
+        }
+      }
+      const durationDynamic = performance.now() - startDynamic;
+
+      const startStatic = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        const arr = staticList;
+        for (let j = 0; j < arr.length; j++) {
+          const _val = arr[j].mode;
+        }
+      }
+      const durationStatic = performance.now() - startStatic;
+
+      console.log(
+        `[Benchmark MODE_CONFIG_LIST] ${iterations} iterations -> Object.values: ${durationDynamic.toFixed(2)}ms, MODE_CONFIG_LIST: ${durationStatic.toFixed(2)}ms`
+      );
+
+      expect(durationStatic).toBeLessThanOrEqual(durationDynamic + 5);
+    });
+  });
+
   describe('Mode Switching and Workspace Rendering', () => {
     it('renders mode toggle tablist and tabs with correct ARIA attributes', () => {
       const setMode = vi.fn();

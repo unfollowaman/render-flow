@@ -285,6 +285,8 @@ const MODE_CONFIGS = {
   }
 };
 
+const MODE_CONFIG_LIST = Object.values(MODE_CONFIGS);
+
 const Workspace = forwardRef(function Workspace({
   modeConfig,
   isVisible,
@@ -780,7 +782,7 @@ export const InputCard = forwardRef(function InputCard({
     <div className={`${styles.card} neu-card`} ref={cardRef}>
       {/* Mode Toggle */}
       <div role="tablist" aria-label="Input mode selector" className={styles.modeSelector}>
-        {Object.values(MODE_CONFIGS).map((cfg) => (
+        {MODE_CONFIG_LIST.map((cfg) => (
           <button
             key={cfg.mode}
             role="tab"
