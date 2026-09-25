@@ -148,9 +148,9 @@ describe('InputCard', () => {
   });
 
   describe('Sample Loading and HTML Workspace Features', () => {
-    it('populates sample text when "Load sample ↗" is clicked in HTML mode', () => {
+    it('populates sample text, updates button feedback state, and announces via status region when "Load sample ↗" is clicked in HTML mode', () => {
       const setError = vi.fn();
-      render(<InputCard {...defaultProps} mode="html" setError={setError} />);
+      const { container } = render(<InputCard {...defaultProps} mode="html" setError={setError} />);
 
       const loadSampleBtn = screen.getByRole('button', { name: 'Load sample ↗' });
       fireEvent.click(loadSampleBtn);
@@ -158,11 +158,16 @@ describe('InputCard', () => {
       const textarea = screen.getByLabelText('Input HTML');
       expect(textarea.value).toContain('<!DOCTYPE html>');
       expect(setError).toHaveBeenCalledWith(null);
+      expect(screen.getByRole('button', { name: '✓ Sample loaded' })).toBeTruthy();
+
+      const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
+      expect(statusRegion).toBeTruthy();
+      expect(statusRegion.textContent).toBe('Sample HTML Mode code loaded successfully.');
     });
 
-    it('populates sample text when "Load sample ↗" is clicked in Mermaid mode', () => {
+    it('populates sample text, updates button feedback state, and announces via status region when "Load sample ↗" is clicked in Mermaid mode', () => {
       const setMermaidError = vi.fn();
-      render(<InputCard {...defaultProps} mode="mermaid" setMermaidError={setMermaidError} />);
+      const { container } = render(<InputCard {...defaultProps} mode="mermaid" setMermaidError={setMermaidError} />);
 
       const loadSampleBtn = screen.getByRole('button', { name: 'Load sample ↗' });
       fireEvent.click(loadSampleBtn);
@@ -170,6 +175,11 @@ describe('InputCard', () => {
       const textarea = screen.getByLabelText('Input Mermaid');
       expect(textarea.value).toContain('graph TD');
       expect(setMermaidError).toHaveBeenCalledWith(null);
+      expect(screen.getByRole('button', { name: '✓ Sample loaded' })).toBeTruthy();
+
+      const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
+      expect(statusRegion).toBeTruthy();
+      expect(statusRegion.textContent).toBe('Sample Mermaid Mode code loaded successfully.');
     });
 
     it('handles file upload for valid HTML files and announces status via aria-live region', async () => {
