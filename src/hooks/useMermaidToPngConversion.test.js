@@ -44,6 +44,87 @@ describe('useMermaidToPngConversion security configuration', () => {
   });
 });
 
+describe('useMermaidToPngConversion error handling', () => {
+  it('sets error state when input code string is empty or whitespace', async () => {
+    const { useMermaidToPngConversion } = await import('./useMermaidToPngConversion.js');
+    const ref = { current: null };
+
+    const { result } = renderHook(() => useMermaidToPngConversion({ outputRef: ref }));
+
+    await act(async () => {
+      await result.current.handleConvert('   ');
+    });
+
+    expect(result.current.error).toBe('Please enter some Mermaid code first.');
+    expect(result.current.loading).toBe(false);
+    expect(result.current.result).toBeNull();
+  });
+
+  it('sets error state when mermaid.render throws an error', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => new ArrayBuffer(8),
+    });
+
+    globalThis.Image = class {
+      constructor() {
+        setTimeout(() => this.onload && this.onload(), 10);
+      }
+    };
+
+    const mermaidModule = await import('mermaid');
+    const mermaid = mermaidModule.default || mermaidModule;
+    vi.spyOn(mermaid, 'initialize').mockImplementation(() => {});
+    vi.spyOn(mermaid, 'render').mockRejectedValue(new Error('Syntax error'));
+
+    const { useMermaidToPngConversion } = await import('./useMermaidToPngConversion.js');
+    const ref = { current: null };
+
+    const { result } = renderHook(() => useMermaidToPngConversion({ outputRef: ref }));
+
+    await act(async () => {
+      await result.current.handleConvert('graph TD; invalid code;');
+    });
+
+    expect(result.current.error).toBe('Invalid Mermaid syntax.');
+    expect(result.current.loading).toBe(false);
+    expect(result.current.result).toBeNull();
+  });
+
+  it('sets error state when SVG dimensions cannot be determined', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      arrayBuffer: async () => new ArrayBuffer(8),
+    });
+
+    globalThis.Image = class {
+      constructor() {
+        setTimeout(() => this.onload && this.onload(), 10);
+      }
+    };
+
+    const mermaidModule = await import('mermaid');
+    const mermaid = mermaidModule.default || mermaidModule;
+    vi.spyOn(mermaid, 'initialize').mockImplementation(() => {});
+    vi.spyOn(mermaid, 'render').mockResolvedValue({
+      svg: '<svg></svg>',
+    });
+
+    const { useMermaidToPngConversion } = await import('./useMermaidToPngConversion.js');
+    const ref = { current: null };
+
+    const { result } = renderHook(() => useMermaidToPngConversion({ outputRef: ref }));
+
+    await act(async () => {
+      await result.current.handleConvert('graph TD; A-->B;');
+    });
+
+    expect(result.current.error).toBe('Unable to determine dimensions from Mermaid SVG.');
+    expect(result.current.loading).toBe(false);
+    expect(result.current.result).toBeNull();
+  });
+});
+
 describe('arrayBufferToBase64', () => {
   it('correctly converts empty ArrayBuffer', async () => {
     const buffer = new Uint8Array([]).buffer;
