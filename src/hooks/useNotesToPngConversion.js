@@ -128,7 +128,10 @@ export function useNotesToPngConversion({ outputRef } = {}) {
         fontFamily: "'Montserrat', sans-serif",
       };
 
-      const itemsToMeasure = flattenedItems.map((item, idx) => {
+      const numItems = flattenedItems.length;
+      const itemsToMeasure = new Array(numItems);
+      for (let idx = 0; idx < numItems; idx += 1) {
+        const item = flattenedItems[idx];
         const qNumber = item.number !== undefined ? item.number : idx + 1;
         const html = renderToStaticMarkup(
           React.createElement(QuestionSolutionCard, { item, questionNumber: qNumber })
@@ -159,12 +162,12 @@ export function useNotesToPngConversion({ outputRef } = {}) {
           targetElement.style.height = `${fallbackHeightMm}mm`;
         }
 
-        return {
+        itemsToMeasure[idx] = {
           id: item.id,
           element: targetElement,
           rawItem: item
         };
-      });
+      }
 
       const { pages: pageItemIds, overflowItems } = await paginateRows(itemsToMeasure, {
         usableHeightPerPage,
