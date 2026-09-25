@@ -1,13 +1,18 @@
 import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
 import DefaultQuestionSolutionCard, {
   QuestionSolutionCard,
   renderContentItem,
   renderContentArray,
 } from './NotesModeCard';
+import { loadKatex } from '../lib/notesMode/renderEquation';
 
 describe('NotesModeCard Component and Helpers', () => {
+  beforeAll(async () => {
+    await loadKatex();
+  });
+
   beforeEach(() => {
     cleanup();
   });

@@ -1,4 +1,3 @@
-import katex from 'katex';
 import DOMPurify from 'dompurify';
 import 'katex/dist/katex.min.css';
 
@@ -6,6 +5,25 @@ import 'katex/dist/katex.min.css';
 // KaTeX AST parsing + DOMPurify HTML sanitization is CPU-intensive (~1-3ms per formula).
 // Caching reduces repeat equation rendering during pagination layout calculations and React re-renders to ~0.001ms (>1000x speedup).
 const equationCache = new Map();
+
+let katexInstance = null;
+let katexPromise = null;
+
+/**
+ * Dynamically loads the KaTeX module on demand.
+ *
+ * @returns {Promise<Object>} Resolves to the KaTeX module.
+ */
+export function loadKatex() {
+  if (katexInstance) return Promise.resolve(katexInstance);
+  if (!katexPromise) {
+    katexPromise = import('katex').then((m) => {
+      katexInstance = m.default || m;
+      return katexInstance;
+    });
+  }
+  return katexPromise;
+}
 
 /**
  * Clears the equation rendering cache.
@@ -20,7 +38,7 @@ export function clearEquationCache() {
  * @param {string} latex - The LaTeX formula string to render.
  * @param {Object} [options={}] - Options object.
  * @param {boolean} [options.displayMode=false] - Render in display/block mode if true, inline mode if false.
- * @returns {{ error: false, element: HTMLElement, html: string } | { error: true, message: string }} Result object.
+ * @returns {{ error: false, element: HTMLElement, html: string } | { error: true, loading?: boolean, message: string }} Result object.
  */
 export function renderEquation(latex, options = {}) {
   const displayMode = Boolean(options?.displayMode);
@@ -36,8 +54,17 @@ export function renderEquation(latex, options = {}) {
   let cached = equationCache.get(cacheKey);
 
   if (!cached) {
+    if (!katexInstance) {
+      loadKatex();
+      return {
+        error: true,
+        loading: true,
+        message: 'KaTeX is loading...'
+      };
+    }
+
     try {
-      const rawHtml = katex.renderToString(latex, {
+      const rawHtml = katexInstance.renderToString(latex, {
         displayMode,
         throwOnError: true,
         trust: false

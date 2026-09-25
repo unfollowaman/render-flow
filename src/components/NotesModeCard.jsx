@@ -1,6 +1,36 @@
 import React from 'react';
-import { renderEquation } from '../lib/notesMode/renderEquation';
+import { renderEquation, loadKatex } from '../lib/notesMode/renderEquation';
 import { CoordinatePlane, Point, LineSegment, Shape } from '../lib/notesMode/diagrams';
+
+function EquationItem({ latex, displayMode }) {
+  const [, setLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    let active = true;
+    loadKatex().then(() => {
+      if (active) setLoaded(true);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const result = renderEquation(latex, { displayMode });
+
+  if (result.loading) {
+    return null;
+  }
+
+  if (result.error) {
+    return (
+      <span style={{ color: '#DC2626', fontWeight: 600 }}>
+        [equation error: {result.message}]
+      </span>
+    );
+  }
+
+  return <span dangerouslySetInnerHTML={{ __html: result.html }} />;
+}
 
 export function renderContentItem(item, idx) {
   if (typeof item === 'string') {
@@ -16,6 +46,9 @@ export function renderContentItem(item, idx) {
 
   if (item.type === 'equation') {
     const result = renderEquation(item.latex, { displayMode: item.displayMode ?? false });
+    if (result.loading) {
+      return <EquationItem key={idx} latex={item.latex} displayMode={item.displayMode ?? false} />;
+    }
     if (result.error) {
       return (
         <span key={idx} style={{ color: '#DC2626', fontWeight: 600 }}>

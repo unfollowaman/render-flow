@@ -1,9 +1,13 @@
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, beforeAll } from 'vitest';
 import { NotesBlockRenderer, ContinuationLabel } from './NotesBlockComponents';
+import { loadKatex } from '../lib/notesMode/renderEquation';
 
 describe('NotesBlockComponents', () => {
+  beforeAll(async () => {
+    await loadKatex();
+  });
   test('renders continuation label correctly', () => {
     const html = renderToStaticMarkup(<ContinuationLabel questionNumber={2} />);
     expect(html).toContain('Q2 (continued)');
