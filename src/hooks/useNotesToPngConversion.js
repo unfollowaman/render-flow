@@ -6,6 +6,54 @@ import { measureHeight, paginateRows } from '../lib/notesMode/paginate';
 import { QuestionSolutionCard } from '../components/NotesModeCard';
 import { loadKatex } from '../lib/notesMode/renderEquation';
 
+function getContentLengthAndGraphFlag(contentArray) {
+  if (!contentArray) return { len: 0, hasGraph: false };
+  if (typeof contentArray === 'string') return { len: contentArray.length, hasGraph: false };
+  if (!Array.isArray(contentArray)) return { len: String(contentArray).length, hasGraph: false };
+
+  let totalLen = 0;
+  let hasGraph = false;
+
+  for (let i = 0; i < contentArray.length; i += 1) {
+    const elem = contentArray[i];
+    if (typeof elem === 'string') {
+      totalLen += elem.length;
+    } else if (elem && typeof elem === 'object') {
+      if (elem.type === 'coordinate_graph') {
+        hasGraph = true;
+      }
+      if (typeof elem.content === 'string') totalLen += elem.content.length;
+      if (typeof elem.text === 'string') totalLen += elem.text.length;
+      if (typeof elem.latex === 'string') totalLen += elem.latex.length;
+    }
+  }
+
+  return { len: totalLen, hasGraph };
+}
+
+function computeFallbackHeightMm(item) {
+  let fallbackHeightMm = 40;
+  let hasGraph = item.type === 'coordinate_graph';
+
+  if (item.question) {
+    const qInfo = getContentLengthAndGraphFlag(item.question);
+    fallbackHeightMm += Math.ceil(qInfo.len / 80) * 10;
+    if (qInfo.hasGraph) hasGraph = true;
+  }
+
+  if (item.solution) {
+    const sInfo = getContentLengthAndGraphFlag(item.solution);
+    fallbackHeightMm += Math.ceil(sInfo.len / 80) * 10;
+    if (sInfo.hasGraph) hasGraph = true;
+  }
+
+  if (hasGraph) {
+    fallbackHeightMm += 110;
+  }
+
+  return fallbackHeightMm;
+}
+
 export function useNotesToPngConversion({ outputRef } = {}) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -151,18 +199,7 @@ export function useNotesToPngConversion({ outputRef } = {}) {
         // In real browsers with layout engines, rect.height > 0 so element.style.height is ignored.
         // We set a fallback style height so JSDOM test suites don't fail, while real browsers use genuine DOM measurements.
         if (typeof window !== 'undefined' && window.navigator?.userAgent?.includes('jsdom')) {
-          let fallbackHeightMm = 40;
-          if (item.question) {
-            const qText = JSON.stringify(item.question);
-            fallbackHeightMm += Math.ceil(qText.length / 80) * 10;
-          }
-          if (item.solution) {
-            const sText = JSON.stringify(item.solution);
-            fallbackHeightMm += Math.ceil(sText.length / 80) * 10;
-          }
-          if (JSON.stringify(item).includes('coordinate_graph')) {
-            fallbackHeightMm += 110;
-          }
+          const fallbackHeightMm = computeFallbackHeightMm(item);
           targetElement.style.height = `${fallbackHeightMm}mm`;
         }
 
