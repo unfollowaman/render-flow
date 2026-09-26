@@ -126,7 +126,6 @@ export function useHtmlToPngConversion({ outputRef }) {
     document.body.appendChild(iframe)
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 0))
       // Inline external resources
       const { html: processedHtml, failedUrls } = await inlineResources(htmlToConvert)
 
@@ -167,7 +166,6 @@ export function useHtmlToPngConversion({ outputRef }) {
       const scrollWidth = iframe.contentDocument.documentElement.scrollWidth
       const scrollHeight = iframe.contentDocument.documentElement.scrollHeight
 
-      await new Promise(resolve => setTimeout(resolve, 0))
       const { width: explicitWidth, height: explicitHeight } = extractDimensions(htmlToConvert)
 
       const finalWidth = explicitWidth !== null ? explicitWidth : scrollWidth
@@ -182,7 +180,6 @@ export function useHtmlToPngConversion({ outputRef }) {
       iframe.style.width = finalWidth + 'px'
       iframe.style.height = finalHeight + 'px'
 
-      await new Promise(resolve => setTimeout(resolve, 0))
       // Capture with html-to-image (lazy loaded)
       const { toPng } = await import('html-to-image')
       const dataUrl = await toPng(iframe.contentDocument.body, {

@@ -80,6 +80,51 @@ describe('useHtmlToPngConversion XSS Sanitization', () => {
   })
 })
 
+describe('useHtmlToPngConversion conversion loop without artificial macro-task delays', () => {
+  it('converts HTML content to PNG successfully without macro-task delays', async () => {
+    const outputRef = { current: { scrollIntoView: vi.fn() } }
+    const { result } = renderHook(() => useHtmlToPngConversion({ outputRef }))
+
+    const origCreateElement = document.createElement.bind(document)
+    vi.spyOn(document, 'createElement').mockImplementation((tagName, options) => {
+      const el = origCreateElement(tagName, options)
+      if (tagName.toLowerCase() === 'iframe') {
+        const fakeDoc = {
+          open: vi.fn(),
+          close: vi.fn(),
+          write: vi.fn(),
+          readyState: 'complete',
+          body: document.createElement('body'),
+          documentElement: document.createElement('html'),
+          images: [],
+          fonts: { ready: Promise.resolve() }
+        }
+        Object.defineProperty(el, 'contentDocument', {
+          get: () => fakeDoc,
+          configurable: true
+        })
+        Object.defineProperty(el, 'contentWindow', {
+          get: () => ({ document: fakeDoc }),
+          configurable: true
+        })
+      }
+      return el
+    })
+
+    await act(async () => {
+      await result.current.handleConvert('<h1>Test Conversion</h1>')
+    })
+
+    expect(result.current.result).toEqual({
+      image: 'data:image/png;base64,fake',
+      width: 0,
+      height: 0
+    })
+    expect(result.current.loading).toBe(false)
+    expect(result.current.error).toBeNull()
+  })
+})
+
 describe('waitForFontsAndImages performance & functionality', () => {
   it('handles HTMLCollection, Array, and null doc.images correctly', async () => {
     // Test with real HTMLCollection
