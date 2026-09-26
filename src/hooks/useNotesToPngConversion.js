@@ -4,6 +4,7 @@ import DOMPurify from 'dompurify';
 import { validateNotesJson } from '../lib/notesMode/validateSchema';
 import { measureHeight, paginateRows } from '../lib/notesMode/paginate';
 import { QuestionSolutionCard } from '../components/NotesModeCard';
+import { loadKatex } from '../lib/notesMode/renderEquation';
 
 export function useNotesToPngConversion({ outputRef } = {}) {
   const [loading, setLoading] = useState(false);
@@ -117,6 +118,9 @@ export function useNotesToPngConversion({ outputRef } = {}) {
       // Footer = 12mm
       // Header region estimate = 24mm (title + subtitle + border + margin)
       // Total usable height per page = 297 - 36 - 12 - 24 = 225mm
+      // Ensure KaTeX is loaded for DOM measurement of equation items
+      await loadKatex();
+
       const usableHeightPerPage = 225;
 
       // In 2-column layout: total content width = 174mm (210mm - 36mm padding).

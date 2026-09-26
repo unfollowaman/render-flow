@@ -60,7 +60,26 @@ export default defineConfig({
           if (id.includes('node_modules')) {
             if (
               id.includes('node_modules/mermaid') ||
-              id.includes('node_modules/@mermaid-js')
+              id.includes('node_modules/@mermaid-js') ||
+              id.includes('node_modules/cytoscape') ||
+              id.includes('node_modules/cytoscape-cose-bilkent') ||
+              id.includes('node_modules/cytoscape-fcose') ||
+              id.includes('node_modules/layout-base') ||
+              id.includes('node_modules/cose-base') ||
+              id.includes('node_modules/dagre-d3-es') ||
+              id.includes('node_modules/d3-') ||
+              id.includes('node_modules/lodash-es') ||
+              id.includes('node_modules/@upsetjs/venn.js') ||
+              id.includes('node_modules/@braintree/sanitize-url') ||
+              id.includes('node_modules/@iconify') ||
+              id.includes('node_modules/fastdom') ||
+              id.includes('node_modules/ts-dedent') ||
+              id.includes('node_modules/marked') ||
+              id.includes('node_modules/es-toolkit') ||
+              id.includes('node_modules/roughjs') ||
+              id.includes('node_modules/khroma') ||
+              id.includes('node_modules/dayjs') ||
+              id.includes('node_modules/stylis')
             ) {
               return 'vendor-mermaid';
             }

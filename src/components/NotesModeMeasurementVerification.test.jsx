@@ -1,10 +1,14 @@
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, beforeAll } from 'vitest';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { QuestionSolutionCard } from '../components/NotesModeCard';
 import { measureHeight, clearMeasurementCache } from '../lib/notesMode/paginate';
+import { loadKatex } from '../lib/notesMode/renderEquation';
 
 describe('Notes Mode Pagination & DOM Measurement Verification', () => {
+  beforeAll(async () => {
+    await loadKatex();
+  });
   const containerCss = {
     width: '174mm',
     boxSizing: 'border-box',
