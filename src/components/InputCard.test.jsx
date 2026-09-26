@@ -470,6 +470,7 @@ describe('InputCard', () => {
       expect(textarea.value).toBe('');
       expect(screen.queryByText('16 chars')).toBeNull();
       expect(setError).toHaveBeenCalledWith(null);
+      expect(statusRegion.textContent).toBe('Input text cleared.');
     });
 
     it('handles Notes Workspace interactions: character count, Copy/Clear visibility, JSON upload, Validate, and Generate', async () => {
@@ -538,6 +539,7 @@ describe('InputCard', () => {
       fireEvent.click(clearBtn);
       expect(textarea.value).toBe('');
       expect(handleNotesReset).toHaveBeenCalledTimes(1);
+      expect(statusRegion.textContent).toBe('Notes input text cleared.');
 
       // Upload JSON file via file input
       const fileInput = container.querySelector('input[type="file"]');

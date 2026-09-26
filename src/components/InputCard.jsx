@@ -345,7 +345,7 @@ const Workspace = forwardRef(function Workspace({
   const handleClear = () => {
     setValue("");
     setError(null);
-    setUploadStatus("");
+    setUploadStatus("Input text cleared.");
     if (setHtmlWarning) setHtmlWarning(null);
   };
 
@@ -580,7 +580,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
 
   const handleClear = () => {
     setValue("");
-    setUploadStatus("");
+    setUploadStatus("Notes input text cleared.");
     handleNotesReset?.();
   };
 
