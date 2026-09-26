@@ -68,10 +68,6 @@ describe('InputCard', () => {
       }
       const durationStatic = performance.now() - startStatic;
 
-      console.log(
-        `[Benchmark MODE_CONFIG_LIST] ${iterations} iterations -> Object.values: ${durationDynamic.toFixed(2)}ms, MODE_CONFIG_LIST: ${durationStatic.toFixed(2)}ms`
-      );
-
       expect(durationStatic).toBeLessThanOrEqual(durationDynamic + 5);
     });
   });
