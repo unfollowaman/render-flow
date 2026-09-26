@@ -36,6 +36,12 @@
   align-items: center;
   gap: 10px;
   text-decoration: none;
+  border-radius: 6px;
+}
+
+.logo:focus-visible {
+  outline: 2px solid #ffa100;
+  outline-offset: 3px;
 }
 
 .logoIcon {
@@ -68,6 +74,12 @@
 
 .nav a:hover {
   color: #ffa100;
+}
+
+.nav a:focus-visible {
+  outline: 2px solid #ffa100;
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 .nav a.navActive {
@@ -429,6 +441,11 @@
   box-shadow: var(--neu-raised-shadow-hover), 0 0 0 1px rgba(0, 0, 0, 0.15);
 }
 
+.sampleBtn:focus-visible {
+  outline: 2px solid #ffa100;
+  outline-offset: 3px;
+}
+
 /* ── WORKSPACE ───────────────────────────────── */
 .workspace {
   display: flex;
@@ -516,6 +533,11 @@
   box-shadow: var(--neu-raised-shadow-hover), 0 0 0 1px rgba(0, 0, 0, 0.15);
 }
 
+.uploadBtn:focus-visible {
+  outline: 2px solid #ffa100;
+  outline-offset: 3px;
+}
+
 .uploadHint {
   font-family: 'Instrument Serif', Georgia, serif;
   font-size: 14px;
@@ -571,6 +593,11 @@
     16px 16px 30px rgba(174, 181, 177, 0.3),
     -16px -16px 30px rgba(255, 255, 255, 1),
     inset 1px 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+.convertBtn:focus-visible {
+  outline: 2px solid #ffa100;
+  outline-offset: 3px;
 }
 
 .convertBtn:active:not(:disabled) {
@@ -697,6 +724,11 @@
   box-shadow: var(--neu-raised-shadow-hover), 0 0 0 1px rgba(0, 0, 0, 0.15);
 }
 
+.downloadBtn:focus-visible {
+  outline: 2px solid #ffa100;
+  outline-offset: 3px;
+}
+
 .downloadBtn:active {
   transform: translateY(0);
 }
@@ -731,6 +763,11 @@
 .resetBtn:hover {
   transform: translateY(-3px);
   box-shadow: var(--neu-raised-shadow-hover), 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+.resetBtn:focus-visible {
+  outline: 2px solid #ffa100;
+  outline-offset: 3px;
 }
 
 .resetBtn:active {
