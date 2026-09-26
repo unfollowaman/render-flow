@@ -229,11 +229,11 @@ export function flowBlocksIntoColumns(blocks = [], options = {}) {
     const labelHeight = measureHeight(labelTarget, containerCss, unit);
 
     // 2. Measure all blocks
+    const dummyEl = document.createElement('div');
     const measuredBlocks = blocks.map((block) => {
       const blockHtml = renderToStaticMarkup(
         React.createElement(NotesBlockRenderer, { block, isTopOfColumn: false })
       );
-      const dummyEl = document.createElement('div');
       dummyEl.innerHTML = DOMPurify.sanitize(blockHtml);
       const targetEl = dummyEl.firstElementChild || dummyEl;
 

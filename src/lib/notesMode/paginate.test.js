@@ -348,6 +348,43 @@ describe('measureHeight caching & performance benchmark', () => {
     expect(result.pages.length).toBeGreaterThan(0);
     expect(result.overflowItems.length).toBe(100); // 10,000 / 100 = 100 oversized items
   });
+
+  test('benchmark flowBlocksIntoColumns performance for 500 blocks', async () => {
+    const blocks = Array.from({ length: 500 }, (_, i) => {
+      const qNum = Math.floor(i / 5) + 1;
+      const mod = i % 5;
+      if (mod === 0) {
+        return {
+          id: `q${qNum}-header`,
+          type: 'question-header',
+          questionNumber: qNum,
+          content: [`Question header text ${qNum}`],
+        };
+      } else if (mod === 1) {
+        return {
+          id: `q${qNum}-sol-0`,
+          type: 'solution-first',
+          questionNumber: qNum,
+          element: `Solution first line for Q${qNum}`,
+        };
+      } else {
+        return {
+          id: `q${qNum}-sol-${mod - 1}`,
+          type: 'solution-rest',
+          questionNumber: qNum,
+          element: `Solution rest line ${mod - 1} for Q${qNum}`,
+        };
+      }
+    });
+
+    const t0 = performance.now();
+    const result = await flowBlocksIntoColumns(blocks, { usableHeightPerPage: 225 });
+    const duration = performance.now() - t0;
+
+    console.log(`[Benchmark flowBlocksIntoColumns] 500 blocks -> Duration: ${duration.toFixed(2)}ms`);
+
+    expect(result.pages.length).toBeGreaterThan(0);
+  });
 });
 
 describe('flowBlocksIntoColumns XSS Sanitization', () => {
