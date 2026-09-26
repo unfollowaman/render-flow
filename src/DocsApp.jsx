@@ -80,7 +80,7 @@ export default function DocsApp() {
       <Header activePage="docs" />
 
       {/* ── MAIN CONTENT ───────────────────────────── */}
-      <main className={styles.main}>
+      <main id="main-content" tabIndex={-1} className={styles.main}>
         <div className={styles.container}>
           {/* ── DESKTOP STICKY SIDEBAR TOC ───────────── */}
           <aside className={styles.sidebar} aria-label="Table of contents">
