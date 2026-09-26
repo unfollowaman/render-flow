@@ -4,6 +4,9 @@ import logoIcon from "../assets/logo.svg";
 export function Header({ activePage = "home" }) {
   return (
     <header className={styles.header}>
+      <a href="#main-content" className={styles.skipLink}>
+        Skip to main content
+      </a>
       <div className={styles.headerInner}>
         <a href="index.html" className={styles.logo}>
           <img src={logoIcon} alt="Logo" className={styles.logoIcon} />

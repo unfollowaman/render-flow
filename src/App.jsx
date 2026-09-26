@@ -49,7 +49,7 @@ export default function App() {
       <Hero />
 
       {/* ── MAIN ───────────────────────────────────── */}
-      <main className={styles.main}>
+      <main id="main-content" tabIndex={-1} className={styles.main}>
         <section className={styles.container}>
           <Suspense fallback={<div>Loading...</div>}>
             {mode === "html" ? (

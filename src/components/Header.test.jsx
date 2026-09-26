@@ -7,6 +7,14 @@ describe('Header', () => {
     cleanup();
   });
 
+  it('renders skip to main content link targeting #main-content', () => {
+    render(<Header />);
+
+    const skipLink = screen.getByRole('link', { name: 'Skip to main content' });
+    expect(skipLink).toBeTruthy();
+    expect(skipLink.getAttribute('href')).toBe('#main-content');
+  });
+
   it('renders logo image and text correctly', () => {
     render(<Header />);
 
