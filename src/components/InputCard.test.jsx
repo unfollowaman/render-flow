@@ -432,7 +432,7 @@ describe('InputCard', () => {
       expect(screen.getByText((content) => content.includes("KaTeX parse error"))).toBeTruthy();
     });
 
-    it('renders character count and handles Copy and Clear input text buttons in Workspace', async () => {
+    it('renders character count, announces copy status via aria-live, and handles Copy and Clear in Workspace', async () => {
       const setError = vi.fn();
       const writeTextMock = vi.fn().mockResolvedValue(undefined);
       Object.assign(navigator, {
@@ -441,7 +441,7 @@ describe('InputCard', () => {
         },
       });
 
-      render(<InputCard {...defaultProps} mode="mermaid" setMermaidError={setError} />);
+      const { container } = render(<InputCard {...defaultProps} mode="mermaid" setMermaidError={setError} />);
 
       const textarea = screen.getByLabelText('Input Mermaid');
       fireEvent.change(textarea, { target: { value: 'graph TD\n  A-->B' } });
@@ -458,6 +458,10 @@ describe('InputCard', () => {
       expect(writeTextMock).toHaveBeenCalledWith('graph TD\n  A-->B');
       expect(screen.getByText('✓ Copied!')).toBeTruthy();
 
+      const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
+      expect(statusRegion).toBeTruthy();
+      expect(statusRegion.textContent).toBe('Input text copied to clipboard.');
+
       const clearBtn = screen.getByRole('button', { name: 'Clear input text' });
       expect(clearBtn).toBeTruthy();
 
@@ -468,7 +472,7 @@ describe('InputCard', () => {
       expect(setError).toHaveBeenCalledWith(null);
     });
 
-    it('handles Notes Workspace interactions: JSON upload, Validate, Clear, and Generate', async () => {
+    it('handles Notes Workspace interactions: character count, Copy/Clear visibility, JSON upload, Validate, and Generate', async () => {
       const validateNotesJson = vi.fn();
       const handleNotesGenerate = vi.fn();
       const handleNotesReset = vi.fn();
@@ -488,8 +492,15 @@ describe('InputCard', () => {
       expect(screen.getByText('✓ Valid Notes JSON structure')).toBeTruthy();
       expect(screen.getByText('⚠️ Invalid JSON formatting')).toBeTruthy();
 
+      // Initially empty -> Clear and Copy buttons should not be present
+      expect(screen.queryByRole('button', { name: 'Clear notes input text' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Copy notes input text to clipboard' })).toBeNull();
+
       const textarea = screen.getByLabelText('Input Notes JSON');
       fireEvent.change(textarea, { target: { value: '{"chapter": "Test"}' } });
+
+      // Character count should now be rendered in Notes mode
+      expect(screen.getByText('19 chars')).toBeTruthy();
 
       const writeTextMock = vi.fn().mockResolvedValue(undefined);
       Object.assign(navigator, {
@@ -511,6 +522,10 @@ describe('InputCard', () => {
       });
       expect(writeTextMock).toHaveBeenCalledWith('{"chapter": "Test"}');
       expect(screen.getByText('✓ Copied!')).toBeTruthy();
+
+      const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
+      expect(statusRegion).toBeTruthy();
+      expect(statusRegion.textContent).toBe('Input text copied to clipboard.');
 
       // Click Generate
       const generateBtn = screen.getByRole('button', { name: 'Generate' });
@@ -534,8 +549,6 @@ describe('InputCard', () => {
       });
       expect(handleNotesReset).toHaveBeenCalled();
 
-      const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
-      expect(statusRegion).toBeTruthy();
       expect(statusRegion.textContent).toBe('File "notes.json" loaded successfully.');
     });
   });

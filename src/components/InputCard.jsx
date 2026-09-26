@@ -354,6 +354,7 @@ const Workspace = forwardRef(function Workspace({
     try {
       await navigator.clipboard.writeText(value);
       setIsCopied(true);
+      setUploadStatus("Input text copied to clipboard.");
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy:", err);
@@ -588,6 +589,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
     try {
       await navigator.clipboard.writeText(value);
       setIsCopied(true);
+      setUploadStatus("Input text copied to clipboard.");
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy:", err);
@@ -658,27 +660,31 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
         </button>
 
         {value && (
-          <button
-            type="button"
-            aria-label="Copy notes input text to clipboard"
-            title="Copy notes input text to clipboard"
-            className={`${styles.sampleBtn} neu-raised`}
-            onClick={handleCopy}
-          >
-            {isCopied ? "✓ Copied!" : "Copy"}
-          </button>
+          <>
+            <span className={`${styles.charCount} neu-recessed`}>
+              {value.length.toLocaleString()} chars
+            </span>
+            <button
+              type="button"
+              aria-label="Copy notes input text to clipboard"
+              title="Copy notes input text to clipboard"
+              className={`${styles.sampleBtn} neu-raised`}
+              onClick={handleCopy}
+            >
+              {isCopied ? "✓ Copied!" : "Copy"}
+            </button>
+            <button
+              type="button"
+              aria-label="Clear notes input text"
+              title="Clear notes input text"
+              className={`${styles.sampleBtn} neu-raised`}
+              style={{ color: '#e53e3e' }}
+              onClick={handleClear}
+            >
+              Clear
+            </button>
+          </>
         )}
-
-        <button
-          type="button"
-          aria-label="Clear notes input text"
-          title="Clear notes input text"
-          className={`${styles.sampleBtn} neu-raised`}
-          style={{ color: '#e53e3e' }}
-          onClick={handleClear}
-        >
-          Clear
-        </button>
 
         <button
           type="button"
