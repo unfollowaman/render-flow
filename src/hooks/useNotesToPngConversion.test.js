@@ -76,4 +76,33 @@ describe('useNotesToPngConversion', () => {
     expect(result.current.validationError).toBe(null);
     expect(result.current.validationSuccess).toBe(null);
   });
+
+  test('benchmark handleGenerate fallback measurement calculation performance for 100 items', async () => {
+    const { result } = renderHook(() => useNotesToPngConversion());
+
+    const items = Array.from({ length: 100 }, (_, i) => ({
+      type: "question",
+      number: i + 1,
+      question: [{ type: "text", content: `Question ${i + 1} with sample text for testing performance.` }],
+      solution: [
+        { type: "text", content: `Solution ${i + 1} with details.` },
+        { type: "coordinate_graph", points: [{ x: 0, y: 0 }] }
+      ]
+    }));
+
+    const jsonObj = {
+      chapter: { title: "Benchmark Chapter", subtitle: "Performance Test" },
+      pages: [{ items }]
+    };
+
+    const start = performance.now();
+    await act(async () => {
+      await result.current.handleGenerate(JSON.stringify(jsonObj));
+    });
+    const duration = performance.now() - start;
+
+    console.log(`[Benchmark handleGenerate] 100 items in JSDOM duration: ${duration.toFixed(2)}ms`);
+    expect(result.current.result).toBeTruthy();
+    expect(result.current.result.pages.length).toBeGreaterThan(0);
+  }, 30000);
 });
