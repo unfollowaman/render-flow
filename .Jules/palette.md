@@ -25,3 +25,7 @@
 ## 2026-09-27 - Drag-and-Drop Editor Import Parity & Validation Feedback
 **Learning:** When multi-mode input editors offer file uploads (like HTML or JSON imports), providing consistent drag-and-drop support across all modes with visual drag hover overlays (`dropZoneActive`), file extension/MIME type validation, and `aria-live` status announcements prevents user confusion and accidental page navigation when dropping files onto textareas.
 **Action:** Ensure all file-import drop zones validate file types before reading, display a visual drop target indicator during `onDragOver`, and announce upload success or validation errors via a `role="status"` live region.
+
+## 2026-09-27 - Zoom Level ARIA Spinbutton & Keyboard Navigation Pattern
+**Learning:** Text representations of adjustable numerical metrics (such as zoom levels or page scale indicators) lack accessibility semantics unless marked up as `role="spinbutton"`. Providing `tabIndex={0}`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-valuetext`, and key handlers (`ArrowUp`/`ArrowDown`/`ArrowLeft`/`ArrowRight`, `Home`, `End`) allows keyboard and screen reader users to discover and modify numerical values directly.
+**Action:** Model interactive scale and zoom indicators as `role="spinbutton"` widgets with complete ARIA value properties and key handlers for directional key steps and boundary bounds (`Home`/`End`).

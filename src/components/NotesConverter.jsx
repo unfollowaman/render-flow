@@ -283,12 +283,35 @@ const NotesConverter = forwardRef(function NotesConverter(
               </button>
 
               <span
+                role="spinbutton"
+                tabIndex={0}
+                aria-label="Zoom level"
+                aria-valuenow={Math.round(zoom * 100)}
+                aria-valuemin={50}
+                aria-valuemax={150}
+                aria-valuetext={`${Math.round(zoom * 100)}%`}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowUp" || e.key === "ArrowRight") {
+                    e.preventDefault();
+                    handleZoomIn();
+                  } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
+                    e.preventDefault();
+                    handleZoomOut();
+                  } else if (e.key === "Home") {
+                    e.preventDefault();
+                    setZoom(MIN_ZOOM);
+                  } else if (e.key === "End") {
+                    e.preventDefault();
+                    setZoom(MAX_ZOOM);
+                  }
+                }}
                 style={{
                   fontSize: "13px",
                   fontWeight: 600,
                   color: "#374151",
                   minWidth: "48px",
                   textAlign: "center",
+                  cursor: "pointer",
                 }}
               >
                 {Math.round(zoom * 100)}%
