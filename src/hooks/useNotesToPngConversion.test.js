@@ -105,4 +105,65 @@ describe('useNotesToPngConversion', () => {
     expect(result.current.result).toBeTruthy();
     expect(result.current.result.pages.length).toBeGreaterThan(0);
   }, 30000);
+
+  test('benchmark array flattening: flatMap+map vs single-pass loop for 10,000 items across 1,000 pages', () => {
+    const pages = Array.from({ length: 1000 }, (_, p) => ({
+      items: Array.from({ length: 10 }, (_, i) => ({
+        type: 'question',
+        number: p * 10 + i + 1,
+        question: 'Sample question'
+      }))
+    }));
+    const parsed = { pages };
+
+    // Baseline: flatMap + map
+    const iterations = 50;
+    const startFlatMap = performance.now();
+    for (let iter = 0; iter < iterations; iter += 1) {
+      let itemCounter = 0;
+      const flattenedItems = Array.isArray(parsed.pages)
+        ? parsed.pages.flatMap(page =>
+            Array.isArray(page?.items)
+              ? page.items.map(item => {
+                  itemCounter += 1;
+                  return {
+                    ...item,
+                    id: item.id || `item-${itemCounter}`
+                  };
+                })
+              : []
+          )
+        : [];
+      expect(flattenedItems.length).toBe(10000);
+    }
+    const flatMapDuration = performance.now() - startFlatMap;
+
+    // Single-pass loop
+    const startLoop = performance.now();
+    for (let iter = 0; iter < iterations; iter += 1) {
+      const flattenedItems = [];
+      if (Array.isArray(parsed.pages)) {
+        let itemCounter = 0;
+        const pageList = parsed.pages;
+        for (let p = 0; p < pageList.length; p += 1) {
+          const page = pageList[p];
+          if (Array.isArray(page?.items)) {
+            const items = page.items;
+            for (let i = 0; i < items.length; i += 1) {
+              const item = items[i];
+              itemCounter += 1;
+              flattenedItems.push({
+                ...item,
+                id: item.id || `item-${itemCounter}`
+              });
+            }
+          }
+        }
+      }
+      expect(flattenedItems.length).toBe(10000);
+    }
+    const loopDuration = performance.now() - startLoop;
+
+    console.log(`[Benchmark Array Flattening] 50 runs x 10,000 items -> flatMap+map: ${flatMapDuration.toFixed(2)}ms, single loop: ${loopDuration.toFixed(2)}ms`);
+  });
 });
