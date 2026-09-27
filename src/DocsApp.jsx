@@ -180,7 +180,7 @@ export default function DocsApp() {
                 Paste any HTML, or drop a <code className={styles.inlineCode}>.html</code> file. Include explicit <code className={styles.inlineCode}>width</code> and <code className={styles.inlineCode}>height</code> on the <code className={styles.inlineCode}>body</code> — without it, Render Flow has to guess the canvas size.
               </p>
               <StaticMermaidDiagram
-                chart={`flowchart TD\n    A["Paste HTML"] --> B["Extract width/height from body"]\n    B --> C["Write into hidden iframe"]\n    C --> D["Wait for fonts and images to load"]\n    D --> E["html-to-image captures the iframe"]\n    E --> F["PNG delivered"]`}
+                chart={`flowchart TD\n    A["Paste HTML"] --> B["Extract width/height<br/>from body"]\n    B --> C["Write into<br/>hidden iframe"]\n    C --> D["Wait for fonts and images to load"]\n    D --> E["html-to-image captures the iframe"]\n    E --> F["PNG delivered"]`}
               />
 
               <h3 className={styles.subSectionTitle}>Mermaid Mode</h3>

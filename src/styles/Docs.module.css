@@ -260,11 +260,16 @@
 }
 
 .diagramSvg svg foreignObject > div {
+  text-align: center;
   word-break: normal;
   overflow-wrap: break-word;
-  white-space: normal;
   box-sizing: border-box;
   padding: 2px 4px;
+}
+
+.diagramSvg svg foreignObject > div * {
+  text-align: center;
+  margin: 0;
 }
 
 .diagramSvg svg :global(.node) rect,
