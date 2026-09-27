@@ -279,7 +279,7 @@ const MODE_CONFIGS = {
     label: "Notes Mode",
     cardTitle: "Input Notes JSON",
     ariaLabel: "Input Notes JSON",
-    placeholder: `Paste your Notes JSON here…`,
+    placeholder: `Paste your Notes JSON here…\n\nOr drag & drop a .json file`,
     sampleText: SAMPLE_NOTES,
     hasFileUpload: false
   }
@@ -548,6 +548,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
   handleNotesReset
 }, ref) {
   const [value, setValue] = useState("");
+  const [dragOver, setDragOver] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
   const fileInputRef = useRef(null);
@@ -569,6 +570,12 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
 
   const handleFileUpload = (file) => {
     if (!file) return;
+    if (!file.name.endsWith(".json") && file.type !== "application/json") {
+      const errMsg = "Please upload a valid .json file.";
+      setNotesError?.(errMsg);
+      setUploadStatus(errMsg);
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
       setValue(e.target.result || "");
@@ -611,7 +618,20 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
       />
 
       <div className="neu-recessed" style={{ borderRadius: '12px' }}>
-        <div className={styles.dropZone}>
+        <div
+          className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ""}`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragOver(false);
+            const file = e.dataTransfer.files[0];
+            handleFileUpload(file);
+          }}
+        >
           <textarea
             aria-label={modeConfig.ariaLabel}
             aria-keyshortcuts="Control+Enter Meta+Enter"
@@ -632,6 +652,11 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
             spellCheck={false}
             style={{ background: 'transparent' }}
           />
+          {dragOver && (
+            <div className={styles.dropOverlay}>
+              <span>📂 Drop .json file here</span>
+            </div>
+          )}
         </div>
       </div>
 
