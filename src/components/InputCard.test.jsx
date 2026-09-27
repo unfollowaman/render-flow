@@ -549,5 +549,44 @@ describe('InputCard', () => {
 
       expect(statusRegion.textContent).toBe('File "notes.json" loaded successfully.');
     });
+
+    it('handles drag over, drag leave, drop valid JSON, and invalid file error handling in Notes Workspace', async () => {
+      const setNotesError = vi.fn();
+      const { container } = render(<InputCard {...defaultProps} mode="notes" setNotesError={setNotesError} />);
+
+      const textarea = screen.getByLabelText('Input Notes JSON');
+      const dropZone = textarea.closest('.dropZone') || textarea.parentElement;
+
+      // Drag Over
+      fireEvent.dragOver(dropZone, { dataTransfer: { files: [] } });
+      expect(screen.getByText('📂 Drop .json file here')).toBeTruthy();
+
+      // Drag Leave
+      fireEvent.dragLeave(dropZone);
+      expect(screen.queryByText('📂 Drop .json file here')).toBeNull();
+
+      // Drop valid JSON
+      const jsonFile = new File(['{"dropped": true}'], 'drop.json', { type: 'application/json' });
+      fireEvent.drop(dropZone, {
+        dataTransfer: { files: [jsonFile] }
+      });
+
+      await waitFor(() => {
+        expect(textarea.value).toBe('{"dropped": true}');
+      });
+
+      const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
+      expect(statusRegion).toBeTruthy();
+      expect(statusRegion.textContent).toBe('File "drop.json" loaded successfully.');
+
+      // Drop invalid file
+      const invalidFile = new File(['plain text'], 'invalid.txt', { type: 'text/plain' });
+      fireEvent.drop(dropZone, {
+        dataTransfer: { files: [invalidFile] }
+      });
+
+      expect(setNotesError).toHaveBeenCalledWith('Please upload a valid .json file.');
+      expect(statusRegion.textContent).toBe('Please upload a valid .json file.');
+    });
   });
 });

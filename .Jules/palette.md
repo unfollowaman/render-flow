@@ -21,3 +21,7 @@
 ## 2025-05-18 - Screen Reader Status Announcements for Async Exports
 **Learning:** Visual-only feedback on export buttons (like "Exporting..." or "✓ Downloaded!") is invisible to screen reader users unless paired with a visually hidden (`sr-only`) `role="status"` live region (`aria-live="polite"`). Differentiating multiple status regions on a single page using descriptive `aria-label`s prevents query collisions in Testing Library and screen readers.
 **Action:** Include a dedicated `<div role="status" aria-label="..." aria-live="polite" className="sr-only">` to announce workflow state transitions for asynchronous export/download and print preparation actions.
+
+## 2026-09-27 - Drag-and-Drop Editor Import Parity & Validation Feedback
+**Learning:** When multi-mode input editors offer file uploads (like HTML or JSON imports), providing consistent drag-and-drop support across all modes with visual drag hover overlays (`dropZoneActive`), file extension/MIME type validation, and `aria-live` status announcements prevents user confusion and accidental page navigation when dropping files onto textareas.
+**Action:** Ensure all file-import drop zones validate file types before reading, display a visual drop target indicator during `onDragOver`, and announce upload success or validation errors via a `role="status"` live region.
