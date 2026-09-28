@@ -29,3 +29,7 @@
 ## 2026-09-27 - Zoom Level ARIA Spinbutton & Keyboard Navigation Pattern
 **Learning:** Text representations of adjustable numerical metrics (such as zoom levels or page scale indicators) lack accessibility semantics unless marked up as `role="spinbutton"`. Providing `tabIndex={0}`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-valuetext`, and key handlers (`ArrowUp`/`ArrowDown`/`ArrowLeft`/`ArrowRight`, `Home`, `End`) allows keyboard and screen reader users to discover and modify numerical values directly.
 **Action:** Model interactive scale and zoom indicators as `role="spinbutton"` widgets with complete ARIA value properties and key handlers for directional key steps and boundary bounds (`Home`/`End`).
+
+## 2026-09-28 - Error Reporting One-Click Clipboard Copy & Live Status Announcements
+**Learning:** In error containers (`role="alert"`), users often need to copy long or technical error messages for debugging or bug reports. Providing a dedicated "Copy error" button with temporary visual feedback ("✓ Copied!") and a visually hidden (`sr-only`) `role="status"` live region (`aria-live="polite"`) eliminates tedious manual text selection and ensures screen reader users receive confirmation when error details are copied to the clipboard.
+**Action:** Add a "Copy error" action button with visual feedback state and a dedicated `role="status"` region to error display cards.
