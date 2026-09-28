@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useId } from "react";
+import DOMPurify from "dompurify";
 import styles from "./styles/Docs.module.css";
 import { Header, Footer } from "./components";
 
@@ -40,8 +41,11 @@ function StaticMermaidDiagram({ chart, caption }) {
         });
 
         const { svg } = await mermaid.render(uniqueId, chart);
+        const cleanSvg = DOMPurify.sanitize(svg, {
+          USE_PROFILES: { html: true, svg: true, svgFilters: true },
+        });
         if (!isCancelled) {
-          setSvgHtml(svg);
+          setSvgHtml(cleanSvg);
         }
       } catch (err) {
         console.error("Failed to render docs Mermaid diagram:", err);

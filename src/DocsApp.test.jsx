@@ -1,5 +1,6 @@
 import { render, screen, cleanup, fireEvent } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import DOMPurify from 'dompurify';
 import DocsApp from './DocsApp';
 
 describe('DocsApp', () => {
@@ -121,6 +122,29 @@ describe('DocsApp', () => {
     // Credits links
     const unfollowLink = screen.getByRole('link', { name: '@unfollowaman' });
     expect(unfollowLink.getAttribute('href')).toBe('https://x.com/unfollowaman');
+  });
+
+  it('sanitizes SVG output from mermaid.render using DOMPurify', async () => {
+    const sanitizeSpy = vi.spyOn(DOMPurify, 'sanitize');
+    const mermaidModule = await import('mermaid');
+    const mermaid = mermaidModule.default || mermaidModule;
+
+    const renderSpy = vi.spyOn(mermaid, 'render').mockResolvedValue({
+      svg: '<svg><script>alert("xss")</script><text>Safe Text</text></svg>',
+    });
+
+    render(<DocsApp />);
+
+    await vi.waitFor(() => {
+      expect(sanitizeSpy).toHaveBeenCalled();
+    });
+
+    expect(screen.queryByText('alert("xss")')).toBeNull();
+    const safeTexts = screen.getAllByText('Safe Text');
+    expect(safeTexts.length).toBeGreaterThan(0);
+
+    sanitizeSpy.mockRestore();
+    renderSpy.mockRestore();
   });
 
   it('handles mobile dropdown navigation change', () => {
