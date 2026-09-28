@@ -1,5 +1,5 @@
-import { render, screen, cleanup } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
+import { render, screen, cleanup, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ErrorCard } from './ErrorCard';
 
 describe('ErrorCard', () => {
@@ -32,5 +32,41 @@ describe('ErrorCard', () => {
     render(<ErrorCard error={404} />);
 
     expect(screen.getByText('404')).toBeTruthy();
+  });
+
+  it('allows copying error text to clipboard with status announcement', async () => {
+    vi.useFakeTimers();
+    const writeTextMock = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: writeTextMock,
+      },
+    });
+
+    const errorMessage = 'SyntaxError: Unexpected token < in JSON at position 0';
+    render(<ErrorCard error={errorMessage} />);
+
+    const copyBtn = screen.getByRole('button', { name: /copy error details to clipboard/i });
+    expect(copyBtn).toBeTruthy();
+    expect(copyBtn.textContent).toBe('Copy error');
+
+    await act(async () => {
+      fireEvent.click(copyBtn);
+    });
+
+    expect(writeTextMock).toHaveBeenCalledWith(errorMessage);
+    expect(copyBtn.textContent).toBe('✓ Copied!');
+
+    const statusRegion = screen.getByRole('status', { name: /copy error status/i });
+    expect(statusRegion.textContent).toBe('Error message copied to clipboard.');
+
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    expect(copyBtn.textContent).toBe('Copy error');
+    expect(statusRegion.textContent).toBe('');
+
+    vi.useRealTimers();
   });
 });
