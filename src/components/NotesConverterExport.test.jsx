@@ -207,7 +207,7 @@ describe("NotesConverter Export and Zoom Functionality", () => {
     expect(zoomInBtn.disabled).toBe(true);
   });
 
-  test("Test Case 7: Zoom reset button has proper aria-label", async () => {
+  test("Test Case 7: Zoom reset button has proper aria-label and spinbutton supports keyboard navigation", async () => {
     render(<NotesConverter mode="notes" setMode={() => {}} />);
 
     const textarea = screen.getByLabelText("Input Notes JSON");
@@ -220,6 +220,26 @@ describe("NotesConverter Export and Zoom Functionality", () => {
 
     const resetButton = screen.getByRole("button", { name: "Reset zoom level to 100%" });
     expect(resetButton).toBeTruthy();
+
+    const zoomSpinbutton = screen.getByRole("spinbutton", { name: "Zoom level" });
+    expect(zoomSpinbutton).toBeTruthy();
+    expect(zoomSpinbutton.getAttribute("aria-valuenow")).toBe("100");
+
+    // ArrowUp -> 110%
+    fireEvent.keyDown(zoomSpinbutton, { key: "ArrowUp" });
+    expect(zoomSpinbutton.getAttribute("aria-valuenow")).toBe("110");
+
+    // ArrowDown -> 100%
+    fireEvent.keyDown(zoomSpinbutton, { key: "ArrowDown" });
+    expect(zoomSpinbutton.getAttribute("aria-valuenow")).toBe("100");
+
+    // End -> 150%
+    fireEvent.keyDown(zoomSpinbutton, { key: "End" });
+    expect(zoomSpinbutton.getAttribute("aria-valuenow")).toBe("150");
+
+    // Home -> 50%
+    fireEvent.keyDown(zoomSpinbutton, { key: "Home" });
+    expect(zoomSpinbutton.getAttribute("aria-valuenow")).toBe("50");
   });
 
   test("Test Case 8: Screen reader status announcements update during PNG export and print", async () => {
