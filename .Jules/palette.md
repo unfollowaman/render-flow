@@ -3,8 +3,8 @@
 **Action:** When creating image preview popups or overlay modals, ensure `onKeyDown` handles `Enter`/`Space` for opening and `Escape` (plus window listener) for closing, and add matching ARIA roles.
 
 ## 2025-05-18 - Mode Switcher Tablist Accessibility Pattern
-**Learning:** In Neumorphic tab controls where visual state uses `.neu-recessed` (active) and `.neu-raised` (inactive), screen readers cannot infer selection state without explicit ARIA tab semantics (`role="tablist"`, `role="tab"`, and `aria-selected`).
-**Action:** Always wrap mode switcher tab groups in `role="tablist"` with an `aria-label`, and mark tab buttons with `role="tab"` and dynamic `aria-selected` attributes matching active state.
+**Learning:** In Neumorphic tab controls where visual state uses `.neu-recessed` (active) and `.neu-raised` (inactive), screen readers cannot infer selection state without explicit ARIA tab semantics (`role="tablist"`, `role="tab"`, and `aria-selected`). Roving `tabIndex` (`0` for active tab, `-1` for inactive tabs) paired with arrow key navigation (`ArrowRight`/`ArrowLeft`/`ArrowUp`/`ArrowDown`/`Home`/`End`) allows keyboard users to navigate between tabs seamlessly without tabbing through every tab stop.
+**Action:** Always wrap mode switcher tab groups in `role="tablist"` with an `aria-label`, mark tab buttons with `role="tab"`, dynamic `aria-selected`, roving `tabIndex`, and arrow key handlers that automatically update active state and focus the target tab button.
 
 ## 2025-05-18 - Multi-platform Keyboard Shortcut Pattern for Textarea Submission
 **Learning:** In text editors/code input cards, users expect standard IDE shortcuts (`Ctrl+Enter` on Windows/Linux, `Cmd+Enter` / `e.metaKey` on macOS) to trigger submit actions without needing to tab out or click buttons. Pair this with `title` attributes on submit buttons to make the shortcut discoverable, and `aria-keyshortcuts="Control+Enter Meta+Enter"` on textareas and submit buttons for assistive technologies.

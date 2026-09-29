@@ -90,6 +90,11 @@ describe('InputCard', () => {
       expect(latexTab.getAttribute('aria-selected')).toBe('false');
       expect(notesTab.getAttribute('aria-selected')).toBe('false');
 
+      expect(htmlTab.getAttribute('tabindex')).toBe('0');
+      expect(mermaidTab.getAttribute('tabindex')).toBe('-1');
+      expect(latexTab.getAttribute('tabindex')).toBe('-1');
+      expect(notesTab.getAttribute('tabindex')).toBe('-1');
+
       fireEvent.click(mermaidTab);
       expect(setMode).toHaveBeenCalledWith('mermaid');
 
@@ -98,6 +103,29 @@ describe('InputCard', () => {
 
       fireEvent.click(notesTab);
       expect(setMode).toHaveBeenCalledWith('notes');
+    });
+
+    it('supports keyboard arrow navigation across tabs (ArrowRight, ArrowLeft, Home, End)', () => {
+      const setMode = vi.fn();
+      render(<InputCard {...defaultProps} mode="html" setMode={setMode} />);
+
+      const htmlTab = screen.getByRole('tab', { name: 'HTML Mode' });
+
+      // ArrowRight from HTML -> Mermaid
+      fireEvent.keyDown(htmlTab, { key: 'ArrowRight' });
+      expect(setMode).toHaveBeenCalledWith('mermaid');
+
+      // ArrowLeft from HTML -> Notes (wraps around)
+      fireEvent.keyDown(htmlTab, { key: 'ArrowLeft' });
+      expect(setMode).toHaveBeenCalledWith('notes');
+
+      // End from HTML -> Notes
+      fireEvent.keyDown(htmlTab, { key: 'End' });
+      expect(setMode).toHaveBeenCalledWith('notes');
+
+      // Home from HTML -> HTML (index 0)
+      fireEvent.keyDown(htmlTab, { key: 'Home' });
+      expect(setMode).toHaveBeenLastCalledWith('notes'); // no setMode call because index is same
     });
 
     it('renders HTML Workspace when mode is "html"', () => {

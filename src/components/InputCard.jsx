@@ -817,6 +817,7 @@ export const InputCard = forwardRef(function InputCard({
           <button
             key={cfg.mode}
             role="tab"
+            tabIndex={mode === cfg.mode ? 0 : -1}
             aria-selected={mode === cfg.mode}
             title={`Switch to ${cfg.label}`}
             className={`${styles.sampleBtn} ${mode === cfg.mode ? "neu-recessed" : "neu-raised"}`}
@@ -828,6 +829,33 @@ export const InputCard = forwardRef(function InputCard({
               border: mode === cfg.mode ? '1px solid rgba(255,161,0,0.3)' : undefined
             }}
             onClick={() => setMode(cfg.mode)}
+            onKeyDown={(e) => {
+              const modes = MODE_CONFIG_LIST.map((c) => c.mode);
+              const currentIndex = modes.indexOf(cfg.mode);
+              let nextIndex = -1;
+
+              if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+                e.preventDefault();
+                nextIndex = (currentIndex + 1) % modes.length;
+              } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+                e.preventDefault();
+                nextIndex = (currentIndex - 1 + modes.length) % modes.length;
+              } else if (e.key === "Home") {
+                e.preventDefault();
+                nextIndex = 0;
+              } else if (e.key === "End") {
+                e.preventDefault();
+                nextIndex = modes.length - 1;
+              }
+
+              if (nextIndex !== -1 && nextIndex !== currentIndex) {
+                setMode(modes[nextIndex]);
+                const buttons = e.currentTarget.parentElement?.querySelectorAll('[role="tab"]');
+                if (buttons && buttons[nextIndex]) {
+                  buttons[nextIndex].focus();
+                }
+              }
+            }}
           >
             {cfg.label}
           </button>
