@@ -1,31 +1,59 @@
+// Cache for globalized RegExp instances when non-global regexes are passed
+const regexCache = new WeakMap();
+
+function getGlobalRegex(regex) {
+  if (regex.global) {
+    return regex;
+  }
+  let cached = regexCache.get(regex);
+  if (!cached) {
+    cached = new RegExp(regex.source, regex.flags + 'g');
+    regexCache.set(regex, cached);
+  }
+  return cached;
+}
+
+// Module-level regexes to avoid re-compilation on every call
+const IPV4_REGEX = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+const URL_REGEX = /url\(\s*(["']|&quot;|&#39;)?(https?:\/\/[^"'\s)<>]+?)(?:["']|&quot;|&#39;)?\s*\)/gi;
+const LINK_REGEX = /<link\s+([^>]+)>/gi;
+const IMG_REGEX = /<img\s+([^>]+)>/gi;
+const REL_STYLESHEET_REGEX = /\brel\s*=\s*(["']?)(stylesheet)\1/i;
+const HREF_URL_REGEX = /\bhref\s*=\s*(["']?)(https?:\/\/[^"'\s>]+)\1/i;
+const SRC_URL_REGEX = /\bsrc\s*=\s*(["']?)(https?:\/\/[^"'\s>]+)\1/i;
+
 // Performance optimization: Avoid dual string scanning passes (str.replace)
 // by matching all occurrences in a single exec pass and constructing the result via slice string builder.
 async function replaceAsync(str, regex, asyncFn) {
   const matches = [];
   const promises = [];
 
-  const flags = regex.flags.includes('g') ? regex.flags : regex.flags + 'g';
-  const rx = new RegExp(regex.source, flags);
+  const rx = getGlobalRegex(regex);
+  rx.lastIndex = 0;
 
-  let match;
-  while ((match = rx.exec(str)) !== null) {
-    matches.push(match);
-    const args = [...match];
-    args.push(match.index, str);
-    if (match.groups !== undefined) {
-      args.push(match.groups);
-    }
-    promises.push(asyncFn(...args));
+  try {
+    let match;
+    while ((match = rx.exec(str)) !== null) {
+      matches.push(match);
+      const args = [...match];
+      args.push(match.index, str);
+      if (match.groups !== undefined) {
+        args.push(match.groups);
+      }
+      promises.push(asyncFn(...args));
 
-    // Guard against zero-width match infinite loop
-    if (match.index === rx.lastIndex) {
-      rx.lastIndex++;
-    }
+      // Guard against zero-width match infinite loop
+      if (match.index === rx.lastIndex) {
+        rx.lastIndex++;
+      }
 
-    // Break after first match if original regex was non-global
-    if (!regex.flags.includes('g')) {
-      break;
+      // Break after first match if original regex was non-global
+      if (!regex.global) {
+        break;
+      }
     }
+  } finally {
+    rx.lastIndex = 0;
   }
 
   if (matches.length === 0) {
@@ -66,8 +94,7 @@ export function isPrivateOrLoopbackHost(hostname) {
   }
 
   // IPv4 regex matching standard dotted quad
-  const ipv4Regex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
-  const match = host.match(ipv4Regex);
+  const match = host.match(IPV4_REGEX);
   if (match) {
     const p = match.slice(1).map(Number);
     if (p.some((n) => n > 255)) return true; // Invalid IP, block
@@ -156,8 +183,7 @@ async function fetchAsDataUrl(url) {
 }
 
 async function inlineCssUrls(text, failedUrls) {
-  const urlRegex = /url\(\s*(["']|&quot;|&#39;)?(https?:\/\/[^"'\s)<>]+?)(?:["']|&quot;|&#39;)?\s*\)/gi;
-  return await replaceAsync(text, urlRegex, async (match, quote, url) => {
+  return await replaceAsync(text, URL_REGEX, async (match, quote, url) => {
     try {
       const dataUrl = await fetchAsDataUrl(url);
       // Data URIs don't strictly require quotes in CSS.
@@ -175,10 +201,9 @@ async function inlineCssUrls(text, failedUrls) {
 export async function inlineResources(html) {
   const failedUrls = [];
 
-  const linkRegex = /<link\s+([^>]+)>/gi;
-  html = await replaceAsync(html, linkRegex, async (match) => {
-    const relMatch = match.match(/\brel\s*=\s*(["']?)(stylesheet)\1/i);
-    const hrefMatch = match.match(/\bhref\s*=\s*(["']?)(https?:\/\/[^"'\s>]+)\1/i);
+  html = await replaceAsync(html, LINK_REGEX, async (match) => {
+    const relMatch = match.match(REL_STYLESHEET_REGEX);
+    const hrefMatch = match.match(HREF_URL_REGEX);
 
     if (relMatch && hrefMatch) {
       const url = hrefMatch[2];
@@ -200,9 +225,8 @@ export async function inlineResources(html) {
     return match;
   });
 
-  const imgRegex = /<img\s+([^>]+)>/gi;
-  html = await replaceAsync(html, imgRegex, async (match) => {
-    const srcMatch = match.match(/\bsrc\s*=\s*(["']?)(https?:\/\/[^"'\s>]+)\1/i);
+  html = await replaceAsync(html, IMG_REGEX, async (match) => {
+    const srcMatch = match.match(SRC_URL_REGEX);
     if (srcMatch) {
       const url = srcMatch[2];
       try {
