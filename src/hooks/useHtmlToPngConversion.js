@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react'
 import DOMPurify from 'dompurify'
 import { inlineResources } from './inlineResources'
 import { createIsolatedIframe } from '../utils/createIsolatedIframe'
+import { runIfLatest } from '../utils/requestHelpers.js'
 
 const BODY_WIDTH_REGEX = /(?:body|html)\s*(?:\/\*.*?\*\/\s*)*\{[^}]*?width:\s*(\d+)px/i
 const BODY_HEIGHT_REGEX = /(?:body|html)\s*(?:\/\*.*?\*\/\s*)*\{[^}]*?height:\s*(\d+)px/i
@@ -101,9 +102,9 @@ export function useHtmlToPngConversion({ outputRef }) {
     const myRequestId = latestRequestIdRef.current
 
     if (!htmlToConvert.trim()) {
-      if (myRequestId === latestRequestIdRef.current) {
+      runIfLatest(myRequestId, latestRequestIdRef, () => {
         setError('Please enter some HTML content first.')
-      }
+      })
       return
     }
 
@@ -111,10 +112,10 @@ export function useHtmlToPngConversion({ outputRef }) {
     setError(null)
     setResult(null)
     if (htmlToConvert.length > 500000 && !force) {
-      if (myRequestId === latestRequestIdRef.current) {
+      runIfLatest(myRequestId, latestRequestIdRef, () => {
         setHtmlWarning('Very large HTML may cause the browser tab to become unresponsive during conversion. Do you want to proceed?');
         setLoading(false);
-      }
+      })
       return;
     }
     setHtmlWarning(null);
@@ -192,12 +193,12 @@ export function useHtmlToPngConversion({ outputRef }) {
         backgroundColor: null,
       })
 
-      if (myRequestId === latestRequestIdRef.current) {
+      runIfLatest(myRequestId, latestRequestIdRef, () => {
         setResult({ image: dataUrl, width: finalWidth, height: finalHeight })
         setTimeout(() => {
           outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }, 100)
-      }
+      })
     } catch (err) {
       let message = 'Rendering failed. Try inlining external assets as data: URLs.'
       if (err.message?.toLowerCase().includes('timeout')) {
@@ -205,14 +206,14 @@ export function useHtmlToPngConversion({ outputRef }) {
       } else if (err.message?.includes('Dimensions too large')) {
         message = err.message
       }
-      if (myRequestId === latestRequestIdRef.current) {
+      runIfLatest(myRequestId, latestRequestIdRef, () => {
         setError(message)
-      }
+      })
     } finally {
       document.body.removeChild(iframe)
-      if (myRequestId === latestRequestIdRef.current) {
+      runIfLatest(myRequestId, latestRequestIdRef, () => {
         setLoading(false)
-      }
+      })
     }
   }, [outputRef])
 

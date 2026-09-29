@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { createIsolatedIframe } from '../utils/createIsolatedIframe';
+import { runIfLatest } from '../utils/requestHelpers.js';
 
 export function useLatexToPngConversion({ outputRef }) {
   const [loading, setLoading] = useState(false);
@@ -19,9 +20,9 @@ export function useLatexToPngConversion({ outputRef }) {
     const myRequestId = latestRequestIdRef.current;
 
     if (!latexString.trim()) {
-      if (myRequestId === latestRequestIdRef.current) {
+      runIfLatest(myRequestId, latestRequestIdRef, () => {
         setError('Please enter some LaTeX code first.');
-      }
+      });
       return;
     }
 
@@ -51,10 +52,10 @@ export function useLatexToPngConversion({ outputRef }) {
             trust: false
         });
       } catch (renderError) {
-        if (myRequestId === latestRequestIdRef.current) {
+        runIfLatest(myRequestId, latestRequestIdRef, () => {
           setParseError(renderError.message || 'LaTeX could not be parsed.');
           setLoading(false);
-        }
+        });
         return;
       }
 
@@ -161,20 +162,20 @@ export function useLatexToPngConversion({ outputRef }) {
 
       resultObjectUrl = URL.createObjectURL(blob);
 
-      if (myRequestId === latestRequestIdRef.current) {
+      runIfLatest(myRequestId, latestRequestIdRef, () => {
         setResult({ image: resultObjectUrl, width: finalWidth, height: finalHeight });
         setTimeout(() => {
           outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
-      }
+      });
     } catch (err) {
-      if (myRequestId === latestRequestIdRef.current) {
+      runIfLatest(myRequestId, latestRequestIdRef, () => {
         setError(err.message || 'An error occurred during conversion.');
-      }
+      });
     } finally {
-      if (myRequestId === latestRequestIdRef.current) {
+      runIfLatest(myRequestId, latestRequestIdRef, () => {
         setLoading(false);
-      }
+      });
     }
   }, [outputRef]);
 
