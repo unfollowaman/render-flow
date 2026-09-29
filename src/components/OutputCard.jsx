@@ -10,6 +10,7 @@ export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
 
   const imageRef = useRef(null);
   const closeBtnRef = useRef(null);
+  const dialogRef = useRef(null);
   const wasFullscreenRef = useRef(false);
 
   useEffect(() => {
@@ -94,15 +95,31 @@ export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
       {isFullscreen &&
         createPortal(
           <div
+            ref={dialogRef}
             className={styles.fullscreenOverlay}
-            role="button"
-            tabIndex={0}
-            aria-label="Close preview overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Fullscreen image preview"
             onClick={() => setIsFullscreen(false)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
+              if (e.key === "Escape") {
                 e.preventDefault();
                 setIsFullscreen(false);
+              } else if (e.key === "Tab" && dialogRef.current) {
+                const focusables = dialogRef.current.querySelectorAll(
+                  'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                );
+                if (focusables.length > 0) {
+                  const first = focusables[0];
+                  const last = focusables[focusables.length - 1];
+                  if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                  } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                  }
+                }
               }
             }}
           >
