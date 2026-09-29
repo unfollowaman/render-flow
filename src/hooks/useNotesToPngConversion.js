@@ -2,11 +2,11 @@ import React, { useState, useCallback, useRef } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import DOMPurify from 'dompurify';
 import { validateNotesJson } from '../lib/notesMode/validateSchema';
-import { measureHeight, paginateRows } from '../lib/notesMode/paginate';
+import { paginateRows } from '../lib/notesMode/paginate';
 import { QuestionSolutionCard } from '../components/NotesModeCard';
 import { loadKatex } from '../lib/notesMode/renderEquation';
 
-function getContentLengthAndGraphFlag(contentArray) {
+export function getContentLengthAndGraphFlag(contentArray) {
   if (!contentArray) return { len: 0, hasGraph: false };
   if (typeof contentArray === 'string') return { len: contentArray.length, hasGraph: false };
   if (!Array.isArray(contentArray)) return { len: String(contentArray).length, hasGraph: false };
@@ -31,7 +31,7 @@ function getContentLengthAndGraphFlag(contentArray) {
   return { len: totalLen, hasGraph };
 }
 
-function computeFallbackHeightMm(item) {
+export function computeFallbackHeightMm(item) {
   let fallbackHeightMm = 40;
   let hasGraph = item.type === 'coordinate_graph';
 
@@ -52,6 +52,87 @@ function computeFallbackHeightMm(item) {
   }
 
   return fallbackHeightMm;
+}
+
+export function flattenPagesItems(pages) {
+  const flattenedItems = [];
+  if (Array.isArray(pages)) {
+    let itemCounter = 0;
+    for (let p = 0; p < pages.length; p += 1) {
+      const page = pages[p];
+      if (Array.isArray(page?.items)) {
+        const items = page.items;
+        for (let i = 0; i < items.length; i += 1) {
+          const item = items[i];
+          itemCounter += 1;
+          flattenedItems.push({
+            ...item,
+            id: item.id || `item-${itemCounter}`
+          });
+        }
+      }
+    }
+  }
+  return flattenedItems;
+}
+
+export function prepareItemsToMeasure(flattenedItems) {
+  const numItems = flattenedItems.length;
+  const itemsToMeasure = new Array(numItems);
+  const isJsdom = typeof window !== 'undefined' && window.navigator?.userAgent?.includes('jsdom');
+
+  for (let idx = 0; idx < numItems; idx += 1) {
+    const item = flattenedItems[idx];
+    const qNumber = item.number !== undefined ? item.number : idx + 1;
+    const html = renderToStaticMarkup(
+      React.createElement(QuestionSolutionCard, { item, questionNumber: qNumber })
+    );
+
+    const dummyEl = document.createElement('div');
+    dummyEl.innerHTML = DOMPurify.sanitize(html);
+
+    const targetElement = dummyEl.firstElementChild || dummyEl;
+
+    // In non-layout testing environments (like JSDOM), getBoundingClientRect returns 0 for all elements.
+    // measureHeight uses element.style.height as a fallback only when rect.height === 0.
+    // In real browsers with layout engines, rect.height > 0 so element.style.height is ignored.
+    // We set a fallback style height so JSDOM test suites don't fail, while real browsers use genuine DOM measurements.
+    if (isJsdom) {
+      const fallbackHeightMm = computeFallbackHeightMm(item);
+      targetElement.style.height = `${fallbackHeightMm}mm`;
+    }
+
+    itemsToMeasure[idx] = {
+      id: item.id,
+      element: targetElement,
+      rawItem: item
+    };
+  }
+
+  return itemsToMeasure;
+}
+
+export function assemblePages(pageItemIds, overflowItems, flattenedItems) {
+  const itemMap = new Map(flattenedItems.map(item => [item.id, item]));
+
+  const generatedPages = pageItemIds.map((idList, pageIdx) => ({
+    pageIndex: pageIdx,
+    isOverflow: false,
+    items: idList.map(id => itemMap.get(id))
+  }));
+
+  // If overflow items exist, render them on separate dedicated overflow page(s)
+  if (overflowItems.length > 0) {
+    overflowItems.forEach((id) => {
+      generatedPages.push({
+        pageIndex: generatedPages.length,
+        isOverflow: true,
+        items: [itemMap.get(id)]
+      });
+    });
+  }
+
+  return generatedPages;
 }
 
 export function useNotesToPngConversion({ outputRef } = {}) {
@@ -129,26 +210,7 @@ export function useNotesToPngConversion({ outputRef } = {}) {
         return;
       }
 
-      // Flatten items from all pages in order using a single-pass loop
-      const flattenedItems = [];
-      if (Array.isArray(parsed.pages)) {
-        let itemCounter = 0;
-        const pageList = parsed.pages;
-        for (let p = 0; p < pageList.length; p += 1) {
-          const page = pageList[p];
-          if (Array.isArray(page?.items)) {
-            const items = page.items;
-            for (let i = 0; i < items.length; i += 1) {
-              const item = items[i];
-              itemCounter += 1;
-              flattenedItems.push({
-                ...item,
-                id: item.id || `item-${itemCounter}`
-              });
-            }
-          }
-        }
-      }
+      const flattenedItems = flattenPagesItems(parsed.pages);
 
       if (flattenedItems.length === 0) {
         if (myRequestId === latestRequestIdRef.current) {
@@ -185,35 +247,7 @@ export function useNotesToPngConversion({ outputRef } = {}) {
         fontFamily: "'Montserrat', sans-serif",
       };
 
-      const numItems = flattenedItems.length;
-      const itemsToMeasure = new Array(numItems);
-      for (let idx = 0; idx < numItems; idx += 1) {
-        const item = flattenedItems[idx];
-        const qNumber = item.number !== undefined ? item.number : idx + 1;
-        const html = renderToStaticMarkup(
-          React.createElement(QuestionSolutionCard, { item, questionNumber: qNumber })
-        );
-
-        const dummyEl = document.createElement('div');
-        dummyEl.innerHTML = DOMPurify.sanitize(html);
-
-        const targetElement = dummyEl.firstElementChild || dummyEl;
-
-        // In non-layout testing environments (like JSDOM), getBoundingClientRect returns 0 for all elements.
-        // measureHeight uses element.style.height as a fallback only when rect.height === 0.
-        // In real browsers with layout engines, rect.height > 0 so element.style.height is ignored.
-        // We set a fallback style height so JSDOM test suites don't fail, while real browsers use genuine DOM measurements.
-        if (typeof window !== 'undefined' && window.navigator?.userAgent?.includes('jsdom')) {
-          const fallbackHeightMm = computeFallbackHeightMm(item);
-          targetElement.style.height = `${fallbackHeightMm}mm`;
-        }
-
-        itemsToMeasure[idx] = {
-          id: item.id,
-          element: targetElement,
-          rawItem: item
-        };
-      }
+      const itemsToMeasure = prepareItemsToMeasure(flattenedItems);
 
       const { pages: pageItemIds, overflowItems } = await paginateRows(itemsToMeasure, {
         usableHeightPerPage,
@@ -225,24 +259,7 @@ export function useNotesToPngConversion({ outputRef } = {}) {
 
       if (myRequestId !== latestRequestIdRef.current) return;
 
-      const itemMap = new Map(flattenedItems.map(item => [item.id, item]));
-
-      const generatedPages = pageItemIds.map((idList, pageIdx) => ({
-        pageIndex: pageIdx,
-        isOverflow: false,
-        items: idList.map(id => itemMap.get(id))
-      }));
-
-      // If overflow items exist, render them on separate dedicated overflow page(s)
-      if (overflowItems.length > 0) {
-        overflowItems.forEach((id) => {
-          generatedPages.push({
-            pageIndex: generatedPages.length,
-            isOverflow: true,
-            items: [itemMap.get(id)]
-          });
-        });
-      }
+      const generatedPages = assemblePages(pageItemIds, overflowItems, flattenedItems);
 
       setValidationError(null);
       setValidationSuccess(null);
