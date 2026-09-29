@@ -536,6 +536,159 @@ const Workspace = forwardRef(function Workspace({
   );
 });
 
+function NotesDropZone({
+  modeConfig,
+  value,
+  setValue,
+  loading,
+  handleNotesGenerate,
+  handleFileUpload
+}) {
+  const [dragOver, setDragOver] = useState(false);
+
+  return (
+    <div className="neu-recessed" style={{ borderRadius: '12px' }}>
+      <div
+        className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ""}`}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          const file = e.dataTransfer.files[0];
+          handleFileUpload(file);
+        }}
+      >
+        <textarea
+          aria-label={modeConfig.ariaLabel}
+          aria-keyshortcuts="Control+Enter Meta+Enter"
+          className={styles.textarea}
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
+          onKeyDown={(e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+              e.preventDefault();
+              if (!loading && value.trim()) {
+                handleNotesGenerate(value);
+              }
+            }
+          }}
+          placeholder={modeConfig.placeholder}
+          spellCheck={false}
+          style={{ background: 'transparent' }}
+        />
+        {dragOver && (
+          <div className={styles.dropOverlay}>
+            <span>📂 Drop .json file here</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function NotesActionControls({
+  fileInputRef,
+  validateNotesJson,
+  value,
+  isCopied,
+  handleCopy,
+  handleClear,
+  handleNotesGenerate,
+  loading
+}) {
+  return (
+    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+      <button
+        type="button"
+        className={`${styles.uploadBtn} neu-raised`}
+        onClick={() => fileInputRef.current?.click()}
+        title="Upload .json file from your computer"
+      >
+        <span>📁</span> Load JSON
+      </button>
+
+      <button
+        type="button"
+        className={`${styles.sampleBtn} neu-raised`}
+        onClick={() => validateNotesJson(value)}
+        title="Validate JSON structure against schema"
+      >
+        Validate
+      </button>
+
+      {value && (
+        <>
+          <span className={`${styles.charCount} neu-recessed`}>
+            {value.length.toLocaleString()} chars
+          </span>
+          <button
+            type="button"
+            aria-label="Copy notes input text to clipboard"
+            title="Copy notes input text to clipboard"
+            className={`${styles.sampleBtn} neu-raised`}
+            onClick={handleCopy}
+          >
+            {isCopied ? "✓ Copied!" : "Copy"}
+          </button>
+          <button
+            type="button"
+            aria-label="Clear notes input text"
+            title="Clear notes input text"
+            className={`${styles.sampleBtn} neu-raised`}
+            style={{ color: '#e53e3e' }}
+            onClick={handleClear}
+          >
+            Clear
+          </button>
+        </>
+      )}
+
+      <button
+        type="button"
+        className={`${styles.convertBtn}`}
+        style={{ flex: '1 1 200px', height: '48px', margin: 0 }}
+        onClick={() => handleNotesGenerate(value)}
+        disabled={loading || !value.trim()}
+        aria-keyshortcuts="Control+Enter Meta+Enter"
+        title={
+          loading
+            ? "Generating…"
+            : !value.trim()
+            ? "Enter JSON or load sample to generate (Ctrl+Enter or ⌘+Enter)"
+            : "Generate (Ctrl+Enter or ⌘+Enter)"
+        }
+      >
+        {loading ? "Generating…" : "Generate"}
+      </button>
+    </div>
+  );
+}
+
+function NotesValidationFeedback({ validationSuccess, validationError }) {
+  if (!validationSuccess && !validationError) return null;
+
+  return (
+    <>
+      {validationSuccess && (
+        <div style={{ color: '#16A34A', fontSize: '14px', fontWeight: '600', padding: '4px 8px' }}>
+          ✓ {validationSuccess}
+        </div>
+      )}
+      {validationError && (
+        <div style={{ color: '#e53e3e', fontSize: '14px', fontWeight: '500', padding: '4px 8px' }}>
+          ⚠️ {validationError}
+        </div>
+      )}
+    </>
+  );
+}
+
 const NotesWorkspace = forwardRef(function NotesWorkspace({
   modeConfig,
   isVisible,
@@ -548,7 +701,6 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
   handleNotesReset
 }, ref) {
   const [value, setValue] = useState("");
-  const [dragOver, setDragOver] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
   const fileInputRef = useRef(null);
@@ -617,130 +769,34 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
         }}
       />
 
-      <div className="neu-recessed" style={{ borderRadius: '12px' }}>
-        <div
-          className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ""}`}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(true);
-          }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setDragOver(false);
-            const file = e.dataTransfer.files[0];
-            handleFileUpload(file);
-          }}
-        >
-          <textarea
-            aria-label={modeConfig.ariaLabel}
-            aria-keyshortcuts="Control+Enter Meta+Enter"
-            className={styles.textarea}
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value);
-            }}
-            onKeyDown={(e) => {
-              if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-                e.preventDefault();
-                if (!loading && value.trim()) {
-                  handleNotesGenerate(value);
-                }
-              }
-            }}
-            placeholder={modeConfig.placeholder}
-            spellCheck={false}
-            style={{ background: 'transparent' }}
-          />
-          {dragOver && (
-            <div className={styles.dropOverlay}>
-              <span>📂 Drop .json file here</span>
-            </div>
-          )}
-        </div>
-      </div>
+      <NotesDropZone
+        modeConfig={modeConfig}
+        value={value}
+        setValue={setValue}
+        loading={loading}
+        handleNotesGenerate={handleNotesGenerate}
+        handleFileUpload={handleFileUpload}
+      />
 
       <div role="status" aria-live="polite" className="sr-only">
         {uploadStatus}
       </div>
 
-      {/* Action Buttons Row */}
-      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-        <button
-          type="button"
-          className={`${styles.uploadBtn} neu-raised`}
-          onClick={() => fileInputRef.current?.click()}
-          title="Upload .json file from your computer"
-        >
-          <span>📁</span> Load JSON
-        </button>
+      <NotesActionControls
+        fileInputRef={fileInputRef}
+        validateNotesJson={validateNotesJson}
+        value={value}
+        isCopied={isCopied}
+        handleCopy={handleCopy}
+        handleClear={handleClear}
+        handleNotesGenerate={handleNotesGenerate}
+        loading={loading}
+      />
 
-        <button
-          type="button"
-          className={`${styles.sampleBtn} neu-raised`}
-          onClick={() => validateNotesJson(value)}
-          title="Validate JSON structure against schema"
-        >
-          Validate
-        </button>
-
-        {value && (
-          <>
-            <span className={`${styles.charCount} neu-recessed`}>
-              {value.length.toLocaleString()} chars
-            </span>
-            <button
-              type="button"
-              aria-label="Copy notes input text to clipboard"
-              title="Copy notes input text to clipboard"
-              className={`${styles.sampleBtn} neu-raised`}
-              onClick={handleCopy}
-            >
-              {isCopied ? "✓ Copied!" : "Copy"}
-            </button>
-            <button
-              type="button"
-              aria-label="Clear notes input text"
-              title="Clear notes input text"
-              className={`${styles.sampleBtn} neu-raised`}
-              style={{ color: '#e53e3e' }}
-              onClick={handleClear}
-            >
-              Clear
-            </button>
-          </>
-        )}
-
-        <button
-          type="button"
-          className={`${styles.convertBtn}`}
-          style={{ flex: '1 1 200px', height: '48px', margin: 0 }}
-          onClick={() => handleNotesGenerate(value)}
-          disabled={loading || !value.trim()}
-          aria-keyshortcuts="Control+Enter Meta+Enter"
-          title={
-            loading
-              ? "Generating…"
-              : !value.trim()
-              ? "Enter JSON or load sample to generate (Ctrl+Enter or ⌘+Enter)"
-              : "Generate (Ctrl+Enter or ⌘+Enter)"
-          }
-        >
-          {loading ? "Generating…" : "Generate"}
-        </button>
-      </div>
-
-      {/* Inline Feedback Messages */}
-      {validationSuccess && (
-        <div style={{ color: '#16A34A', fontSize: '14px', fontWeight: '600', padding: '4px 8px' }}>
-          ✓ {validationSuccess}
-        </div>
-      )}
-      {validationError && (
-        <div style={{ color: '#e53e3e', fontSize: '14px', fontWeight: '500', padding: '4px 8px' }}>
-          ⚠️ {validationError}
-        </div>
-      )}
+      <NotesValidationFeedback
+        validationSuccess={validationSuccess}
+        validationError={validationError}
+      />
     </div>
   );
 });
