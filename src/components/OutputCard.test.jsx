@@ -92,10 +92,31 @@ describe('OutputCard', () => {
     fireEvent.keyDown(previewImg, { key: ' ' });
     expect(screen.getByAltText('Rendered HTML output (fullscreen view)')).toBeTruthy();
 
-    // Close via overlay keyboard interaction
-    const overlay = screen.getByRole('button', { name: /Close preview overlay/i });
-    fireEvent.keyDown(overlay, { key: 'Escape' });
+    // Close via overlay keyboard interaction (role="dialog")
+    const dialog = screen.getByRole('dialog', { name: /Fullscreen image preview/i });
+    expect(dialog.getAttribute('aria-modal')).toBe('true');
+    fireEvent.keyDown(dialog, { key: 'Escape' });
     expect(screen.queryByAltText('Rendered HTML output (fullscreen view)')).toBeNull();
+  });
+
+  it('traps focus within the fullscreen preview modal on Tab key navigation', () => {
+    render(<OutputCard result={mockResult} onReset={() => {}} mode="html" />);
+
+    const previewImg = screen.getByRole('button', { name: /Rendered HTML output - Click to enlarge/i });
+    fireEvent.click(previewImg);
+
+    const dialog = screen.getByRole('dialog', { name: /Fullscreen image preview/i });
+    const closeBtn = screen.getByRole('button', { name: /Close fullscreen preview/i });
+
+    expect(document.activeElement).toBe(closeBtn);
+
+    // Press Tab when on single focusable element (closeBtn) -> focus remains on closeBtn
+    fireEvent.keyDown(dialog, { key: 'Tab' });
+    expect(document.activeElement).toBe(closeBtn);
+
+    // Press Shift+Tab when on closeBtn -> focus wraps back to closeBtn
+    fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(closeBtn);
   });
 
   it('manages focus when opening and closing fullscreen overlay', () => {
