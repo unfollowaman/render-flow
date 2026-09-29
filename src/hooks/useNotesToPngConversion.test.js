@@ -1,6 +1,13 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, test, expect } from 'vitest';
-import { useNotesToPngConversion } from './useNotesToPngConversion';
+import {
+  useNotesToPngConversion,
+  getContentLengthAndGraphFlag,
+  computeFallbackHeightMm,
+  flattenPagesItems,
+  prepareItemsToMeasure,
+  assemblePages
+} from './useNotesToPngConversion';
 
 describe('useNotesToPngConversion', () => {
   test('validates valid JSON string', () => {
@@ -165,5 +172,125 @@ describe('useNotesToPngConversion', () => {
     const loopDuration = performance.now() - startLoop;
 
     console.log(`[Benchmark Array Flattening] 50 runs x 10,000 items -> flatMap+map: ${flatMapDuration.toFixed(2)}ms, single loop: ${loopDuration.toFixed(2)}ms`);
+  });
+});
+
+describe('useNotesToPngConversion extracted helper functions', () => {
+  describe('getContentLengthAndGraphFlag', () => {
+    test('handles null, empty, string, and number inputs', () => {
+      expect(getContentLengthAndGraphFlag(null)).toEqual({ len: 0, hasGraph: false });
+      expect(getContentLengthAndGraphFlag('')).toEqual({ len: 0, hasGraph: false });
+      expect(getContentLengthAndGraphFlag('Hello world')).toEqual({ len: 11, hasGraph: false });
+      expect(getContentLengthAndGraphFlag(12345)).toEqual({ len: 5, hasGraph: false });
+    });
+
+    test('parses array of strings and content objects with graphs', () => {
+      const arrayInput = [
+        'Intro text',
+        { type: 'text', content: 'Detailed question' },
+        { type: 'equation', latex: 'e = mc^2' },
+        { type: 'coordinate_graph', text: 'Graph label' }
+      ];
+      const res = getContentLengthAndGraphFlag(arrayInput);
+      expect(res.hasGraph).toBe(true);
+      expect(res.len).toBe('Intro text'.length + 'Detailed question'.length + 'e = mc^2'.length + 'Graph label'.length);
+    });
+  });
+
+  describe('computeFallbackHeightMm', () => {
+    test('computes base height for simple question without graph', () => {
+      const item = {
+        question: [{ type: 'text', content: 'Short question' }],
+        solution: [{ type: 'text', content: 'Short solution' }]
+      };
+      const height = computeFallbackHeightMm(item);
+      expect(height).toBeGreaterThanOrEqual(40);
+    });
+
+    test('adds graph height bonus when graph is present', () => {
+      const itemWithoutGraph = {
+        question: [{ type: 'text', content: 'Short question' }],
+        solution: [{ type: 'text', content: 'Short solution' }]
+      };
+      const itemWithGraph = {
+        type: 'coordinate_graph',
+        question: [{ type: 'text', content: 'Short question' }],
+        solution: [{ type: 'text', content: 'Short solution' }]
+      };
+
+      expect(computeFallbackHeightMm(itemWithGraph) - computeFallbackHeightMm(itemWithoutGraph)).toBe(110);
+    });
+  });
+
+  describe('flattenPagesItems', () => {
+    test('handles empty or non-array inputs', () => {
+      expect(flattenPagesItems(null)).toEqual([]);
+      expect(flattenPagesItems(undefined)).toEqual([]);
+      expect(flattenPagesItems([])).toEqual([]);
+    });
+
+    test('flattens pages items preserving explicit IDs and generating missing IDs', () => {
+      const pages = [
+        {
+          items: [
+            { id: 'custom-1', question: 'Q1' },
+            { question: 'Q2' }
+          ]
+        },
+        {
+          items: [
+            { question: 'Q3' }
+          ]
+        }
+      ];
+
+      const res = flattenPagesItems(pages);
+      expect(res).toEqual([
+        { id: 'custom-1', question: 'Q1' },
+        { id: 'item-2', question: 'Q2' },
+        { id: 'item-3', question: 'Q3' }
+      ]);
+    });
+  });
+
+  describe('prepareItemsToMeasure', () => {
+    test('prepares elements and target structures for items', () => {
+      const items = [
+        { id: 'item-1', number: 1, question: [{ type: 'text', content: 'Q1' }], solution: [{ type: 'text', content: 'S1' }] }
+      ];
+
+      const measured = prepareItemsToMeasure(items);
+      expect(measured).toHaveLength(1);
+      expect(measured[0].id).toBe('item-1');
+      expect(measured[0].rawItem).toBe(items[0]);
+      expect(measured[0].element).toBeTruthy();
+      expect(measured[0].element.style.height).toBeTruthy();
+    });
+  });
+
+  describe('assemblePages', () => {
+    test('assembles normal and overflow pages correctly', () => {
+      const flattenedItems = [
+        { id: 'item-1', name: 'Item 1' },
+        { id: 'item-2', name: 'Item 2' },
+        { id: 'item-3', name: 'Item 3' }
+      ];
+
+      const pageItemIds = [['item-1', 'item-2']];
+      const overflowItems = ['item-3'];
+
+      const pages = assemblePages(pageItemIds, overflowItems, flattenedItems);
+      expect(pages).toHaveLength(2);
+      expect(pages[0]).toEqual({
+        pageIndex: 0,
+        isOverflow: false,
+        items: [flattenedItems[0], flattenedItems[1]]
+      });
+      expect(pages[1]).toEqual({
+        pageIndex: 1,
+        isOverflow: true,
+        items: [flattenedItems[2]]
+      });
+    });
   });
 });
