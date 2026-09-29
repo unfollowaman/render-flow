@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
-import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
+import { describe, it, expect, beforeEach, beforeAll, vi } from 'vitest';
 import DefaultQuestionSolutionCard, {
   QuestionSolutionCard,
   renderContentItem,
@@ -51,6 +51,13 @@ describe('NotesModeCard Component and Helpers', () => {
       expect(container.querySelector('.katex')).not.toBeNull();
     });
 
+    it('renders equation type item with displayMode: true', () => {
+      const { container } = render(
+        renderContentItem({ type: 'equation', latex: '\\int_0^\\infty x dx', displayMode: true }, 0)
+      );
+      expect(container.querySelector('.katex-display')).not.toBeNull();
+    });
+
     it('renders equation error message when KaTeX parsing fails', () => {
       const { container } = render(
         renderContentItem({ type: 'equation', latex: '\\invalidMacro{' }, 0)
@@ -58,6 +65,77 @@ describe('NotesModeCard Component and Helpers', () => {
       expect(container.textContent).toContain('[equation error:');
       const errorSpan = container.querySelector('span');
       expect(errorSpan.style.color).toBe('rgb(220, 38, 38)');
+    });
+
+    it('renders EquationItem fallback during loading and updates or handles unmount', async () => {
+      // Clear equation cache so renderEquation executes fresh
+      const renderEqModule = await import('../lib/notesMode/renderEquation');
+      renderEqModule.clearEquationCache();
+      const originalRenderEquation = renderEqModule.renderEquation;
+
+      let isLoading = true;
+      const spy = vi.spyOn(renderEqModule, 'renderEquation').mockImplementation((latex, options) => {
+        if (isLoading) {
+          return { error: true, loading: true, message: 'KaTeX is loading...' };
+        }
+        return originalRenderEquation(latex, options);
+      });
+
+      const { container } = render(
+        renderContentItem({ type: 'equation', latex: 'x^2 + y^2 = r^2' }, 0)
+      );
+
+      // Initially null because loading is true inside EquationItem
+      expect(container.textContent).toBe('');
+
+      // Simulate KaTeX loading complete
+      isLoading = false;
+      renderEqModule.clearEquationCache();
+
+      // Trigger loadKatex resolution and wait for re-render
+      await screen.findByText((content, element) => Boolean(element?.classList?.contains('katex')));
+
+      expect(container.querySelector('.katex')).not.toBeNull();
+
+      spy.mockRestore();
+    });
+
+    it('handles EquationItem unmounting cleanly before loadKatex resolves', async () => {
+      const renderEqModule = await import('../lib/notesMode/renderEquation');
+
+      const spy = vi.spyOn(renderEqModule, 'renderEquation').mockReturnValue({
+        error: true,
+        loading: true,
+        message: 'KaTeX is loading...'
+      });
+
+      const { unmount } = render(
+        renderContentItem({ type: 'equation', latex: 'x + y = z' }, 0)
+      );
+
+      // Unmount before async effect completes
+      expect(() => unmount()).not.toThrow();
+
+      spy.mockRestore();
+    });
+
+    it('renders error in EquationItem if rendering fails after loading', async () => {
+      const renderEqModule = await import('../lib/notesMode/renderEquation');
+
+      const spy = vi.spyOn(renderEqModule, 'renderEquation').mockReturnValue({
+        error: true,
+        loading: false,
+        message: 'Custom syntax error'
+      });
+
+      const { container } = render(
+        renderContentItem({ type: 'equation', latex: '\\bad' }, 0)
+      );
+
+      await screen.findByText('[equation error: Custom syntax error]');
+      expect(container.textContent).toContain('[equation error: Custom syntax error]');
+
+      spy.mockRestore();
     });
 
     it('renders coordinate_graph type item with CoordinatePlane, Shape, LineSegment, and Point', () => {
@@ -120,6 +198,14 @@ describe('NotesModeCard Component and Helpers', () => {
       expect(container.querySelector('.coordinate-shape')).not.toBeNull();
       expect(container.textContent).toContain('Diagonal');
       expect(container.textContent).toContain('P(2,3)');
+    });
+
+    it('renders coordinate_graph with minimal or missing sub-arrays', () => {
+      const minimalGraph = {
+        type: 'coordinate_graph',
+      };
+      const { container } = render(renderContentItem(minimalGraph, 0));
+      expect(container.querySelector('svg')).not.toBeNull();
     });
 
     it('renders fallback representation for unknown object types or missing type', () => {
