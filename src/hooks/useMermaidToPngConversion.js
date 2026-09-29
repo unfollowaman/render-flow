@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { renderImageToPngBlobUrl } from '../utils/canvasToBlob.js';
+import { runIfLatest } from '../utils/requestHelpers.js';
 
 let cachedStyleString = null;
 let fontLoadingPromise = null;
@@ -118,9 +119,9 @@ export function useMermaidToPngConversion({ outputRef }) {
     const myRequestId = latestRequestIdRef.current;
 
     if (!mermaidCodeString.trim()) {
-      if (myRequestId === latestRequestIdRef.current) {
+      runIfLatest(myRequestId, latestRequestIdRef, () => {
         setError('Please enter some Mermaid code first.');
-      }
+      });
       return;
     }
 
@@ -288,20 +289,20 @@ export function useMermaidToPngConversion({ outputRef }) {
       const finalWidth = renderResult.finalWidth;
       const finalHeight = renderResult.finalHeight;
 
-      if (myRequestId === latestRequestIdRef.current) {
+      runIfLatest(myRequestId, latestRequestIdRef, () => {
         setResult({ image: resultObjectUrl, width: finalWidth, height: finalHeight });
         setTimeout(() => {
           outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
-      }
+      });
     } catch (err) {
-      if (myRequestId === latestRequestIdRef.current) {
+      runIfLatest(myRequestId, latestRequestIdRef, () => {
         setError(err.message || 'An error occurred during conversion.');
-      }
+      });
     } finally {
-      if (myRequestId === latestRequestIdRef.current) {
+      runIfLatest(myRequestId, latestRequestIdRef, () => {
         setLoading(false);
-      }
+      });
     }
   }, [outputRef]);
 
