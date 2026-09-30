@@ -29,6 +29,7 @@ function EquationItem({ latex, displayMode }) {
     );
   }
 
+  // Optimization: renderEquation already returns sanitized HTML from DOMPurify.
   return <span dangerouslySetInnerHTML={{ __html: result.html }} />;
 }
 
