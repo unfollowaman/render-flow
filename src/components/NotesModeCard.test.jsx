@@ -51,6 +51,15 @@ describe('NotesModeCard Component and Helpers', () => {
       expect(container.querySelector('.katex')).not.toBeNull();
     });
 
+    it('sanitizes equation LaTeX XSS attempts before rendering with dangerouslySetInnerHTML', () => {
+      const { container } = render(
+        renderContentItem({ type: 'equation', latex: '\\href{javascript:alert(1)}{ClickMe}' }, 0)
+      );
+      expect(container.querySelector('script')).toBeNull();
+      expect(container.querySelector('a[href*="javascript:"]')).toBeNull();
+      expect(container.querySelector('[onload]')).toBeNull();
+    });
+
     it('renders equation type item with displayMode: true', () => {
       const { container } = render(
         renderContentItem({ type: 'equation', latex: '\\int_0^\\infty x dx', displayMode: true }, 0)
