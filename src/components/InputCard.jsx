@@ -676,12 +676,20 @@ function NotesValidationFeedback({ validationSuccess, validationError }) {
   return (
     <>
       {validationSuccess && (
-        <div style={{ color: '#16A34A', fontSize: '14px', fontWeight: '600', padding: '4px 8px' }}>
+        <div
+          role="status"
+          aria-live="polite"
+          style={{ color: '#16A34A', fontSize: '14px', fontWeight: '600', padding: '4px 8px' }}
+        >
           ✓ {validationSuccess}
         </div>
       )}
       {validationError && (
-        <div style={{ color: '#e53e3e', fontSize: '14px', fontWeight: '500', padding: '4px 8px' }}>
+        <div
+          role="alert"
+          aria-live="assertive"
+          style={{ color: '#e53e3e', fontSize: '14px', fontWeight: '500', padding: '4px 8px' }}
+        >
           ⚠️ {validationError}
         </div>
       )}
