@@ -363,6 +363,8 @@ const Workspace = forwardRef(function Workspace({
 
   if (!isVisible) return null;
 
+  const shortcutHintId = `${modeConfig.mode}-shortcut-hint`;
+
   return (
     <div className={styles.workspace}>
       <div className="neu-recessed" style={{ borderRadius: '12px' }}>
@@ -379,6 +381,7 @@ const Workspace = forwardRef(function Workspace({
         >
           <textarea
             aria-label={modeConfig.ariaLabel}
+            aria-describedby={shortcutHintId}
             aria-keyshortcuts="Control+Enter Meta+Enter"
             className={styles.textarea}
             value={value}
@@ -517,21 +520,66 @@ const Workspace = forwardRef(function Workspace({
         </div>
       )}
 
-      <button
-        className={`${styles.convertBtn} ${loading ? styles.convertBtnLoading : ""}`}
-        onClick={() => handleConvert(value)}
-        disabled={loading || !value.trim()}
-        aria-keyshortcuts="Control+Enter Meta+Enter"
-        title={
-          loading
-            ? "Converting…"
-            : !value.trim()
-            ? "Enter code or load sample to convert (Ctrl+Enter or ⌘+Enter)"
-            : "Convert to PNG (Ctrl+Enter or ⌘+Enter)"
-        }
-      >
-        {loading ? "Converting…" : "Convert to PNG"}
-      </button>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <button
+          className={`${styles.convertBtn} ${loading ? styles.convertBtnLoading : ""}`}
+          onClick={() => handleConvert(value)}
+          disabled={loading || !value.trim()}
+          aria-keyshortcuts="Control+Enter Meta+Enter"
+          title={
+            loading
+              ? "Converting…"
+              : !value.trim()
+              ? "Enter code or load sample to convert (Ctrl+Enter or ⌘+Enter)"
+              : "Convert to PNG (Ctrl+Enter or ⌘+Enter)"
+          }
+        >
+          {loading ? "Converting…" : "Convert to PNG"}
+        </button>
+
+        <div
+          id={shortcutHintId}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            fontSize: '11px',
+            color: '#718096',
+            fontWeight: '600'
+          }}
+        >
+          <span>Press</span>
+          <kbd
+            style={{
+              padding: '2px 6px',
+              fontSize: '10px',
+              fontFamily: 'SF Mono, monospace',
+              background: 'rgba(0, 0, 0, 0.05)',
+              borderRadius: '4px',
+              border: '1px solid rgba(0, 0, 0, 0.1)',
+              color: '#4a5568'
+            }}
+          >
+            Ctrl+Enter
+          </kbd>
+          <span>or</span>
+          <kbd
+            style={{
+              padding: '2px 6px',
+              fontSize: '10px',
+              fontFamily: 'SF Mono, monospace',
+              background: 'rgba(0, 0, 0, 0.05)',
+              borderRadius: '4px',
+              border: '1px solid rgba(0, 0, 0, 0.1)',
+              color: '#4a5568'
+            }}
+          >
+            ⌘+Enter
+          </kbd>
+          <span>to submit</span>
+        </div>
+      </div>
     </div>
   );
 });
@@ -542,7 +590,8 @@ function NotesDropZone({
   setValue,
   loading,
   handleNotesGenerate,
-  handleFileUpload
+  handleFileUpload,
+  shortcutHintId
 }) {
   const [dragOver, setDragOver] = useState(false);
 
@@ -564,6 +613,7 @@ function NotesDropZone({
       >
         <textarea
           aria-label={modeConfig.ariaLabel}
+          aria-describedby={shortcutHintId}
           aria-keyshortcuts="Control+Enter Meta+Enter"
           className={styles.textarea}
           value={value}
@@ -755,6 +805,8 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
     }
   };
 
+  const shortcutHintId = `${modeConfig.mode}-shortcut-hint`;
+
   return (
     <div className={styles.workspace}>
       <input
@@ -776,6 +828,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
         loading={loading}
         handleNotesGenerate={handleNotesGenerate}
         handleFileUpload={handleFileUpload}
+        shortcutHintId={shortcutHintId}
       />
 
       <div role="status" aria-live="polite" className="sr-only">
@@ -797,6 +850,49 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
         validationSuccess={validationSuccess}
         validationError={validationError}
       />
+
+      <div
+        id={shortcutHintId}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '6px',
+          fontSize: '11px',
+          color: '#718096',
+          fontWeight: '600'
+        }}
+      >
+        <span>Press</span>
+        <kbd
+          style={{
+            padding: '2px 6px',
+            fontSize: '10px',
+            fontFamily: 'SF Mono, monospace',
+            background: 'rgba(0, 0, 0, 0.05)',
+            borderRadius: '4px',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            color: '#4a5568'
+          }}
+        >
+          Ctrl+Enter
+        </kbd>
+        <span>or</span>
+        <kbd
+          style={{
+            padding: '2px 6px',
+            fontSize: '10px',
+            fontFamily: 'SF Mono, monospace',
+            background: 'rgba(0, 0, 0, 0.05)',
+            borderRadius: '4px',
+            border: '1px solid rgba(0, 0, 0, 0.1)',
+            color: '#4a5568'
+          }}
+        >
+          ⌘+Enter
+        </kbd>
+        <span>to submit</span>
+      </div>
     </div>
   );
 });

@@ -128,13 +128,22 @@ describe('InputCard', () => {
       expect(setMode).toHaveBeenLastCalledWith('notes'); // no setMode call because index is same
     });
 
-    it('renders HTML Workspace when mode is "html"', () => {
+    it('renders HTML Workspace when mode is "html" with keyboard shortcut hint and aria-describedby', () => {
       render(<InputCard {...defaultProps} mode="html" />);
 
       expect(screen.getByText('Input HTML')).toBeTruthy();
       const htmlTextarea = screen.getByLabelText('Input HTML');
       expect(htmlTextarea).toBeTruthy();
       expect(htmlTextarea.getAttribute('aria-keyshortcuts')).toBe('Control+Enter Meta+Enter');
+      expect(htmlTextarea.getAttribute('aria-describedby')).toBe('html-shortcut-hint');
+
+      const shortcutHint = document.getElementById('html-shortcut-hint');
+      expect(shortcutHint).toBeTruthy();
+      expect(shortcutHint.textContent).toContain('Press');
+      expect(shortcutHint.textContent).toContain('Ctrl+Enter');
+      expect(shortcutHint.textContent).toContain('⌘+Enter');
+      expect(shortcutHint.textContent).toContain('to submit');
+
       expect(screen.queryByLabelText('Input Mermaid')).toBeNull();
       expect(screen.queryByLabelText('Input LaTeX')).toBeNull();
       expect(screen.queryByLabelText('Input Notes JSON')).toBeNull();
@@ -156,11 +165,21 @@ describe('InputCard', () => {
       expect(screen.queryByLabelText('Input HTML')).toBeNull();
     });
 
-    it('renders Notes Workspace when mode is "notes"', () => {
+    it('renders Notes Workspace when mode is "notes" with keyboard shortcut hint and aria-describedby', () => {
       render(<InputCard {...defaultProps} mode="notes" />);
 
       expect(screen.getByText('Input Notes JSON')).toBeTruthy();
-      expect(screen.getByLabelText('Input Notes JSON')).toBeTruthy();
+      const notesTextarea = screen.getByLabelText('Input Notes JSON');
+      expect(notesTextarea).toBeTruthy();
+      expect(notesTextarea.getAttribute('aria-describedby')).toBe('notes-shortcut-hint');
+
+      const shortcutHint = document.getElementById('notes-shortcut-hint');
+      expect(shortcutHint).toBeTruthy();
+      expect(shortcutHint.textContent).toContain('Press');
+      expect(shortcutHint.textContent).toContain('Ctrl+Enter');
+      expect(shortcutHint.textContent).toContain('⌘+Enter');
+      expect(shortcutHint.textContent).toContain('to submit');
+
       expect(screen.queryByLabelText('Input HTML')).toBeNull();
     });
   });
