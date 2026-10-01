@@ -533,8 +533,14 @@ describe('InputCard', () => {
         />
       );
 
-      expect(screen.getByText('✓ Valid Notes JSON structure')).toBeTruthy();
-      expect(screen.getByText('⚠️ Invalid JSON formatting')).toBeTruthy();
+      const successEl = screen.getByText('✓ Valid Notes JSON structure');
+      const errorEl = screen.getByText('⚠️ Invalid JSON formatting');
+      expect(successEl).toBeTruthy();
+      expect(successEl.getAttribute('role')).toBe('status');
+      expect(successEl.getAttribute('aria-live')).toBe('polite');
+      expect(errorEl).toBeTruthy();
+      expect(errorEl.getAttribute('role')).toBe('alert');
+      expect(errorEl.getAttribute('aria-live')).toBe('assertive');
 
       // Initially empty -> Clear and Copy buttons should not be present
       expect(screen.queryByRole('button', { name: 'Clear notes input text' })).toBeNull();
