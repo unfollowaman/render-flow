@@ -366,7 +366,12 @@ const Workspace = forwardRef(function Workspace({
   const shortcutHintId = `${modeConfig.mode}-shortcut-hint`;
 
   return (
-    <div className={styles.workspace}>
+    <div
+      role="tabpanel"
+      id={`${modeConfig.mode}-tabpanel`}
+      aria-labelledby={`${modeConfig.mode}-tab`}
+      className={styles.workspace}
+    >
       <div className="neu-recessed" style={{ borderRadius: '12px' }}>
         <div
           className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ""}`}
@@ -816,7 +821,12 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
   const shortcutHintId = `${modeConfig.mode}-shortcut-hint`;
 
   return (
-    <div className={styles.workspace}>
+    <div
+      role="tabpanel"
+      id={`${modeConfig.mode}-tabpanel`}
+      aria-labelledby={`${modeConfig.mode}-tab`}
+      className={styles.workspace}
+    >
       <input
         ref={fileInputRef}
         type="file"
@@ -976,7 +986,9 @@ export const InputCard = forwardRef(function InputCard({
         {MODE_CONFIG_LIST.map((cfg) => (
           <button
             key={cfg.mode}
+            id={`${cfg.mode}-tab`}
             role="tab"
+            aria-controls={`${cfg.mode}-tabpanel`}
             tabIndex={mode === cfg.mode ? 0 : -1}
             aria-selected={mode === cfg.mode}
             title={`Switch to ${cfg.label}`}

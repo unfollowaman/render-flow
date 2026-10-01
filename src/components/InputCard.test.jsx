@@ -85,6 +85,21 @@ describe('InputCard', () => {
       const latexTab = screen.getByRole('tab', { name: 'LaTeX Mode' });
       const notesTab = screen.getByRole('tab', { name: 'Notes Mode' });
 
+      expect(htmlTab.getAttribute('id')).toBe('html-tab');
+      expect(mermaidTab.getAttribute('id')).toBe('mermaid-tab');
+      expect(latexTab.getAttribute('id')).toBe('latex-tab');
+      expect(notesTab.getAttribute('id')).toBe('notes-tab');
+
+      expect(htmlTab.getAttribute('aria-controls')).toBe('html-tabpanel');
+      expect(mermaidTab.getAttribute('aria-controls')).toBe('mermaid-tabpanel');
+      expect(latexTab.getAttribute('aria-controls')).toBe('latex-tabpanel');
+      expect(notesTab.getAttribute('aria-controls')).toBe('notes-tabpanel');
+
+      const tabPanel = screen.getByRole('tabpanel', { name: 'HTML Mode' });
+      expect(tabPanel).toBeTruthy();
+      expect(tabPanel.getAttribute('id')).toBe('html-tabpanel');
+      expect(tabPanel.getAttribute('aria-labelledby')).toBe('html-tab');
+
       expect(htmlTab.getAttribute('aria-selected')).toBe('true');
       expect(mermaidTab.getAttribute('aria-selected')).toBe('false');
       expect(latexTab.getAttribute('aria-selected')).toBe('false');
