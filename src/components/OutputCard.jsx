@@ -54,6 +54,13 @@ export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
     }, 2000);
   };
 
+  const handleReset = () => {
+    setDownloadStatus("Workspace output reset.");
+    if (onReset) {
+      onReset();
+    }
+  };
+
   return (
     <div className={`${styles.card} neu-card`} ref={ref}>
       <div role="status" aria-label="Output status" aria-live="polite" className="sr-only">
@@ -175,7 +182,7 @@ export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
         </span>
         <button
           className={`${styles.resetBtn} neu-raised`}
-          onClick={onReset}
+          onClick={handleReset}
           title="Reset preview and clear input"
           aria-label="Reset workspace output"
         >
