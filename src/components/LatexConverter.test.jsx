@@ -103,6 +103,7 @@ describe('LatexConverter', () => {
 
     expect(screen.getByText('Preview')).toBeTruthy();
     expect(screen.getByRole('button', { name: /Download PNG/i })).toBeTruthy();
+    expect(screen.getByAltText('Rendered LaTeX equation')).toBeTruthy();
   });
 
   it('exposes handleReset through forwarded ref via useImperativeHandle', () => {
