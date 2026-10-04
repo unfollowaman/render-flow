@@ -574,10 +574,11 @@ describe('InputCard', () => {
         },
       });
 
-      // Click Validate
+      // Click Validate and check visual feedback state
       const validateBtn = screen.getByRole('button', { name: 'Validate' });
       fireEvent.click(validateBtn);
       expect(validateNotesJson).toHaveBeenCalledWith('{"chapter": "Test"}');
+      expect(screen.getByRole('button', { name: '✓ Validated!' })).toBeTruthy();
 
       // Click Copy
       const copyNotesBtn = screen.getByRole('button', { name: 'Copy notes input text to clipboard' });
