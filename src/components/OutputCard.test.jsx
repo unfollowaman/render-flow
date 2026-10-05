@@ -135,7 +135,8 @@ describe('OutputCard', () => {
     expect(document.activeElement).toBe(previewImg);
   });
 
-  it('triggers onReset when Reset button is clicked', () => {
+  it('triggers onReset when Reset button is clicked and provides temporary visual & aria-live feedback', async () => {
+    vi.useFakeTimers();
     const handleReset = vi.fn();
     render(<OutputCard result={mockResult} onReset={handleReset} mode="html" />);
 
@@ -143,6 +144,16 @@ describe('OutputCard', () => {
     fireEvent.click(resetButton);
 
     expect(handleReset).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('✓ Reset!')).toBeTruthy();
+
+    const statusRegion = screen.getByRole('status', { name: /Output status/i });
+    expect(statusRegion.textContent).toBe('Workspace output reset.');
+
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(screen.queryByText('✓ Reset!')).toBeNull();
+    expect(screen.getByText('Reset')).toBeTruthy();
+
+    vi.useRealTimers();
   });
 
   it('triggers image download on Download PNG button click and updates text feedback', () => {

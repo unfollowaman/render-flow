@@ -6,6 +6,7 @@ import downloadIcon from "../assets/download-icon.png";
 export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDownloaded, setIsDownloaded] = useState(false);
+  const [isReset, setIsReset] = useState(false);
   const [downloadStatus, setDownloadStatus] = useState("");
 
   const imageRef = useRef(null);
@@ -50,6 +51,16 @@ export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
     setDownloadStatus("PNG image downloaded successfully.");
     setTimeout(() => {
       setIsDownloaded(false);
+      setDownloadStatus("");
+    }, 2000);
+  };
+
+  const handleResetClick = () => {
+    onReset?.();
+    setIsReset(true);
+    setDownloadStatus("Workspace output reset.");
+    setTimeout(() => {
+      setIsReset(false);
       setDownloadStatus("");
     }, 2000);
   };
@@ -175,11 +186,11 @@ export const OutputCard = forwardRef(({ result, onReset, mode }, ref) => {
         </span>
         <button
           className={`${styles.resetBtn} neu-raised`}
-          onClick={onReset}
+          onClick={handleResetClick}
           title="Reset preview and clear input"
           aria-label="Reset workspace output"
         >
-          Reset
+          {isReset ? "✓ Reset!" : "Reset"}
         </button>
       </div>
     </div>
