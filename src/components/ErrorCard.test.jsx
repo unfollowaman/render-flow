@@ -61,6 +61,7 @@ describe('ErrorCard', () => {
 
     expect(writeTextMock).toHaveBeenCalledWith(errorMessage);
     expect(screen.getByText('✓ Copied!')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Error details copied to clipboard' })).toBeTruthy();
     expect(screen.getByText('Error details copied to clipboard.')).toBeTruthy();
 
     act(() => {
@@ -68,5 +69,6 @@ describe('ErrorCard', () => {
     });
 
     expect(screen.getByText('Copy error')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Copy error details to clipboard' })).toBeTruthy();
   });
 });
