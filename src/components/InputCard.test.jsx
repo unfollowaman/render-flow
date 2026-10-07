@@ -532,7 +532,7 @@ describe('InputCard', () => {
     });
 
     it('handles Notes Workspace interactions: character count, Copy/Clear visibility, JSON upload, Validate, and Generate', async () => {
-      const validateNotesJson = vi.fn();
+      const validateNotesJson = vi.fn().mockReturnValue({ valid: true });
       const handleNotesGenerate = vi.fn();
       const handleNotesReset = vi.fn();
 
@@ -578,6 +578,7 @@ describe('InputCard', () => {
       const validateBtn = screen.getByRole('button', { name: 'Validate' });
       fireEvent.click(validateBtn);
       expect(validateNotesJson).toHaveBeenCalledWith('{"chapter": "Test"}');
+      expect(screen.getByRole('button', { name: '✓ Validated!' })).toBeTruthy();
 
       // Click Copy
       const copyNotesBtn = screen.getByRole('button', { name: 'Copy notes input text to clipboard' });
