@@ -29,3 +29,7 @@
 ## 2026-09-27 - Zoom Level ARIA Spinbutton & Keyboard Navigation Pattern
 **Learning:** Text representations of adjustable numerical metrics (such as zoom levels or page scale indicators) lack accessibility semantics unless marked up as `role="spinbutton"`. Providing `tabIndex={0}`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-valuetext`, and key handlers (`ArrowUp`/`ArrowDown`/`ArrowLeft`/`ArrowRight`, `Home`, `End`) allows keyboard and screen reader users to discover and modify numerical values directly.
 **Action:** Model interactive scale and zoom indicators as `role="spinbutton"` widgets with complete ARIA value properties and key handlers for directional key steps and boundary bounds (`Home`/`End`).
+
+## 2026-09-27 - Schema Validation Feedback Parity & Conditional Confirmation
+**Learning:** Action buttons that trigger schema checks or validation rules must inspect validation output before displaying visual success indicators (e.g. "✓ Validated!"). Showing visual confirmation when validation fails creates misleading user feedback.
+**Action:** When adding confirmation feedback to validation controls, verify that the validation result returned success (`res?.valid`) before toggling temporary visual success states.
