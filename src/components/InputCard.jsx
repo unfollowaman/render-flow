@@ -657,6 +657,16 @@ function NotesActionControls({
   handleNotesGenerate,
   loading
 }) {
+  const [isValidated, setIsValidated] = useState(false);
+
+  const handleValidateClick = () => {
+    const res = validateNotesJson(value);
+    if (res?.valid) {
+      setIsValidated(true);
+      setTimeout(() => setIsValidated(false), 2000);
+    }
+  };
+
   return (
     <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
       <button
@@ -671,10 +681,11 @@ function NotesActionControls({
       <button
         type="button"
         className={`${styles.sampleBtn} neu-raised`}
-        onClick={() => validateNotesJson(value)}
-        title="Validate JSON structure against schema"
+        onClick={handleValidateClick}
+        aria-label={isValidated ? "JSON structure validated successfully" : "Validate JSON structure against schema"}
+        title={isValidated ? "JSON structure validated successfully" : "Validate JSON structure against schema"}
       >
-        Validate
+        {isValidated ? "✓ Validated!" : "Validate"}
       </button>
 
       {value && (

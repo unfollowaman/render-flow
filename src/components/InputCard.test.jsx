@@ -574,10 +574,13 @@ describe('InputCard', () => {
         },
       });
 
-      // Click Validate
-      const validateBtn = screen.getByRole('button', { name: 'Validate' });
+      // Click Validate with valid result returned from validateNotesJson
+      validateNotesJson.mockReturnValue({ valid: true });
+      const validateBtn = screen.getByRole('button', { name: 'Validate JSON structure against schema' });
       fireEvent.click(validateBtn);
       expect(validateNotesJson).toHaveBeenCalledWith('{"chapter": "Test"}');
+      expect(screen.getByRole('button', { name: 'JSON structure validated successfully' })).toBeTruthy();
+      expect(screen.getByText('✓ Validated!')).toBeTruthy();
 
       // Click Copy
       const copyNotesBtn = screen.getByRole('button', { name: 'Copy notes input text to clipboard' });
