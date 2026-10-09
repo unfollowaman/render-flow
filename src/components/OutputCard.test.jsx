@@ -135,14 +135,18 @@ describe('OutputCard', () => {
     expect(document.activeElement).toBe(previewImg);
   });
 
-  it('triggers onReset when Reset button is clicked', () => {
+  it('triggers onReset when Reset button is clicked and shows temporary feedback', () => {
     const handleReset = vi.fn();
     render(<OutputCard result={mockResult} onReset={handleReset} mode="html" />);
 
-    const resetButton = screen.getByRole('button', { name: /Reset/i });
+    const resetButton = screen.getByRole('button', { name: /Reset workspace output/i });
     fireEvent.click(resetButton);
 
     expect(handleReset).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('✓ Reset!')).toBeTruthy();
+
+    const statusRegion = screen.getByRole('status', { name: /Output status/i });
+    expect(statusRegion.textContent).toBe('Workspace output and input reset.');
   });
 
   it('triggers image download on Download PNG button click and updates text feedback', () => {
