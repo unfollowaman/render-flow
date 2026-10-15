@@ -1,4 +1,5 @@
 import styles from "../styles/Home.module.css";
+import useReveal from "../hooks/useReveal";
 
 const FOOTER_BADGES = [
   "YOUR CODE STAYS ON YOUR DEVICE, ALWAYS",
@@ -28,6 +29,8 @@ const SOCIAL_LINKS = [
 ];
 
 export function Footer() {
+  const [footerRef, footerVisible] = useReveal({ threshold: 0.1 });
+
   return (
     <footer className={styles.footer}>
       <div className={styles.footerHighlightsWrapper}>
@@ -48,12 +51,16 @@ export function Footer() {
           ))}
         </div>
       </div>
-      <div className={styles.footerSocialShell}>
+      <div
+        ref={footerRef}
+        className={`${styles.footerSocialShell} reveal-group${footerVisible ? " is-visible" : ""}`}
+      >
         <div className={styles.footerSocialRow} aria-label="Social links">
-          {SOCIAL_LINKS.map(({ label, href, icon }) => (
+          {SOCIAL_LINKS.map(({ label, href, icon }, idx) => (
             <a
               key={label}
-              className={`${styles.footerSocialLink} neu-raised`}
+              className={`${styles.footerSocialLink} neu-raised reveal-tile`}
+              style={{ "--reveal-i": idx }}
               href={href}
               target={href.startsWith("mailto:") ? undefined : "_blank"}
               rel={href.startsWith("mailto:") ? undefined : "noopener"}
@@ -68,7 +75,9 @@ export function Footer() {
             </a>
           ))}
         </div>
-        <div className={styles.footerHandle}>@unfollowaman</div>
+        <div className={`${styles.footerHandle} reveal-tile`} style={{ "--reveal-i": 3 }}>
+          @unfollowaman
+        </div>
       </div>
     </footer>
   );
