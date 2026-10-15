@@ -16,10 +16,7 @@ export default function useReveal({ threshold = 0.15 } = {}) {
     }
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          io.disconnect();
-        }
+        setVisible(entry.isIntersecting);
       },
       { threshold, rootMargin: '0px 0px -10% 0px' }
     );
