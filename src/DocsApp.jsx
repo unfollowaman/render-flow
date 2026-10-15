@@ -19,6 +19,10 @@ function StaticMermaidDiagram({ chart, caption }) {
         mermaid.initialize({
           startOnLoad: false,
           securityLevel: "strict",
+          htmlLabels: false,
+          flowchart: {
+            htmlLabels: false,
+          },
           theme: "base",
           themeVariables: {
             fontFamily: "'Montserrat', sans-serif",

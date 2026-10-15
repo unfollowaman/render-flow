@@ -6,6 +6,18 @@ import DocsApp from './DocsApp';
 describe('DocsApp', () => {
   beforeEach(() => {
     cleanup();
+    if (typeof window !== 'undefined' && window.SVGElement) {
+      if (!window.SVGElement.prototype.getBBox) {
+        window.SVGElement.prototype.getBBox = function () {
+          return { x: 0, y: 0, width: 100, height: 40 };
+        };
+      }
+      if (!window.SVGElement.prototype.getComputedTextLength) {
+        window.SVGElement.prototype.getComputedTextLength = function () {
+          return 100;
+        };
+      }
+    }
   });
 
   it('renders header with active Docs link and footer', () => {
@@ -122,6 +134,27 @@ describe('DocsApp', () => {
     // Credits links
     const unfollowLink = screen.getByRole('link', { name: '@unfollowaman' });
     expect(unfollowLink.getAttribute('href')).toBe('https://x.com/unfollowaman');
+  });
+
+  it('initializes mermaid with htmlLabels: false so SVG text elements are used and preserved by DOMPurify', async () => {
+    const mermaidModule = await import('mermaid');
+    const mermaid = mermaidModule.default || mermaidModule;
+    const initSpy = vi.spyOn(mermaid, 'initialize');
+
+    render(<DocsApp />);
+
+    await vi.waitFor(() => {
+      expect(initSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          htmlLabels: false,
+          flowchart: expect.objectContaining({
+            htmlLabels: false,
+          }),
+        })
+      );
+    });
+
+    initSpy.mockRestore();
   });
 
   it('sanitizes SVG output from mermaid.render using DOMPurify', async () => {
