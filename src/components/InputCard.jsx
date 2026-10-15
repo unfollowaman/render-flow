@@ -1,5 +1,6 @@
 import styles from "../styles/Home.module.css";
 import { useRef, useState, forwardRef, useImperativeHandle } from "react";
+import useReveal from "../hooks/useReveal";
 
 const SAMPLE_HTML = `<!DOCTYPE html>
 <html lang="en">
@@ -372,7 +373,7 @@ const Workspace = forwardRef(function Workspace({
       aria-labelledby={`${modeConfig.mode}-tab`}
       className={styles.workspace}
     >
-      <div className="neu-recessed" style={{ borderRadius: '12px' }}>
+      <div className="neu-recessed reveal-item" style={{ borderRadius: '12px', '--reveal-i': 2 }}>
         <div
           className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ""}`}
           onDragOver={(e) => {
@@ -431,7 +432,7 @@ const Workspace = forwardRef(function Workspace({
       )}
 
       {modeConfig.hasFileUpload ? (
-        <div className={styles.uploadRow}>
+        <div className={`${styles.uploadRow} reveal-item`} style={{ '--reveal-i': 3 }}>
           <input
             ref={fileInputRef}
             type="file"
@@ -525,7 +526,7 @@ const Workspace = forwardRef(function Workspace({
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div className="reveal-item" style={{ display: 'flex', flexDirection: 'column', gap: '8px', '--reveal-i': 4 }}>
         <button
           className={`${styles.convertBtn} ${loading ? styles.convertBtnLoading : ""}`}
           onClick={() => handleConvert(value)}
@@ -601,7 +602,7 @@ function NotesDropZone({
   const [dragOver, setDragOver] = useState(false);
 
   return (
-    <div className="neu-recessed" style={{ borderRadius: '12px' }}>
+    <div className="neu-recessed reveal-item" style={{ borderRadius: '12px', '--reveal-i': 2 }}>
       <div
         className={`${styles.dropZone} ${dragOver ? styles.dropZoneActive : ""}`}
         onDragOver={(e) => {
@@ -944,6 +945,7 @@ export const InputCard = forwardRef(function InputCard({
   const latexRef = useRef(null);
   const notesRef = useRef(null);
   const cardRef = useRef(null);
+  const [revealRef, revealVisible] = useReveal();
 
   useImperativeHandle(ref, () => ({
     resetHtml: () => {
@@ -980,9 +982,20 @@ export const InputCard = forwardRef(function InputCard({
   };
 
   return (
-    <div className={`${styles.card} neu-card`} ref={cardRef}>
+    <div
+      className={`${styles.card} neu-card reveal${revealVisible ? ' is-visible' : ''}`}
+      ref={(node) => {
+        revealRef.current = node;
+        cardRef.current = node;
+      }}
+    >
       {/* Mode Toggle */}
-      <div role="tablist" aria-label="Input mode selector" className={styles.modeSelector}>
+      <div
+        role="tablist"
+        aria-label="Input mode selector"
+        className={`${styles.modeSelector} reveal-item`}
+        style={{ '--reveal-i': 0 }}
+      >
         {MODE_CONFIG_LIST.map((cfg) => (
           <button
             key={cfg.mode}
@@ -1034,7 +1047,7 @@ export const InputCard = forwardRef(function InputCard({
         ))}
       </div>
 
-      <div className={styles.cardHeader}>
+      <div className={`${styles.cardHeader} reveal-item`} style={{ '--reveal-i': 1 }}>
         <h2 className={styles.cardTitle}>
           {MODE_CONFIGS[mode].cardTitle}
         </h2>
