@@ -431,86 +431,57 @@ const Workspace = forwardRef(function Workspace({
         </div>
       )}
 
-      {modeConfig.hasFileUpload ? (
-        <div className={`${styles.uploadRow} reveal-item`} style={{ '--reveal-i': 3 }}>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".html,text/html"
-            style={{ display: "none" }}
-            onChange={(e) => handleFileUpload(e.target.files?.[0])}
-          />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+      <div className={`${styles.secondaryControlsRow} reveal-item`} style={{ '--reveal-i': 3 }}>
+        {modeConfig.hasFileUpload && (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".html,text/html"
+              style={{ display: "none" }}
+              onChange={(e) => handleFileUpload(e.target.files?.[0])}
+            />
             <button
-              className={`${styles.uploadBtn} neu-raised`}
+              className={styles.uploadBtn}
               onClick={() => fileInputRef.current?.click()}
               title="Upload .html file from your computer"
             >
               <span>📁</span> Upload .html file
             </button>
-            {value && (
-              <>
-                <span className={`${styles.charCount} neu-recessed`}>
-                  {value.length.toLocaleString()} chars
-                </span>
-                <button
-                  type="button"
-                  aria-label="Copy input text to clipboard"
-                  title="Copy input text to clipboard"
-                  className={`${styles.sampleBtn} neu-raised`}
-                  style={{ padding: '4px 8px', fontSize: '12px' }}
-                  onClick={handleCopy}
-                >
-                  {isCopied ? "✓ Copied!" : "Copy"}
-                </button>
-                <button
-                  type="button"
-                  aria-label="Clear input text"
-                  title="Clear input text"
-                  className={`${styles.sampleBtn} neu-raised`}
-                  style={{ color: '#e53e3e', padding: '4px 8px', fontSize: '12px' }}
-                  onClick={handleClear}
-                >
-                  Clear
-                </button>
-              </>
-            )}
-          </div>
-          <span className={styles.uploadHint}>
-            or drag & drop onto the editor above
+          </>
+        )}
+
+        <div className={styles.charCountBadge} title={`${value.length.toLocaleString()} characters`}>
+          <span className={styles.charCountValue}>
+            {value.length > 9999 ? `${(value.length / 1000).toFixed(1)}k` : value.length.toLocaleString()}
           </span>
+          <span className={styles.charCountLabel}>chars</span>
         </div>
-      ) : (
-        value && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', marginTop: '4px' }}>
-            <span className={`${styles.charCount} neu-recessed`}>
-              {value.length.toLocaleString()} chars
-            </span>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                type="button"
-                aria-label="Copy input text to clipboard"
-                title="Copy input text to clipboard"
-                className={`${styles.sampleBtn} neu-raised`}
-                style={{ padding: '4px 8px', fontSize: '12px' }}
-                onClick={handleCopy}
-              >
-                {isCopied ? "✓ Copied!" : "Copy"}
-              </button>
-              <button
-                type="button"
-                aria-label="Clear input text"
-                title="Clear input text"
-                className={`${styles.sampleBtn} neu-raised`}
-                style={{ color: '#e53e3e', padding: '4px 8px', fontSize: '12px' }}
-                onClick={handleClear}
-              >
-                Clear
-              </button>
-            </div>
-          </div>
-        )
-      )}
+
+        <button
+          type="button"
+          aria-label="Copy input text to clipboard"
+          title="Copy input text to clipboard"
+          className={`${styles.secondaryBtn} ${styles.copyBtn}`}
+          onClick={handleCopy}
+        >
+          <span>📋</span> {isCopied ? "✓ Copied!" : "Copy"}
+        </button>
+
+        <button
+          type="button"
+          aria-label="Clear input text"
+          title="Clear input text"
+          className={`${styles.secondaryBtn} ${styles.clearBtn}`}
+          onClick={handleClear}
+        >
+          <span>🗑️</span> Clear
+        </button>
+      </div>
+
+      <span className={styles.dragDropHint}>
+        or drag & drop onto the editor above
+      </span>
 
       {htmlWarning && (
         <div style={{ color: '#F30A49', fontSize: '14px', border: '1px solid #F30A49', padding: '8px', borderRadius: '4px' }}>
@@ -526,7 +497,7 @@ const Workspace = forwardRef(function Workspace({
         </div>
       )}
 
-      <div className="reveal-item" style={{ display: 'flex', flexDirection: 'column', gap: '8px', '--reveal-i': 4 }}>
+      <div className="reveal-item" style={{ display: 'flex', flexDirection: 'column', gap: '12px', '--reveal-i': 4 }}>
         <button
           className={`${styles.convertBtn} ${loading ? styles.convertBtnLoading : ""}`}
           onClick={() => handleConvert(value)}
@@ -540,49 +511,24 @@ const Workspace = forwardRef(function Workspace({
               : "Convert to PNG (Ctrl+Enter or ⌘+Enter)"
           }
         >
-          {loading ? "Converting…" : "Convert to PNG"}
+          <div className={styles.convertBtnLeft}>
+            <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="4" ry="4"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <span>{loading ? "Converting…" : "Convert to PNG"}</span>
+          </div>
+          <div className={styles.convertBtnArrowBadge} aria-hidden="true">
+            ➔
+          </div>
         </button>
 
-        <div
-          id={shortcutHintId}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            fontSize: '11px',
-            color: '#718096',
-            fontWeight: '600'
-          }}
-        >
+        <div id={shortcutHintId} className={styles.shortcutGuidance}>
           <span>Press</span>
-          <kbd
-            style={{
-              padding: '2px 6px',
-              fontSize: '10px',
-              fontFamily: 'SF Mono, monospace',
-              background: 'rgba(0, 0, 0, 0.05)',
-              borderRadius: '4px',
-              border: '1px solid rgba(0, 0, 0, 0.1)',
-              color: '#4a5568'
-            }}
-          >
-            Ctrl+Enter
-          </kbd>
+          <kbd className={styles.shortcutKbd}>Ctrl+Enter</kbd>
           <span>or</span>
-          <kbd
-            style={{
-              padding: '2px 6px',
-              fontSize: '10px',
-              fontFamily: 'SF Mono, monospace',
-              background: 'rgba(0, 0, 0, 0.05)',
-              borderRadius: '4px',
-              border: '1px solid rgba(0, 0, 0, 0.1)',
-              color: '#4a5568'
-            }}
-          >
-            ⌘+Enter
-          </kbd>
+          <kbd className={styles.shortcutKbd}>⌘+Enter</kbd>
           <span>to submit</span>
         </div>
       </div>
@@ -655,68 +601,50 @@ function NotesActionControls({
   loading
 }) {
   return (
-    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+    <div className={styles.secondaryControlsRow}>
       <button
         type="button"
-        className={`${styles.uploadBtn} neu-raised`}
+        className={styles.uploadBtn}
         onClick={() => fileInputRef.current?.click()}
         title="Upload .json file from your computer"
       >
-        <span>📁</span> Load JSON
+        <span>📁</span> Upload .json file
       </button>
 
       <button
         type="button"
-        className={`${styles.sampleBtn} neu-raised`}
+        className={styles.secondaryBtn}
         onClick={() => validateNotesJson(value)}
         title="Validate JSON structure against schema"
       >
-        Validate
+        <span>🔍</span> Validate
       </button>
 
-      {value && (
-        <>
-          <span className={`${styles.charCount} neu-recessed`}>
-            {value.length.toLocaleString()} chars
-          </span>
-          <button
-            type="button"
-            aria-label="Copy notes input text to clipboard"
-            title="Copy notes input text to clipboard"
-            className={`${styles.sampleBtn} neu-raised`}
-            onClick={handleCopy}
-          >
-            {isCopied ? "✓ Copied!" : "Copy"}
-          </button>
-          <button
-            type="button"
-            aria-label="Clear notes input text"
-            title="Clear notes input text"
-            className={`${styles.sampleBtn} neu-raised`}
-            style={{ color: '#e53e3e' }}
-            onClick={handleClear}
-          >
-            Clear
-          </button>
-        </>
-      )}
+      <div className={styles.charCountBadge} title={`${value.length.toLocaleString()} characters`}>
+        <span className={styles.charCountValue}>
+          {value.length > 9999 ? `${(value.length / 1000).toFixed(1)}k` : value.length.toLocaleString()}
+        </span>
+        <span className={styles.charCountLabel}>chars</span>
+      </div>
 
       <button
         type="button"
-        className={`${styles.convertBtn}`}
-        style={{ flex: '1 1 200px', height: '48px', margin: 0 }}
-        onClick={() => handleNotesGenerate(value)}
-        disabled={loading || !value.trim()}
-        aria-keyshortcuts="Control+Enter Meta+Enter"
-        title={
-          loading
-            ? "Generating…"
-            : !value.trim()
-            ? "Enter JSON or load sample to generate (Ctrl+Enter or ⌘+Enter)"
-            : "Generate (Ctrl+Enter or ⌘+Enter)"
-        }
+        aria-label="Copy notes input text to clipboard"
+        title="Copy notes input text to clipboard"
+        className={`${styles.secondaryBtn} ${styles.copyBtn}`}
+        onClick={handleCopy}
       >
-        {loading ? "Generating…" : "Generate"}
+        <span>📋</span> {isCopied ? "✓ Copied!" : "Copy"}
+      </button>
+
+      <button
+        type="button"
+        aria-label="Clear notes input text"
+        title="Clear notes input text"
+        className={`${styles.secondaryBtn} ${styles.clearBtn}`}
+        onClick={handleClear}
+      >
+        <span>🗑️</span> Clear
       </button>
     </div>
   );
@@ -870,47 +798,40 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
         validationError={validationError}
       />
 
-      <div
-        id={shortcutHintId}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '6px',
-          fontSize: '11px',
-          color: '#718096',
-          fontWeight: '600'
-        }}
-      >
-        <span>Press</span>
-        <kbd
-          style={{
-            padding: '2px 6px',
-            fontSize: '10px',
-            fontFamily: 'SF Mono, monospace',
-            background: 'rgba(0, 0, 0, 0.05)',
-            borderRadius: '4px',
-            border: '1px solid rgba(0, 0, 0, 0.1)',
-            color: '#4a5568'
-          }}
+      <div className="reveal-item" style={{ display: 'flex', flexDirection: 'column', gap: '12px', '--reveal-i': 4 }}>
+        <button
+          className={`${styles.convertBtn} ${loading ? styles.convertBtnLoading : ""}`}
+          onClick={() => handleNotesGenerate(value)}
+          disabled={loading || !value.trim()}
+          aria-keyshortcuts="Control+Enter Meta+Enter"
+          title={
+            loading
+              ? "Generating…"
+              : !value.trim()
+              ? "Enter JSON or load sample to generate (Ctrl+Enter or ⌘+Enter)"
+              : "Generate (Ctrl+Enter or ⌘+Enter)"
+          }
         >
-          Ctrl+Enter
-        </kbd>
-        <span>or</span>
-        <kbd
-          style={{
-            padding: '2px 6px',
-            fontSize: '10px',
-            fontFamily: 'SF Mono, monospace',
-            background: 'rgba(0, 0, 0, 0.05)',
-            borderRadius: '4px',
-            border: '1px solid rgba(0, 0, 0, 0.1)',
-            color: '#4a5568'
-          }}
-        >
-          ⌘+Enter
-        </kbd>
-        <span>to submit</span>
+          <div className={styles.convertBtnLeft}>
+            <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="4" ry="4"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <span>{loading ? "Generating…" : "Generate"}</span>
+          </div>
+          <div className={styles.convertBtnArrowBadge} aria-hidden="true">
+            ➔
+          </div>
+        </button>
+
+        <div id={shortcutHintId} className={styles.shortcutGuidance}>
+          <span>Press</span>
+          <kbd className={styles.shortcutKbd}>Ctrl+Enter</kbd>
+          <span>or</span>
+          <kbd className={styles.shortcutKbd}>⌘+Enter</kbd>
+          <span>to submit</span>
+        </div>
       </div>
     </div>
   );

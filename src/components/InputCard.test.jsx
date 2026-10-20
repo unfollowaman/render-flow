@@ -439,7 +439,7 @@ describe('InputCard', () => {
       expect(errorEl.getAttribute('aria-live')).toBe('assertive');
 
       // Click Validate
-      const validateBtn = screen.getByRole('button', { name: 'Validate' });
+      const validateBtn = screen.getByRole('button', { name: /Validate/i });
       fireEvent.click(validateBtn);
       expect(validateNotesJson).toHaveBeenCalled();
 
