@@ -134,11 +134,11 @@ export const CodeEditor = forwardRef(function CodeEditor(
           color: "#012b1b"
         },
         ".cm-cursor, .cm-dropCursor": {
-          borderLeftColor: "#ffa100",
+          borderLeftColor: "#012b1b",
           borderLeftWidth: "2px"
         },
         "&.cm-focused .cm-selectionBackground, ::selection": {
-          backgroundColor: "rgba(255, 161, 0, 0.25)"
+          backgroundColor: "rgba(1, 43, 27, 0.12)"
         },
         ".cm-gutters": {
           backgroundColor: "rgba(1, 43, 27, 0.03)",
@@ -151,12 +151,12 @@ export const CodeEditor = forwardRef(function CodeEditor(
           padding: "0 10px 0 12px"
         },
         ".cm-activeLineGutter": {
-          backgroundColor: "rgba(255, 161, 0, 0.15)",
-          color: "#ffa100",
+          backgroundColor: "rgba(1, 43, 27, 0.06)",
+          color: "#012b1b",
           fontWeight: "bold"
         },
         ".cm-activeLine": {
-          backgroundColor: "rgba(255, 161, 0, 0.05)"
+          backgroundColor: "rgba(1, 43, 27, 0.03)"
         },
         ".cm-placeholder": {
           color: "#718096",
