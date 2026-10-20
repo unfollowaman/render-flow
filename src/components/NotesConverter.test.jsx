@@ -132,7 +132,7 @@ describe('NotesConverter & Notes Mode integration', () => {
 
     expect(await screen.findByText('Chapter 1: Physics')).toBeTruthy();
 
-    const clearBtn = screen.getByRole('button', { name: /Clear/i });
+    const clearBtn = screen.getByRole('button', { name: 'Clear notes input text' });
     fireEvent.click(clearBtn);
 
     expect(textarea.value).toBe('');

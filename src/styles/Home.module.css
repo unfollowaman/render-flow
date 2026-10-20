@@ -481,7 +481,7 @@
   gap: 16px;
 }
 
-/* ── TEXTAREA / DROP ZONE ──────────────────────── */
+/* ── CODE EDITOR & DROP ZONE ──────────────────── */
 .dropZone {
   position: relative;
   border-radius: 12px;
@@ -491,6 +491,111 @@
 .dropZoneActive {
   outline: 2.5px dashed #ffa100;
   outline-offset: 2px;
+}
+
+.codeEditorContainer {
+  width: 100%;
+  border-radius: 12px;
+  border: 1.5px solid rgba(1, 43, 27, 0.12);
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: inset 2px 2px 6px rgba(1, 43, 27, 0.06), inset -2px -2px 6px rgba(255, 255, 255, 0.8);
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.codeEditorContainer:focus-within {
+  border-color: #ffa100;
+  box-shadow: inset 2px 2px 6px rgba(1, 43, 27, 0.06), 0 0 0 3px rgba(255, 161, 0, 0.2);
+}
+
+.editorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(1, 43, 27, 0.04);
+  border-bottom: 1.5px solid rgba(1, 43, 27, 0.08);
+  font-family: 'Montserrat', sans-serif;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.editorHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.languageBadge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #012b1b;
+  background: rgba(255, 161, 0, 0.25);
+  border: 1px solid rgba(255, 161, 0, 0.4);
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.editorCursorInfo {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #5a6a64;
+}
+
+.editorCharCount {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9aa39e;
+}
+
+.editorHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.editorHeaderBtn {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(1, 43, 27, 0.12);
+  background: rgba(255, 255, 255, 0.8);
+  color: #012b1b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.editorHeaderBtn:hover:not(:disabled) {
+  background: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.editorHeaderBtn:focus-visible {
+  outline: 2px solid #ffa100;
+  outline-offset: 1px;
+}
+
+.editorHeaderBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.confirmingClearBtn {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border-color: #fca5a5 !important;
+  animation: pulse 1s infinite;
 }
 
 .textarea {
@@ -531,6 +636,7 @@
   font-weight: 700;
   color: #ffa100;
   pointer-events: none;
+  z-index: 10;
 }
 
 /* ── UPLOAD ROW ──────────────────────────────── */
