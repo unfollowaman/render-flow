@@ -55,10 +55,6 @@ export const CodeEditor = forwardRef(function CodeEditor(
   const containerRef = useRef(null);
   const viewRef = useRef(null);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
-  const [isCopied, setIsCopied] = useState(false);
-  const [confirmingClear, setConfirmingClear] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const clearTimeoutRef = useRef(null);
 
   // Expose imperative handle methods
   useImperativeHandle(ref, () => ({
@@ -112,7 +108,7 @@ export const CodeEditor = forwardRef(function CodeEditor(
     const renderFlowTheme = EditorView.theme(
       {
         "&": {
-          height: isExpanded ? "500px" : "320px",
+          height: "320px",
           fontSize: "13px",
           fontFamily: "'SF Mono', 'Fira Code', 'Cascadia Code', monospace",
           backgroundColor: "transparent",
@@ -236,39 +232,6 @@ export const CodeEditor = forwardRef(function CodeEditor(
     }
   }, [value]);
 
-  // Handle Copy Button
-  const handleCopy = async () => {
-    const textToCopy = viewRef.current ? viewRef.current.state.doc.toString() : value;
-    if (!textToCopy) return;
-    try {
-      await navigator.clipboard.writeText(textToCopy);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
-      console.error("Copy failed:", err);
-    }
-  };
-
-  // Handle Clear Button
-  const handleClearClick = () => {
-    const currentText = viewRef.current ? viewRef.current.state.doc.toString() : value;
-    if (!currentText) return;
-
-    if (!confirmingClear) {
-      setConfirmingClear(true);
-      if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
-      clearTimeoutRef.current = setTimeout(() => setConfirmingClear(false), 3000);
-    } else {
-      setConfirmingClear(false);
-      if (onChange) onChange("");
-      if (viewRef.current) {
-        viewRef.current.dispatch({
-          changes: { from: 0, to: viewRef.current.state.doc.length, insert: "" }
-        });
-      }
-    }
-  };
-
   const charCount = value ? value.length : 0;
 
   return (
@@ -317,40 +280,6 @@ export const CodeEditor = forwardRef(function CodeEditor(
             </span>
           )}
         </div>
-
-        <div className={styles.editorHeaderRight}>
-          <button
-            type="button"
-            className={`${styles.editorHeaderBtn}`}
-            onClick={handleCopy}
-            disabled={!charCount}
-            title="Copy editor content to clipboard"
-            aria-label="Copy editor content to clipboard"
-          >
-            {isCopied ? "✓ Copied!" : "📋 Copy"}
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.editorHeaderBtn} ${confirmingClear ? styles.confirmingClearBtn : ""}`}
-            onClick={handleClearClick}
-            disabled={!charCount}
-            title={confirmingClear ? "Click again to confirm clear" : "Clear editor content"}
-            aria-label={confirmingClear ? "Confirm clear editor text" : "Clear editor text"}
-          >
-            {confirmingClear ? "⚠️ Confirm Clear?" : "🗑️ Clear"}
-          </button>
-
-          <button
-            type="button"
-            className={styles.editorHeaderBtn}
-            onClick={() => setIsExpanded(!isExpanded)}
-            title={isExpanded ? "Collapse editor height" : "Expand editor height"}
-            aria-label={isExpanded ? "Collapse editor height" : "Expand editor height"}
-          >
-            {isExpanded ? "↙ Expand" : "⤢ Expand"}
-          </button>
-        </div>
       </div>
 
       {/* CodeMirror Mounting Div */}
@@ -358,7 +287,7 @@ export const CodeEditor = forwardRef(function CodeEditor(
         ref={containerRef}
         aria-describedby={shortcutHintId}
         style={{
-          height: isExpanded ? "500px" : "320px",
+          height: "320px",
           transition: "height 0.2s ease"
         }}
       />

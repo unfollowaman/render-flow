@@ -451,13 +451,6 @@ const Workspace = forwardRef(function Workspace({
           </>
         )}
 
-        <div className={styles.charCountBadge} title={`${value.length.toLocaleString()} characters`}>
-          <span className={styles.charCountValue}>
-            {value.length > 9999 ? `${(value.length / 1000).toFixed(1)}k` : value.length.toLocaleString()}
-          </span>
-          <span className={styles.charCountLabel}>chars</span>
-        </div>
-
         <button
           type="button"
           aria-label="Copy input text to clipboard"
@@ -619,13 +612,6 @@ function NotesActionControls({
       >
         <span>🔍</span> Validate
       </button>
-
-      <div className={styles.charCountBadge} title={`${value.length.toLocaleString()} characters`}>
-        <span className={styles.charCountValue}>
-          {value.length > 9999 ? `${(value.length / 1000).toFixed(1)}k` : value.length.toLocaleString()}
-        </span>
-        <span className={styles.charCountLabel}>chars</span>
-      </div>
 
       <button
         type="button"
