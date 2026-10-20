@@ -643,28 +643,31 @@
 .secondaryControlsRow {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex-wrap: nowrap;
   width: 100%;
 }
 
 .uploadBtn {
   font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
+  font-size: clamp(11px, 2.5vw, 13px);
   font-weight: 700;
   color: #012b1b;
-  padding: 10px 16px;
-  height: 44px;
-  border-radius: 12px;
+  padding: 8px 12px;
+  height: 40px;
+  border-radius: 10px;
   border: 1.5px solid rgba(1, 43, 27, 0.12);
   background: #ffffff;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 6px;
   transition: all 0.15s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .uploadBtn:hover {
@@ -677,53 +680,25 @@
   outline-offset: 2px;
 }
 
-.charCountBadge {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  border-radius: 50%;
-  background: rgba(1, 43, 27, 0.04);
-  border: 1.5px solid rgba(1, 43, 27, 0.08);
-  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.05);
-  font-family: 'Montserrat', sans-serif;
-  line-height: 1.15;
-  text-align: center;
-  padding: 2px;
-  user-select: none;
-}
-
-.charCountValue {
-  font-size: 11px;
-  font-weight: 800;
-  color: #2d3748;
-}
-
-.charCountLabel {
-  font-size: 9px;
-  font-weight: 600;
-  color: #8c9894;
-}
-
 .secondaryBtn {
   font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
+  font-size: clamp(11px, 2.5vw, 13px);
   font-weight: 700;
-  height: 44px;
-  padding: 10px 16px;
-  border-radius: 12px;
+  height: 40px;
+  padding: 8px 12px;
+  border-radius: 10px;
   border: 1.5px solid rgba(1, 43, 27, 0.12);
   background: #ffffff;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 5px;
   transition: all 0.15s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .secondaryBtn:hover {
