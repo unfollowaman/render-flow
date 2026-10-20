@@ -1,6 +1,7 @@
 import styles from "../styles/Home.module.css";
 import { useRef, useState, forwardRef, useImperativeHandle } from "react";
 import useReveal from "../hooks/useReveal";
+import { CodeEditor } from "./CodeEditor";
 
 const SAMPLE_HTML = `<!DOCTYPE html>
 <html lang="en">
@@ -305,13 +306,17 @@ const Workspace = forwardRef(function Workspace({
   const [uploadStatus, setUploadStatus] = useState("");
   const fileInputRef = useRef(null);
 
+  const editorRef = useRef(null);
+
   useImperativeHandle(ref, () => ({
     reset: () => {
       setValue("");
+      editorRef.current?.setValue("");
       setUploadStatus("");
     },
     loadSample: () => {
       setValue(modeConfig.sampleText);
+      editorRef.current?.setValue(modeConfig.sampleText);
       setError(null);
       setUploadStatus(`Sample ${modeConfig.label} code loaded successfully.`);
     }
@@ -385,28 +390,23 @@ const Workspace = forwardRef(function Workspace({
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
         >
-          <textarea
-            aria-label={modeConfig.ariaLabel}
-            aria-describedby={shortcutHintId}
-            aria-keyshortcuts="Control+Enter Meta+Enter"
-            className={styles.textarea}
+          <CodeEditor
+            ref={editorRef}
             value={value}
-            onChange={(e) => {
-              setValue(e.target.value);
+            onChange={(newVal) => {
+              setValue(newVal);
               setError(null);
               if (setHtmlWarning) setHtmlWarning(null);
             }}
-            onKeyDown={(e) => {
-              if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-                e.preventDefault();
-                if (!loading && value.trim()) {
-                  handleConvert(value);
-                }
+            onSubmit={(codeVal) => {
+              if (!loading && codeVal.trim()) {
+                handleConvert(codeVal);
               }
             }}
+            mode={modeConfig.mode}
             placeholder={modeConfig.placeholder}
-            spellCheck={false}
-            style={{ background: 'transparent' }}
+            ariaLabel={modeConfig.ariaLabel}
+            shortcutHintId={shortcutHintId}
           />
           {dragOver && (
             <div className={styles.dropOverlay}>
@@ -597,7 +597,8 @@ function NotesDropZone({
   loading,
   handleNotesGenerate,
   handleFileUpload,
-  shortcutHintId
+  shortcutHintId,
+  editorRef
 }) {
   const [dragOver, setDragOver] = useState(false);
 
@@ -617,26 +618,21 @@ function NotesDropZone({
           handleFileUpload(file);
         }}
       >
-        <textarea
-          aria-label={modeConfig.ariaLabel}
-          aria-describedby={shortcutHintId}
-          aria-keyshortcuts="Control+Enter Meta+Enter"
-          className={styles.textarea}
+        <CodeEditor
+          ref={editorRef}
           value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
+          onChange={(newVal) => {
+            setValue(newVal);
           }}
-          onKeyDown={(e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-              e.preventDefault();
-              if (!loading && value.trim()) {
-                handleNotesGenerate(value);
-              }
+          onSubmit={(codeVal) => {
+            if (!loading && codeVal.trim()) {
+              handleNotesGenerate(codeVal);
             }
           }}
+          mode={modeConfig.mode}
           placeholder={modeConfig.placeholder}
-          spellCheck={false}
-          style={{ background: 'transparent' }}
+          ariaLabel={modeConfig.ariaLabel}
+          shortcutHintId={shortcutHintId}
         />
         {dragOver && (
           <div className={styles.dropOverlay}>
@@ -768,15 +764,18 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
   const [isCopied, setIsCopied] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
   const fileInputRef = useRef(null);
+  const editorRef = useRef(null);
 
   useImperativeHandle(ref, () => ({
     reset: () => {
       setValue("");
+      editorRef.current?.setValue("");
       setUploadStatus("");
       handleNotesReset?.();
     },
     loadSample: () => {
       setValue(modeConfig.sampleText);
+      editorRef.current?.setValue(modeConfig.sampleText);
       setNotesError?.(null);
       setUploadStatus(`Sample ${modeConfig.label} code loaded successfully.`);
     }
@@ -848,6 +847,7 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
         handleNotesGenerate={handleNotesGenerate}
         handleFileUpload={handleFileUpload}
         shortcutHintId={shortcutHintId}
+        editorRef={editorRef}
       />
 
       <div role="status" aria-live="polite" className="sr-only">

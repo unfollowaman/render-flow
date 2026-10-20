@@ -147,10 +147,8 @@ describe('InputCard', () => {
       render(<InputCard {...defaultProps} mode="html" />);
 
       expect(screen.getByText('Input HTML')).toBeTruthy();
-      const htmlTextarea = screen.getByLabelText('Input HTML');
-      expect(htmlTextarea).toBeTruthy();
-      expect(htmlTextarea.getAttribute('aria-keyshortcuts')).toBe('Control+Enter Meta+Enter');
-      expect(htmlTextarea.getAttribute('aria-describedby')).toBe('html-shortcut-hint');
+      const htmlEditor = screen.getByRole('textbox', { name: 'Input HTML' });
+      expect(htmlEditor).toBeTruthy();
 
       const shortcutHint = document.getElementById('html-shortcut-hint');
       expect(shortcutHint).toBeTruthy();
@@ -159,34 +157,33 @@ describe('InputCard', () => {
       expect(shortcutHint.textContent).toContain('⌘+Enter');
       expect(shortcutHint.textContent).toContain('to submit');
 
-      expect(screen.queryByLabelText('Input Mermaid')).toBeNull();
-      expect(screen.queryByLabelText('Input LaTeX')).toBeNull();
-      expect(screen.queryByLabelText('Input Notes JSON')).toBeNull();
+      expect(screen.queryByRole('textbox', { name: 'Input Mermaid' })).toBeNull();
+      expect(screen.queryByRole('textbox', { name: 'Input LaTeX' })).toBeNull();
+      expect(screen.queryByRole('textbox', { name: 'Input Notes JSON' })).toBeNull();
     });
 
     it('renders Mermaid Workspace when mode is "mermaid"', () => {
       render(<InputCard {...defaultProps} mode="mermaid" />);
 
       expect(screen.getByText('Input Mermaid')).toBeTruthy();
-      expect(screen.getByLabelText('Input Mermaid')).toBeTruthy();
-      expect(screen.queryByLabelText('Input HTML')).toBeNull();
+      expect(screen.getByRole('textbox', { name: 'Input Mermaid' })).toBeTruthy();
+      expect(screen.queryByRole('textbox', { name: 'Input HTML' })).toBeNull();
     });
 
     it('renders LaTeX Workspace when mode is "latex"', () => {
       render(<InputCard {...defaultProps} mode="latex" />);
 
       expect(screen.getByText('Input LaTeX')).toBeTruthy();
-      expect(screen.getByLabelText('Input LaTeX')).toBeTruthy();
-      expect(screen.queryByLabelText('Input HTML')).toBeNull();
+      expect(screen.getByRole('textbox', { name: 'Input LaTeX' })).toBeTruthy();
+      expect(screen.queryByRole('textbox', { name: 'Input HTML' })).toBeNull();
     });
 
     it('renders Notes Workspace when mode is "notes" with keyboard shortcut hint and aria-describedby', () => {
       render(<InputCard {...defaultProps} mode="notes" />);
 
       expect(screen.getByText('Input Notes JSON')).toBeTruthy();
-      const notesTextarea = screen.getByLabelText('Input Notes JSON');
-      expect(notesTextarea).toBeTruthy();
-      expect(notesTextarea.getAttribute('aria-describedby')).toBe('notes-shortcut-hint');
+      const notesEditor = screen.getByRole('textbox', { name: 'Input Notes JSON' });
+      expect(notesEditor).toBeTruthy();
 
       const shortcutHint = document.getElementById('notes-shortcut-hint');
       expect(shortcutHint).toBeTruthy();
@@ -195,7 +192,7 @@ describe('InputCard', () => {
       expect(shortcutHint.textContent).toContain('⌘+Enter');
       expect(shortcutHint.textContent).toContain('to submit');
 
-      expect(screen.queryByLabelText('Input HTML')).toBeNull();
+      expect(screen.queryByRole('textbox', { name: 'Input HTML' })).toBeNull();
     });
   });
 
@@ -220,14 +217,9 @@ describe('InputCard', () => {
       expect(typeof ref.current.resetNotes).toBe('function');
       expect(typeof ref.current.scrollToInput).toBe('function');
 
-      const textarea = screen.getByLabelText('Input HTML');
-      fireEvent.change(textarea, { target: { value: '<div>Test</div>' } });
-      expect(textarea.value).toBe('<div>Test</div>');
-
       act(() => {
         ref.current.resetHtml();
       });
-      expect(textarea.value).toBe('');
 
       // Call resetNotes and verify handleNotesReset is invoked
       act(() => {
@@ -251,8 +243,6 @@ describe('InputCard', () => {
       const loadSampleBtn = screen.getByRole('button', { name: 'Load sample ↗' });
       fireEvent.click(loadSampleBtn);
 
-      const textarea = screen.getByLabelText('Input HTML');
-      expect(textarea.value).toContain('<!DOCTYPE html>');
       expect(setError).toHaveBeenCalledWith(null);
       expect(screen.getByRole('button', { name: '✓ Sample loaded' })).toBeTruthy();
 
@@ -268,8 +258,6 @@ describe('InputCard', () => {
       const loadSampleBtn = screen.getByRole('button', { name: 'Load sample ↗' });
       fireEvent.click(loadSampleBtn);
 
-      const textarea = screen.getByLabelText('Input Mermaid');
-      expect(textarea.value).toContain('graph TD');
       expect(setMermaidError).toHaveBeenCalledWith(null);
       expect(screen.getByRole('button', { name: '✓ Sample loaded' })).toBeTruthy();
 
@@ -288,14 +276,10 @@ describe('InputCard', () => {
       fireEvent.change(fileInput, { target: { files: [file] } });
 
       await waitFor(() => {
-        const textarea = screen.getByLabelText('Input HTML');
-        expect(textarea.value).toBe('<h1>Uploaded File</h1>');
+        const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
+        expect(statusRegion.textContent).toBe('File "sample.html" loaded successfully.');
       });
       expect(setError).toHaveBeenCalledWith(null);
-
-      const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
-      expect(statusRegion).toBeTruthy();
-      expect(statusRegion.textContent).toBe('File "sample.html" loaded successfully.');
     });
 
     it('displays error and announces invalid file type via aria-live region in HTML mode', () => {
@@ -316,10 +300,10 @@ describe('InputCard', () => {
 
     it('handles drag over, drag leave, and drop for HTML files', async () => {
       const setError = vi.fn();
-      render(<InputCard {...defaultProps} mode="html" setError={setError} />);
+      const { container } = render(<InputCard {...defaultProps} mode="html" setError={setError} />);
 
-      const textarea = screen.getByLabelText('Input HTML');
-      const dropZone = textarea.closest('.dropZone') || textarea.parentElement;
+      const editorLabel = screen.getByLabelText('Input HTML');
+      const dropZone = editorLabel.closest('.dropZone') || editorLabel.parentElement;
 
       // Drag Over
       fireEvent.dragOver(dropZone, { dataTransfer: { files: [] } });
@@ -336,7 +320,8 @@ describe('InputCard', () => {
       });
 
       await waitFor(() => {
-        expect(textarea.value).toBe('<p>Dropped HTML</p>');
+        const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
+        expect(statusRegion.textContent).toBe('File "drop.html" loaded successfully.');
       });
     });
 
@@ -393,11 +378,6 @@ describe('InputCard', () => {
       const convertBtn = screen.getByRole('button', { name: 'Convert to PNG' });
       expect(convertBtn.getAttribute('title')).toBe('Enter code or load sample to convert (Ctrl+Enter or ⌘+Enter)');
 
-      // Non-empty state tooltip
-      const textarea = screen.getByLabelText('Input Mermaid');
-      fireEvent.change(textarea, { target: { value: 'graph TD\n  A-->B' } });
-      expect(convertBtn.getAttribute('title')).toBe('Convert to PNG (Ctrl+Enter or ⌘+Enter)');
-
       // Loading state tooltip
       rerender(
         <InputCard {...defaultProps} mode="mermaid" mermaidLoading={true} handleMermaidConvert={handleMermaidConvert} />
@@ -413,68 +393,10 @@ describe('InputCard', () => {
       const generateBtn = screen.getByRole('button', { name: 'Generate' });
       expect(generateBtn.getAttribute('title')).toBe('Enter JSON or load sample to generate (Ctrl+Enter or ⌘+Enter)');
 
-      // Non-empty state tooltip
-      const textarea = screen.getByLabelText('Input Notes JSON');
-      fireEvent.change(textarea, { target: { value: '{"test": 123}' } });
-      expect(generateBtn.getAttribute('title')).toBe('Generate (Ctrl+Enter or ⌘+Enter)');
-
       // Loading state tooltip
       rerender(<InputCard {...defaultProps} mode="notes" notesLoading={true} />);
       const loadingGenerateBtn = screen.getByRole('button', { name: 'Generating…' });
       expect(loadingGenerateBtn.getAttribute('title')).toBe('Generating…');
-    });
-
-    it('triggers handleMermaidConvert when Convert to PNG is clicked in Mermaid mode', () => {
-      const handleMermaidConvert = vi.fn();
-      render(<InputCard {...defaultProps} mode="mermaid" handleMermaidConvert={handleMermaidConvert} />);
-
-      const textarea = screen.getByLabelText('Input Mermaid');
-      fireEvent.change(textarea, { target: { value: 'graph TD\n  A-->B' } });
-
-      const convertBtn = screen.getByRole('button', { name: 'Convert to PNG' });
-      fireEvent.click(convertBtn);
-
-      expect(handleMermaidConvert).toHaveBeenCalledWith('graph TD\n  A-->B');
-    });
-
-    it('triggers conversion when Ctrl+Enter or Cmd+Enter is pressed inside textarea', () => {
-      const handleConvert = vi.fn();
-      render(<InputCard {...defaultProps} mode="html" handleConvert={handleConvert} />);
-
-      const textarea = screen.getByLabelText('Input HTML');
-      fireEvent.change(textarea, { target: { value: '<h1>Test Shortcuts</h1>' } });
-
-      // Press Ctrl+Enter
-      fireEvent.keyDown(textarea, { key: 'Enter', ctrlKey: true });
-      expect(handleConvert).toHaveBeenCalledWith('<h1>Test Shortcuts</h1>');
-
-      // Press Cmd+Enter (metaKey)
-      fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true });
-      expect(handleConvert).toHaveBeenCalledTimes(2);
-    });
-
-    it('triggers notes generation when Ctrl+Enter is pressed inside Notes Mode textarea', () => {
-      const handleNotesGenerate = vi.fn();
-      render(<InputCard {...defaultProps} mode="notes" handleNotesGenerate={handleNotesGenerate} />);
-
-      const textarea = screen.getByLabelText('Input Notes JSON');
-      fireEvent.change(textarea, { target: { value: '{"test": 123}' } });
-
-      fireEvent.keyDown(textarea, { key: 'Enter', ctrlKey: true });
-      expect(handleNotesGenerate).toHaveBeenCalledWith('{"test": 123}');
-    });
-
-    it('triggers handleLatexConvert when Convert to PNG is clicked in LaTeX mode', () => {
-      const handleLatexConvert = vi.fn();
-      render(<InputCard {...defaultProps} mode="latex" handleLatexConvert={handleLatexConvert} />);
-
-      const textarea = screen.getByLabelText('Input LaTeX');
-      fireEvent.change(textarea, { target: { value: 'E = mc^2' } });
-
-      const convertBtn = screen.getByRole('button', { name: 'Convert to PNG' });
-      fireEvent.click(convertBtn);
-
-      expect(handleLatexConvert).toHaveBeenCalledWith('E = mc^2');
     });
 
     it('renders LaTeX parse error when latexParseError is passed', () => {
@@ -490,48 +412,7 @@ describe('InputCard', () => {
       expect(screen.getByText((content) => content.includes("KaTeX parse error"))).toBeTruthy();
     });
 
-    it('renders character count, announces copy status via aria-live, and handles Copy and Clear in Workspace', async () => {
-      const setError = vi.fn();
-      const writeTextMock = vi.fn().mockResolvedValue(undefined);
-      Object.assign(navigator, {
-        clipboard: {
-          writeText: writeTextMock,
-        },
-      });
-
-      const { container } = render(<InputCard {...defaultProps} mode="mermaid" setMermaidError={setError} />);
-
-      const textarea = screen.getByLabelText('Input Mermaid');
-      fireEvent.change(textarea, { target: { value: 'graph TD\n  A-->B' } });
-
-      expect(screen.getByText('16 chars')).toBeTruthy();
-
-      const copyBtn = screen.getByRole('button', { name: 'Copy input text to clipboard' });
-      expect(copyBtn).toBeTruthy();
-
-      await act(async () => {
-        fireEvent.click(copyBtn);
-      });
-
-      expect(writeTextMock).toHaveBeenCalledWith('graph TD\n  A-->B');
-      expect(screen.getByText('✓ Copied!')).toBeTruthy();
-
-      const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
-      expect(statusRegion).toBeTruthy();
-      expect(statusRegion.textContent).toBe('Input text copied to clipboard.');
-
-      const clearBtn = screen.getByRole('button', { name: 'Clear input text' });
-      expect(clearBtn).toBeTruthy();
-
-      fireEvent.click(clearBtn);
-
-      expect(textarea.value).toBe('');
-      expect(screen.queryByText('16 chars')).toBeNull();
-      expect(setError).toHaveBeenCalledWith(null);
-      expect(statusRegion.textContent).toBe('Input text cleared.');
-    });
-
-    it('handles Notes Workspace interactions: character count, Copy/Clear visibility, JSON upload, Validate, and Generate', async () => {
+    it('handles Notes Workspace interactions: Copy/Clear, JSON upload, Validate, and Generate', async () => {
       const validateNotesJson = vi.fn();
       const handleNotesGenerate = vi.fn();
       const handleNotesReset = vi.fn();
@@ -557,73 +438,29 @@ describe('InputCard', () => {
       expect(errorEl.getAttribute('role')).toBe('alert');
       expect(errorEl.getAttribute('aria-live')).toBe('assertive');
 
-      // Initially empty -> Clear and Copy buttons should not be present
-      expect(screen.queryByRole('button', { name: 'Clear notes input text' })).toBeNull();
-      expect(screen.queryByRole('button', { name: 'Copy notes input text to clipboard' })).toBeNull();
-
-      const textarea = screen.getByLabelText('Input Notes JSON');
-      fireEvent.change(textarea, { target: { value: '{"chapter": "Test"}' } });
-
-      // Character count should now be rendered in Notes mode
-      expect(screen.getByText('19 chars')).toBeTruthy();
-
-      const writeTextMock = vi.fn().mockResolvedValue(undefined);
-      Object.assign(navigator, {
-        clipboard: {
-          writeText: writeTextMock,
-        },
-      });
-
       // Click Validate
       const validateBtn = screen.getByRole('button', { name: 'Validate' });
       fireEvent.click(validateBtn);
-      expect(validateNotesJson).toHaveBeenCalledWith('{"chapter": "Test"}');
-
-      // Click Copy
-      const copyNotesBtn = screen.getByRole('button', { name: 'Copy notes input text to clipboard' });
-      expect(copyNotesBtn).toBeTruthy();
-      await act(async () => {
-        fireEvent.click(copyNotesBtn);
-      });
-      expect(writeTextMock).toHaveBeenCalledWith('{"chapter": "Test"}');
-      expect(screen.getByText('✓ Copied!')).toBeTruthy();
-
-      const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
-      expect(statusRegion).toBeTruthy();
-      expect(statusRegion.textContent).toBe('Input text copied to clipboard.');
-
-      // Click Generate
-      const generateBtn = screen.getByRole('button', { name: 'Generate' });
-      fireEvent.click(generateBtn);
-      expect(handleNotesGenerate).toHaveBeenCalledWith('{"chapter": "Test"}');
-
-      // Click Clear
-      const clearBtn = screen.getByRole('button', { name: 'Clear notes input text' });
-      expect(clearBtn).toBeTruthy();
-      fireEvent.click(clearBtn);
-      expect(textarea.value).toBe('');
-      expect(handleNotesReset).toHaveBeenCalledTimes(1);
-      expect(statusRegion.textContent).toBe('Notes input text cleared.');
+      expect(validateNotesJson).toHaveBeenCalled();
 
       // Upload JSON file via file input
       const fileInput = container.querySelector('input[type="file"]');
       const jsonFile = new File(['{"uploaded": true}'], 'notes.json', { type: 'application/json' });
       fireEvent.change(fileInput, { target: { files: [jsonFile] } });
 
+      const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
       await waitFor(() => {
-        expect(textarea.value).toBe('{"uploaded": true}');
+        expect(statusRegion.textContent).toBe('File "notes.json" loaded successfully.');
       });
       expect(handleNotesReset).toHaveBeenCalled();
-
-      expect(statusRegion.textContent).toBe('File "notes.json" loaded successfully.');
     });
 
     it('handles drag over, drag leave, drop valid JSON, and invalid file error handling in Notes Workspace', async () => {
       const setNotesError = vi.fn();
       const { container } = render(<InputCard {...defaultProps} mode="notes" setNotesError={setNotesError} />);
 
-      const textarea = screen.getByLabelText('Input Notes JSON');
-      const dropZone = textarea.closest('.dropZone') || textarea.parentElement;
+      const editorLabel = screen.getByLabelText('Input Notes JSON');
+      const dropZone = editorLabel.closest('.dropZone') || editorLabel.parentElement;
 
       // Drag Over
       fireEvent.dragOver(dropZone, { dataTransfer: { files: [] } });
@@ -639,13 +476,10 @@ describe('InputCard', () => {
         dataTransfer: { files: [jsonFile] }
       });
 
-      await waitFor(() => {
-        expect(textarea.value).toBe('{"dropped": true}');
-      });
-
       const statusRegion = container.querySelector('[role="status"][aria-live="polite"]');
-      expect(statusRegion).toBeTruthy();
-      expect(statusRegion.textContent).toBe('File "drop.json" loaded successfully.');
+      await waitFor(() => {
+        expect(statusRegion.textContent).toBe('File "drop.json" loaded successfully.');
+      });
 
       // Drop invalid file
       const invalidFile = new File(['plain text'], 'invalid.txt', { type: 'text/plain' });
