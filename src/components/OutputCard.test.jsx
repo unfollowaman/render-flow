@@ -15,15 +15,19 @@ describe('OutputCard', () => {
     height: 600,
   };
 
-  it('renders preview title, dimensions, image, and hint correctly', () => {
+  it('renders preview title, reset button, image, and download button correctly without pixel dimension badges', () => {
     const handleReset = vi.fn();
     const { container } = render(
       <OutputCard result={mockResult} onReset={handleReset} mode="html" />
     );
 
     expect(screen.getByText('Preview')).toBeTruthy();
-    expect(screen.getByText('800 × 600px')).toBeTruthy();
-    expect(screen.getByText('800 × 600 · PNG · 1x scale')).toBeTruthy();
+    expect(screen.getByRole('button', { name: /Reset workspace output/i })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /Download PNG/i })).toBeTruthy();
+
+    // Verify dimension badge and metadata text are removed
+    expect(screen.queryByText('800 × 600px')).toBeNull();
+    expect(screen.queryByText('800 × 600 · PNG · 1x scale')).toBeNull();
 
     const img = screen.getByAltText('Rendered HTML output');
     expect(img).toBeTruthy();
@@ -139,7 +143,7 @@ describe('OutputCard', () => {
     const handleReset = vi.fn();
     render(<OutputCard result={mockResult} onReset={handleReset} mode="html" />);
 
-    const resetButton = screen.getByRole('button', { name: /Reset/i });
+    const resetButton = screen.getByRole('button', { name: /Reset workspace output/i });
     fireEvent.click(resetButton);
 
     expect(handleReset).toHaveBeenCalledTimes(1);
