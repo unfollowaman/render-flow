@@ -10,7 +10,7 @@ vi.mock("html-to-image", () => ({
   }),
 }));
 
-describe("NotesConverter Export and Zoom Functionality", () => {
+describe("NotesConverter Export Functionality", () => {
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
@@ -32,18 +32,6 @@ describe("NotesConverter Export and Zoom Functionality", () => {
     ],
   });
 
-  const multiPageItems = Array.from({ length: 15 }, (_, i) => ({
-    type: "question",
-    number: i + 1,
-    question: [{ type: "text", content: `Question ${i + 1} content block with detailed text for print testing.` }],
-    solution: [{ type: "text", content: `Solution ${i + 1} content block with detailed solution text.` }],
-  }));
-
-  const sampleThreePageJson = JSON.stringify({
-    chapter: { title: "Multi-page Print Test", subtitle: "3 Pages" },
-    pages: [{ items: multiPageItems }],
-  });
-
   test("Test Case 1: PNG Download triggers download with pixelRatio = 3 and proper filename", async () => {
     render(<NotesConverter mode="notes" setMode={() => {}} />);
 
@@ -55,7 +43,7 @@ describe("NotesConverter Export and Zoom Functionality", () => {
 
     expect(await screen.findByText("Export Test Chapter")).toBeTruthy();
 
-    const downloadBtn = screen.getByRole("button", { name: /Download Page as PNG/i });
+    const downloadBtn = screen.getByRole("button", { name: /^Download PNG$/i });
     expect(downloadBtn).toBeTruthy();
 
     const linkClickSpy = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
@@ -88,7 +76,7 @@ describe("NotesConverter Export and Zoom Functionality", () => {
 
     expect(await screen.findByText("Export Test Chapter")).toBeTruthy();
 
-    const downloadBtn = screen.getByRole("button", { name: /Download Page as PNG/i });
+    const downloadBtn = screen.getByRole("button", { name: /^Download PNG$/i });
 
     // Mock offsetWidth & offsetHeight on HTMLDivElement prototype to artificially exceed 200,000,000px
     const widthGetter = vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(10000);
@@ -104,145 +92,7 @@ describe("NotesConverter Export and Zoom Functionality", () => {
     heightGetter.mockRestore();
   });
 
-  test("Test Case 3 & 4: Clicking Print/Export All Pages creates temporary print DOM with break-after: page and clears on afterprint", async () => {
-    render(<NotesConverter mode="notes" setMode={() => {}} />);
-
-    const textarea = screen.getByLabelText("Input Notes JSON");
-    fireEvent.change(textarea, { target: { value: sampleThreePageJson } });
-
-    const generateBtn = screen.getByRole("button", { name: /Generate/i });
-    fireEvent.click(generateBtn);
-
-    expect(await screen.findByText("Multi-page Print Test")).toBeTruthy();
-    expect(await screen.findByText(/Page 1 of/i)).toBeTruthy();
-
-    const printBtn = screen.getByRole("button", { name: /Print \/ Export All Pages/i });
-
-    const printSpy = vi.spyOn(window, "print").mockImplementation(() => {});
-
-    fireEvent.click(printBtn);
-
-    expect(screen.getByText("Preparing print...")).toBeTruthy();
-
-    await waitFor(() => {
-      const printContainer = document.querySelector(".print-only-container");
-      expect(printContainer).toBeTruthy();
-      const pageWrappers = printContainer.querySelectorAll(".print-page-wrapper");
-      expect(pageWrappers.length).toBeGreaterThanOrEqual(3);
-    });
-
-    // Fire window afterprint event to simulate print dialog close
-    fireEvent(window, new Event("afterprint"));
-
-    await waitFor(() => {
-      const printContainerAfter = document.querySelector(".print-only-container");
-      expect(printContainerAfter).toBeNull();
-      expect(screen.getByText("Print / Export All Pages")).toBeTruthy();
-    });
-
-    printSpy.mockRestore();
-  });
-
-  test("Test Case 5: Zoom level changes scale on screen but does not alter PNG export element", async () => {
-    render(<NotesConverter mode="notes" setMode={() => {}} />);
-
-    const textarea = screen.getByLabelText("Input Notes JSON");
-    fireEvent.change(textarea, { target: { value: sampleSinglePageJson } });
-
-    const generateBtn = screen.getByRole("button", { name: /Generate/i });
-    fireEvent.click(generateBtn);
-
-    expect(await screen.findByText("Export Test Chapter")).toBeTruthy();
-
-    const zoomInBtn = screen.getByRole("button", { name: "Zoom in" });
-    fireEvent.click(zoomInBtn);
-    fireEvent.click(zoomInBtn);
-
-    expect(screen.getByText("120%")).toBeTruthy();
-
-    const linkClickSpy = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
-    const downloadBtn = screen.getByRole("button", { name: /Download Page as PNG/i });
-
-    fireEvent.click(downloadBtn);
-
-    await waitFor(() => {
-      expect(linkClickSpy).toHaveBeenCalled();
-    });
-
-    const htmlToImage = await import("html-to-image");
-    const exportedElement = htmlToImage.toPng.mock.calls[0][0];
-
-    // The captured element is the unscaled container ref div inside the transform wrapper
-    expect(exportedElement.style.transform).not.toContain("scale");
-
-    linkClickSpy.mockRestore();
-  });
-
-  test("Test Case 6: Zoom respects documented min/max bounds (50% to 150%)", async () => {
-    render(<NotesConverter mode="notes" setMode={() => {}} />);
-
-    const textarea = screen.getByLabelText("Input Notes JSON");
-    fireEvent.change(textarea, { target: { value: sampleSinglePageJson } });
-
-    const generateBtn = screen.getByRole("button", { name: /Generate/i });
-    fireEvent.click(generateBtn);
-
-    expect(await screen.findByText("Export Test Chapter")).toBeTruthy();
-
-    const zoomOutBtn = screen.getByRole("button", { name: "Zoom out" });
-    const zoomInBtn = screen.getByRole("button", { name: "Zoom in" });
-
-    // Zoom out multiple times below min bound (50%)
-    for (let i = 0; i < 10; i++) {
-      fireEvent.click(zoomOutBtn);
-    }
-    expect(screen.getByText("50%")).toBeTruthy();
-    expect(zoomOutBtn.disabled).toBe(true);
-
-    // Zoom in multiple times above max bound (150%)
-    for (let i = 0; i < 20; i++) {
-      fireEvent.click(zoomInBtn);
-    }
-    expect(screen.getByText("150%")).toBeTruthy();
-    expect(zoomInBtn.disabled).toBe(true);
-  });
-
-  test("Test Case 7: Zoom reset button has proper aria-label and spinbutton supports keyboard navigation", async () => {
-    render(<NotesConverter mode="notes" setMode={() => {}} />);
-
-    const textarea = screen.getByLabelText("Input Notes JSON");
-    fireEvent.change(textarea, { target: { value: sampleSinglePageJson } });
-
-    const generateBtn = screen.getByRole("button", { name: /Generate/i });
-    fireEvent.click(generateBtn);
-
-    expect(await screen.findByText("Export Test Chapter")).toBeTruthy();
-
-    const resetButton = screen.getByRole("button", { name: "Reset zoom level to 100%" });
-    expect(resetButton).toBeTruthy();
-
-    const zoomSpinbutton = screen.getByRole("spinbutton", { name: "Zoom level" });
-    expect(zoomSpinbutton).toBeTruthy();
-    expect(zoomSpinbutton.getAttribute("aria-valuenow")).toBe("100");
-
-    // ArrowUp -> 110%
-    fireEvent.keyDown(zoomSpinbutton, { key: "ArrowUp" });
-    expect(zoomSpinbutton.getAttribute("aria-valuenow")).toBe("110");
-
-    // ArrowDown -> 100%
-    fireEvent.keyDown(zoomSpinbutton, { key: "ArrowDown" });
-    expect(zoomSpinbutton.getAttribute("aria-valuenow")).toBe("100");
-
-    // End -> 150%
-    fireEvent.keyDown(zoomSpinbutton, { key: "End" });
-    expect(zoomSpinbutton.getAttribute("aria-valuenow")).toBe("150");
-
-    // Home -> 50%
-    fireEvent.keyDown(zoomSpinbutton, { key: "Home" });
-    expect(zoomSpinbutton.getAttribute("aria-valuenow")).toBe("50");
-  });
-
-  test("Test Case 8: Screen reader status announcements update during PNG export and print", async () => {
+  test("Test Case 3: Screen reader status announcements update during PNG export", async () => {
     render(<NotesConverter mode="notes" setMode={() => {}} />);
 
     const textarea = screen.getByLabelText("Input Notes JSON");
@@ -257,26 +107,14 @@ describe("NotesConverter Export and Zoom Functionality", () => {
     expect(statusContainer).toBeTruthy();
 
     const linkClickSpy = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
-    const downloadBtn = screen.getByRole("button", { name: /Download Page as PNG/i });
+    const downloadBtn = screen.getByRole("button", { name: /^Download PNG$/i });
 
     fireEvent.click(downloadBtn);
 
     await waitFor(() => {
-      expect(statusContainer.textContent).toBe("Page exported as PNG successfully!");
-    });
-
-    const printBtn = screen.getByRole("button", { name: /Print \/ Export All Pages/i });
-    const printSpy = vi.spyOn(window, "print").mockImplementation(() => {});
-
-    fireEvent.click(printBtn);
-    expect(statusContainer.textContent).toBe("Preparing print document...");
-
-    fireEvent(window, new Event("afterprint"));
-    await waitFor(() => {
-      expect(statusContainer.textContent).toBe("Print dialog closed.");
+      expect(statusContainer.textContent).toBe("Page(s) exported as PNG successfully!");
     });
 
     linkClickSpy.mockRestore();
-    printSpy.mockRestore();
   });
 });

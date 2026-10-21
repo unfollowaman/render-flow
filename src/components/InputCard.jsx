@@ -585,13 +585,9 @@ function NotesDropZone({
 
 function NotesActionControls({
   fileInputRef,
-  validateNotesJson,
-  value,
   isCopied,
   handleCopy,
-  handleClear,
-  handleNotesGenerate,
-  loading
+  handleClear
 }) {
   return (
     <div className={styles.secondaryControlsRow}>
@@ -602,15 +598,6 @@ function NotesActionControls({
         title="Upload .json file from your computer"
       >
         <span>📁</span> Upload .json file
-      </button>
-
-      <button
-        type="button"
-        className={styles.secondaryBtn}
-        onClick={() => validateNotesJson(value)}
-        title="Validate JSON structure against schema"
-      >
-        <span>🔍</span> Validate
       </button>
 
       <button
@@ -770,13 +757,9 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
 
       <NotesActionControls
         fileInputRef={fileInputRef}
-        validateNotesJson={validateNotesJson}
-        value={value}
         isCopied={isCopied}
         handleCopy={handleCopy}
         handleClear={handleClear}
-        handleNotesGenerate={handleNotesGenerate}
-        loading={loading}
       />
 
       <NotesValidationFeedback

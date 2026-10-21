@@ -412,7 +412,7 @@ describe('InputCard', () => {
       expect(screen.getByText((content) => content.includes("KaTeX parse error"))).toBeTruthy();
     });
 
-    it('handles Notes Workspace interactions: Copy/Clear, JSON upload, Validate, and Generate', async () => {
+    it('handles Notes Workspace interactions: Copy/Clear, JSON upload, and Generate', async () => {
       const validateNotesJson = vi.fn();
       const handleNotesGenerate = vi.fn();
       const handleNotesReset = vi.fn();
@@ -437,11 +437,6 @@ describe('InputCard', () => {
       expect(errorEl).toBeTruthy();
       expect(errorEl.getAttribute('role')).toBe('alert');
       expect(errorEl.getAttribute('aria-live')).toBe('assertive');
-
-      // Click Validate
-      const validateBtn = screen.getByRole('button', { name: /Validate/i });
-      fireEvent.click(validateBtn);
-      expect(validateNotesJson).toHaveBeenCalled();
 
       // Upload JSON file via file input
       const fileInput = container.querySelector('input[type="file"]');

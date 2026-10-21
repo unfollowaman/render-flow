@@ -5,25 +5,18 @@ import { useNotesToPngConversion } from "../hooks/useNotesToPngConversion";
 import styles from "../styles/Home.module.css";
 import downloadIcon from "../assets/download-icon.png";
 
-const MIN_ZOOM = 0.5;
-const MAX_ZOOM = 1.5;
-const DEFAULT_ZOOM = 1.0;
-const ZOOM_STEP = 0.1;
 const MAX_AREA = 200000000;
 
 const NotesConverter = forwardRef(function NotesConverter(
   { inputRef, outputRef, mode, setMode, onReset },
   ref
 ) {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const [exportError, setExportError] = useState(null);
   const [isExportingPng, setIsExportingPng] = useState(false);
-  const [isPrinting, setIsPrinting] = useState(false);
   const [isDownloaded, setIsDownloaded] = useState(false);
   const [exportStatus, setExportStatus] = useState("");
 
-  const pageRef = useRef(null);
+  const pagesContainerRef = useRef(null);
 
   const {
     loading: notesLoading,
@@ -39,110 +32,68 @@ const NotesConverter = forwardRef(function NotesConverter(
     outputRef,
   });
 
-  // Reset page index and zoom when notesResult changes
   useEffect(() => {
-    setCurrentPageIndex(0);
-    setZoom(DEFAULT_ZOOM);
     setExportError(null);
   }, [notesResult]);
 
   useImperativeHandle(ref, () => ({
     handleReset: () => {
-      setCurrentPageIndex(0);
-      setZoom(DEFAULT_ZOOM);
       setExportError(null);
       handleNotesReset();
     },
   }));
 
   const pages = notesResult?.pages || [];
-  const totalPages = pages.length;
-  const activePage = pages[currentPageIndex] || null;
 
-  const pageData = activePage
-    ? {
-        chapter: notesResult.chapter,
-        items: activePage.items,
-        isOverflow: activePage.isOverflow,
-      }
-    : null;
-
-  // PNG Export handler (current page)
+  // PNG Export handler (exports all generated pages)
   const handleDownloadPng = async () => {
-    if (!pageRef.current) return;
+    if (!pagesContainerRef.current) return;
     setExportError(null);
     setIsExportingPng(true);
-    setExportStatus("Exporting page as PNG...");
+    setExportStatus("Exporting page(s) as PNG...");
 
     try {
-      const pageEl = pageRef.current;
-      const pixelRatio = 3; // 300 DPI high resolution for print quality A4
-      const width = pageEl.offsetWidth || 794;
-      const height = pageEl.offsetHeight || 1123;
-      const totalArea = width * height * pixelRatio * pixelRatio;
-
-      if (totalArea > MAX_AREA) {
-        throw new Error(
-          `Dimensions too large: requested export area of ${Math.round(
-            totalArea
-          )}px exceeds maximum supported limit of ${MAX_AREA} total pixels.`
-        );
-      }
+      const pageEls = pagesContainerRef.current.querySelectorAll("[data-page-index]");
+      if (!pageEls.length) return;
 
       const { toPng } = await import("html-to-image");
-      const dataUrl = await toPng(pageEl, {
-        backgroundColor: "#FFFFFF",
-        pixelRatio,
-      });
 
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = `notes-page-${currentPageIndex + 1}-${Date.now()}.png`;
-      link.click();
+      for (let i = 0; i < pageEls.length; i += 1) {
+        const pageEl = pageEls[i];
+        const pixelRatio = 3; // 300 DPI high resolution for print quality A4
+        const width = pageEl.offsetWidth || 794;
+        const height = pageEl.offsetHeight || 1123;
+        const totalArea = width * height * pixelRatio * pixelRatio;
+
+        if (totalArea > MAX_AREA) {
+          throw new Error(
+            `Dimensions too large: requested export area of ${Math.round(
+              totalArea
+            )}px exceeds maximum supported limit of ${MAX_AREA} total pixels.`
+          );
+        }
+
+        const dataUrl = await toPng(pageEl, {
+          backgroundColor: "#FFFFFF",
+          pixelRatio,
+        });
+
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = `notes-page-${i + 1}-${Date.now()}.png`;
+        link.click();
+      }
+
       setIsDownloaded(true);
-      setExportStatus("Page exported as PNG successfully!");
+      setExportStatus("Page(s) exported as PNG successfully!");
       setTimeout(() => setIsDownloaded(false), 2000);
     } catch (err) {
-      const errMsg = err.message || "Failed to export page as PNG.";
+      const errMsg = err.message || "Failed to export page(s) as PNG.";
       setExportError(errMsg);
       setExportStatus("Export failed.");
     } finally {
       setIsExportingPng(false);
     }
-  };
-
-  // Print / Export All as PDF handler
-  const handlePrintAll = () => {
-    setExportError(null);
-    setIsPrinting(true);
-    setExportStatus("Preparing print document...");
-
-    const handleAfterPrint = () => {
-      setIsPrinting(false);
-      setExportStatus("Print dialog closed.");
-      window.removeEventListener("afterprint", handleAfterPrint);
-    };
-
-    window.addEventListener("afterprint", handleAfterPrint);
-
-    // Wait for DOM paint and asset loading before calling window.print()
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        window.print();
-      }, 150);
-    });
-  };
-
-  const handleZoomIn = () => {
-    setZoom((prev) => Math.min(MAX_ZOOM, Math.round((prev + ZOOM_STEP) * 10) / 10));
-  };
-
-  const handleZoomOut = () => {
-    setZoom((prev) => Math.max(MIN_ZOOM, Math.round((prev - ZOOM_STEP) * 10) / 10));
-  };
-
-  const handleZoomReset = () => {
-    setZoom(DEFAULT_ZOOM);
   };
 
   return (
@@ -166,7 +117,7 @@ const NotesConverter = forwardRef(function NotesConverter(
       {notesError && <ErrorCard error={notesError} />}
       {exportError && <ErrorCard error={exportError} />}
 
-      {notesResult && pageData && (
+      {notesResult && pages.length > 0 && (
         <div
           className={`${styles.card} neu-card no-print`}
           ref={outputRef}
@@ -176,259 +127,110 @@ const NotesConverter = forwardRef(function NotesConverter(
             flexDirection: "column",
             alignItems: "center",
             padding: "32px",
-            overflowX: "auto",
           }}
         >
-          {/* Controls Bar */}
-          <div
-            className="no-print"
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: totalPages > 1 ? "space-between" : "flex-end",
-              width: "100%",
-              maxWidth: "210mm",
-              gap: "16px",
-              marginBottom: "24px",
-            }}
-          >
-            {/* Page Navigation */}
-            {totalPages > 1 && (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                }}
-              >
-                <button
-                  type="button"
-                  className="neu-raised"
-                  disabled={currentPageIndex === 0}
-                  aria-label="Go to previous page"
-                  title={currentPageIndex === 0 ? "Already on the first page" : "Go to previous page"}
-                  onClick={() => setCurrentPageIndex((prev) => Math.max(0, prev - 1))}
-                  style={{
-                    padding: "8px 14px",
-                    borderRadius: "8px",
-                    cursor: currentPageIndex === 0 ? "not-allowed" : "pointer",
-                    opacity: currentPageIndex === 0 ? 0.5 : 1,
-                    fontWeight: 600,
-                    fontSize: "13px",
-                  }}
-                >
-                  ← Previous
-                </button>
-
-                <span
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: 600,
-                    color: "#374151",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  Page {currentPageIndex + 1} of {totalPages}
-                </span>
-
-                <button
-                  type="button"
-                  className="neu-raised"
-                  disabled={currentPageIndex >= totalPages - 1}
-                  aria-label="Go to next page"
-                  title={currentPageIndex >= totalPages - 1 ? "Already on the last page" : "Go to next page"}
-                  onClick={() =>
-                    setCurrentPageIndex((prev) => Math.min(totalPages - 1, prev + 1))
-                  }
-                  style={{
-                    padding: "8px 14px",
-                    borderRadius: "8px",
-                    cursor: currentPageIndex >= totalPages - 1 ? "not-allowed" : "pointer",
-                    opacity: currentPageIndex >= totalPages - 1 ? 0.5 : 1,
-                    fontWeight: 600,
-                    fontSize: "13px",
-                  }}
-                >
-                  Next →
-                </button>
-              </div>
-            )}
-
-            {/* Zoom Controls */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
+          {/* Header with Title and Reset button matching OutputCard */}
+          <div className={styles.cardHeader} style={{ width: "100%", marginBottom: "20px" }}>
+            <h2 className={styles.cardTitle}>Preview</h2>
+            {onReset && (
               <button
-                type="button"
-                className="neu-raised"
-                disabled={zoom <= MIN_ZOOM}
-                onClick={handleZoomOut}
-                aria-label="Zoom out"
-                title="Decrease zoom level"
-                style={{
-                  padding: "6px 12px",
-                  borderRadius: "6px",
-                  cursor: zoom <= MIN_ZOOM ? "not-allowed" : "pointer",
-                  opacity: zoom <= MIN_ZOOM ? 0.5 : 1,
-                  fontWeight: 700,
-                  fontSize: "14px",
-                }}
+                className={styles.resetBtn}
+                onClick={onReset}
+                title="Reset preview and clear input"
+                aria-label="Reset workspace output"
               >
-                -
-              </button>
-
-              <span
-                role="spinbutton"
-                tabIndex={0}
-                aria-label="Zoom level"
-                aria-valuenow={Math.round(zoom * 100)}
-                aria-valuemin={50}
-                aria-valuemax={150}
-                aria-valuetext={`${Math.round(zoom * 100)}%`}
-                onKeyDown={(e) => {
-                  if (e.key === "ArrowUp" || e.key === "ArrowRight") {
-                    e.preventDefault();
-                    handleZoomIn();
-                  } else if (e.key === "ArrowDown" || e.key === "ArrowLeft") {
-                    e.preventDefault();
-                    handleZoomOut();
-                  } else if (e.key === "Home") {
-                    e.preventDefault();
-                    setZoom(MIN_ZOOM);
-                  } else if (e.key === "End") {
-                    e.preventDefault();
-                    setZoom(MAX_ZOOM);
-                  }
-                }}
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  color: "#374151",
-                  minWidth: "48px",
-                  textAlign: "center",
-                  cursor: "pointer",
-                }}
-              >
-                {Math.round(zoom * 100)}%
-              </span>
-
-              <button
-                type="button"
-                className="neu-raised"
-                disabled={zoom >= MAX_ZOOM}
-                onClick={handleZoomIn}
-                aria-label="Zoom in"
-                title="Increase zoom level"
-                style={{
-                  padding: "6px 12px",
-                  borderRadius: "6px",
-                  cursor: zoom >= MAX_ZOOM ? "not-allowed" : "pointer",
-                  opacity: zoom >= MAX_ZOOM ? 0.5 : 1,
-                  fontWeight: 700,
-                  fontSize: "14px",
-                }}
-              >
-                +
-              </button>
-
-              <button
-                type="button"
-                className="neu-raised"
-                disabled={zoom === DEFAULT_ZOOM}
-                onClick={handleZoomReset}
-                aria-label="Reset zoom level to 100%"
-                title="Reset zoom to 100%"
-                style={{
-                  padding: "6px 10px",
-                  borderRadius: "6px",
-                  cursor: zoom === DEFAULT_ZOOM ? "not-allowed" : "pointer",
-                  opacity: zoom === DEFAULT_ZOOM ? 0.5 : 1,
-                  fontWeight: 600,
-                  fontSize: "12px",
-                  marginLeft: "4px",
-                }}
-              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  className={styles.resetIcon}
+                >
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <line x1="10" y1="11" x2="10" y2="17" />
+                  <line x1="14" y1="11" x2="14" y2="17" />
+                </svg>
                 Reset
               </button>
-            </div>
+            )}
           </div>
 
-          {/* Export Action Buttons Row */}
+          {/* Vertically Stacked Scrollable Container for Pages */}
+          <div
+            ref={pagesContainerRef}
+            aria-label="Generated Notes Pages Preview"
+            style={{
+              width: "100%",
+              maxHeight: "750px",
+              overflowY: "auto",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "24px",
+              padding: "16px 0",
+              boxSizing: "border-box",
+            }}
+          >
+            {pages.map((page, index) => (
+              <div
+                key={index}
+                data-page-index={index}
+                style={{
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+                  borderRadius: "4px",
+                  backgroundColor: "#ffffff",
+                  flexShrink: 0,
+                }}
+              >
+                <A4Page
+                  data={{
+                    chapter: notesResult.chapter,
+                    items: page.items,
+                    isOverflow: page.isOverflow,
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Download PNG Button Row (Placed Below the Container) */}
           <div
             className={`${styles.downloadRow} no-print`}
             style={{
               width: "100%",
-              maxWidth: "210mm",
-              marginBottom: "24px",
-              justifyContent: "flex-start",
-              gap: "12px",
-              flexWrap: "wrap",
-            }}
-          >
-            <button
-              type="button"
-              className={`${styles.downloadBtn} neu-raised`}
-              disabled={isExportingPng}
-              onClick={handleDownloadPng}
-              title="Download current page as PNG"
-            >
-              <img src={downloadIcon} alt="" aria-hidden="true" className={styles.downloadIcon} />
-              {isExportingPng
-                ? "Exporting PNG..."
-                : isDownloaded
-                ? "✓ Downloaded!"
-                : "Download Page as PNG"}
-            </button>
-
-            <button
-              type="button"
-              className={`${styles.downloadBtn} neu-raised`}
-              disabled={isPrinting}
-              onClick={handlePrintAll}
-              title={isPrinting ? "Preparing print document..." : "Print or export all document pages as PDF"}
-            >
-              {isPrinting ? "Preparing print..." : "Print / Export All Pages"}
-            </button>
-          </div>
-
-          {/* Scaled Preview Wrapper */}
-          <div
-            style={{
-              width: "100%",
+              marginTop: "24px",
               display: "flex",
               justifyContent: "center",
-              transform: `scale(${zoom})`,
-              transformOrigin: "top center",
-              transition: "transform 0.15s ease-out",
-              marginBottom: zoom > 1 ? `${(zoom - 1) * 297}mm` : 0,
             }}
           >
-            <div ref={pageRef}>
-              <A4Page data={pageData} />
-            </div>
+            <button
+              type="button"
+              className={styles.downloadBtn}
+              disabled={isExportingPng}
+              onClick={handleDownloadPng}
+              title="Download PNG"
+            >
+              <div className={styles.downloadBtnLeft}>
+                <img src={downloadIcon} alt="" aria-hidden="true" className={styles.downloadIcon} />
+                <span>
+                  {isExportingPng
+                    ? "Exporting PNG..."
+                    : isDownloaded
+                    ? "✓ Downloaded!"
+                    : "Download PNG"}
+                </span>
+              </div>
+              <span className={styles.convertBtnArrowBadge} aria-hidden="true">
+                ➔
+              </span>
+            </button>
           </div>
-        </div>
-      )}
-
-      {/* Temporary Print Container for Exporting All Pages */}
-      {isPrinting && notesResult && (
-        <div className="print-only-container">
-          {pages.map((p, index) => (
-            <div key={index} className="print-page-wrapper">
-              <A4Page
-                data={{
-                  chapter: notesResult.chapter,
-                  items: p.items,
-                  isOverflow: p.isOverflow,
-                }}
-              />
-            </div>
-          ))}
         </div>
       )}
     </>
