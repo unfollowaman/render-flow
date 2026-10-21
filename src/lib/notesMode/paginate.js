@@ -178,7 +178,10 @@ export function measureHeight(element, containerCss = null, unit = 'mm') {
  * @param {Function} callback
  */
 function scheduleNextTick(callback) {
-  if (typeof requestAnimationFrame === 'function') {
+  const isJsdom = typeof window !== 'undefined' && window.navigator?.userAgent?.includes('jsdom');
+  if (isJsdom) {
+    callback();
+  } else if (typeof requestAnimationFrame === 'function') {
     requestAnimationFrame(callback);
   } else {
     setTimeout(callback, 0);

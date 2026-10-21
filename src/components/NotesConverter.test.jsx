@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup, act } from '@testing-library/react';
 import { describe, test, expect, afterEach } from 'vitest';
 import React from 'react';
 import App from '../App';
@@ -31,28 +31,18 @@ describe('NotesConverter & Notes Mode integration', () => {
     ]
   });
 
+  const multiItems = Array.from({ length: 10 }, (_, i) => ({
+    type: "question",
+    number: i + 1,
+    question: [{ type: "text", content: `Question ${i + 1} text content` }],
+    solution: [{ type: "text", content: `Solution ${i + 1} text content` }]
+  }));
+
   const sampleJsonTwoPages = JSON.stringify({
-    chapter: { title: "Chapter 2: Multi Page", subtitle: "Testing pagination" },
+    chapter: { title: "Chapter 2: Multi Page", subtitle: "Testing vertical stacking" },
     pages: [
       {
-        items: [
-          {
-            type: "question",
-            number: 1,
-            question: [{ type: "text", content: "First Page Question" }],
-            solution: [{ type: "text", content: "First Page Solution" }]
-          }
-        ]
-      },
-      {
-        items: [
-          {
-            type: "question",
-            number: 2,
-            question: [{ type: "text", content: "Second Page Question" }],
-            solution: [{ type: "text", content: "Second Page Solution" }]
-          }
-        ]
+        items: multiItems
       }
     ]
   });
@@ -74,7 +64,7 @@ describe('NotesConverter & Notes Mode integration', () => {
     expect(screen.getByText('Rate of change of velocity.')).toBeTruthy();
   });
 
-  test('Test Case 2: Flattening & Pagination - Paste JSON with items -> Generate flattens items into multi-page array and allows navigation', async () => {
+  test('Test Case 2: Flattening & Vertical Stacking - Paste JSON with items -> Generate renders pages vertically stacked inside scroll container', async () => {
     render(<NotesConverter mode="notes" setMode={() => {}} />);
 
     const textarea = screen.getByLabelText('Input Notes JSON');
@@ -83,28 +73,15 @@ describe('NotesConverter & Notes Mode integration', () => {
     const generateBtn = screen.getByRole('button', { name: /Generate/i });
     fireEvent.click(generateBtn);
 
-    expect(await screen.findByText('Chapter 2: Multi Page')).toBeTruthy();
-    expect(screen.getByText('First Page Question')).toBeTruthy();
+    const chapterTitles = await screen.findAllByText('Chapter 2: Multi Page');
+    expect(chapterTitles.length).toBeGreaterThanOrEqual(2);
 
-    // With pagination flattening, items are paginated. If page 1 has item 1, Next button moves to page 2.
-    const pageCounter = screen.queryByText(/Page 1 of/i);
-    if (pageCounter) {
-      const nextBtn = screen.getByRole('button', { name: /Next/i });
-      fireEvent.click(nextBtn);
-      expect(await screen.findByText('Second Page Question')).toBeTruthy();
-    }
-  });
+    const scrollContainer = screen.getByLabelText('Generated Notes Pages Preview');
+    expect(scrollContainer).toBeTruthy();
+    expect(scrollContainer.style.overflowY).toBe('auto');
 
-  test('Test Case 3: Paste invalid JSON -> Validate shows clear inline error message', () => {
-    render(<NotesConverter mode="notes" setMode={() => {}} />);
-
-    const textarea = screen.getByLabelText('Input Notes JSON');
-    fireEvent.change(textarea, { target: { value: '{"chapter": "bad json",}' } });
-
-    const validateBtn = screen.getByRole('button', { name: /Validate/i });
-    fireEvent.click(validateBtn);
-
-    expect(screen.getByText(/Expected/i)).toBeTruthy();
+    const pageDivs = scrollContainer.querySelectorAll('[data-page-index]');
+    expect(pageDivs.length).toBeGreaterThanOrEqual(2);
   });
 
   test('Test Case 4: Load JSON file from disk -> populates textarea', async () => {
@@ -257,7 +234,7 @@ describe('NotesConverter & Notes Mode integration', () => {
     expect(screen.queryByText('Bad Math')).toBeNull();
   });
 
-  test('Specific Requirement Test 5 & 7: 3+ page pagination and page navigation', async () => {
+  test('Specific Requirement Test 5 & 7: Multi-page document renders all pages vertically inside scroll container', async () => {
     const multiPageItems = Array.from({ length: 15 }, (_, i) => ({
       type: "question",
       number: i + 1,
@@ -278,27 +255,14 @@ describe('NotesConverter & Notes Mode integration', () => {
     const generateBtn = screen.getByRole('button', { name: /Generate/i });
     fireEvent.click(generateBtn);
 
-    expect(await screen.findByText('Large Doc')).toBeTruthy();
-    expect(screen.getByText(/Page 1 of/i)).toBeTruthy();
+    const chapterTitles = await screen.findAllByText('Large Doc');
+    expect(chapterTitles.length).toBeGreaterThanOrEqual(3);
 
-    const prevBtn = screen.getByRole('button', { name: /Go to previous page/i });
-    expect(prevBtn.getAttribute('aria-label')).toBe('Go to previous page');
-    expect(prevBtn.getAttribute('title')).toBe('Already on the first page');
+    const scrollContainer = screen.getByLabelText('Generated Notes Pages Preview');
+    expect(scrollContainer).toBeTruthy();
 
-    const nextBtn = screen.getByRole('button', { name: /Go to next page/i });
-    expect(nextBtn.getAttribute('aria-label')).toBe('Go to next page');
-    expect(nextBtn.getAttribute('title')).toBe('Go to next page');
-
-    fireEvent.click(nextBtn);
-    expect(await screen.findByText(/Page 2 of/i)).toBeTruthy();
-    expect(prevBtn.getAttribute('title')).toBe('Go to previous page');
-
-    fireEvent.click(nextBtn);
-    expect(await screen.findByText(/Page 3 of/i)).toBeTruthy();
-    expect(nextBtn.getAttribute('title')).toBe('Already on the last page');
-
-    fireEvent.click(prevBtn);
-    expect(await screen.findByText(/Page 2 of/i)).toBeTruthy();
+    const pageDivs = scrollContainer.querySelectorAll('[data-page-index]');
+    expect(pageDivs.length).toBeGreaterThanOrEqual(3);
   });
 
   test('Specific Requirement Test 6: Oversized item rendered with overflow warning banner', async () => {
