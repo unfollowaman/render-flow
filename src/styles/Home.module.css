@@ -906,11 +906,20 @@
   border-radius: 100px;
 }
 
+.previewContainer {
+  background: #ffffff;
+  border: 1.5px solid rgba(1, 43, 27, 0.1);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(1, 43, 27, 0.04);
+}
+
 .previewWrapper {
   border-radius: 12px;
   overflow: hidden;
   border: none;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .checkerBg {
@@ -921,7 +930,7 @@
     linear-gradient(-45deg, transparent 75%, #e8e8ea 75%);
   background-size: 16px 16px;
   background-position: 0 0, 0 8px, 8px -8px, -8px 0;
-  background-color: #f5f5f7;
+  background-color: #ffffff;
   padding: 0;
   display: flex;
   justify-content: center;
@@ -938,37 +947,57 @@
 
 /* ── DOWNLOAD ROW ────────────────────────────── */
 .downloadRow {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  width: 100%;
 }
 
 .downloadBtn {
+  width: 100%;
+  height: 58px;
+  color: #ffffff;
   font-family: 'Montserrat', sans-serif;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 800;
-  color: #012b1b;
-  padding: 12px 28px;
-  border-radius: 10px;
+  letter-spacing: -0.01em;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #ffaa00 0%, #ff7700 100%);
+  border: 1px solid #e06c00;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.15s;
+  justify-content: space-between;
+  padding: 0 16px 0 24px;
+  box-shadow:
+    0 8px 20px rgba(255, 136, 0, 0.35),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.downloadBtn:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--neu-raised-shadow-hover), 0 0 0 1px rgba(0, 0, 0, 0.15);
+.downloadBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 24px rgba(255, 136, 0, 0.45),
+    0 4px 8px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .downloadBtn:focus-visible {
-  outline: 2px solid #ffa100;
+  outline: 3px solid #ffaa00;
   outline-offset: 3px;
 }
 
-.downloadBtn:active {
+.downloadBtn:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(255, 136, 0, 0.3);
+}
+
+.downloadBtnLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 auto;
 }
 
 .downloadIcon {
@@ -977,39 +1006,46 @@
   object-fit: contain;
 }
 
-.downloadHint {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  color: #9aa39e;
+.downloadBtn:hover .convertBtnArrowBadge {
+  transform: translateX(2px);
 }
 
 .resetBtn {
   font-family: 'Montserrat', sans-serif;
-  font-size: 14px;
-  font-weight: 800;
-  color: #e53e3e;
-  padding: 12px 28px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #dc2626;
+  background: #ffffff;
+  border: 1.5px solid rgba(220, 38, 38, 0.25);
+  padding: 6px 14px;
   border-radius: 10px;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  margin-left: auto;
-  transition: all 0.15s;
+  gap: 6px;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .resetBtn:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--neu-raised-shadow-hover), 0 0 0 1px rgba(0, 0, 0, 0.15);
+  background: rgba(220, 38, 38, 0.05);
+  border-color: rgba(220, 38, 38, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.1);
 }
 
 .resetBtn:focus-visible {
-  outline: 2px solid #ffa100;
-  outline-offset: 3px;
+  outline: 2px solid #dc2626;
+  outline-offset: 2px;
 }
 
 .resetBtn:active {
   transform: translateY(0);
+}
+
+.resetIcon {
+  color: #dc2626;
+  flex-shrink: 0;
 }
 
 /* ── FULLSCREEN OVERLAY ──────────────────────── */
