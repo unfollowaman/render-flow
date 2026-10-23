@@ -35,7 +35,7 @@ export function ErrorCard({ error }) {
               className={`${styles.sampleBtn} neu-raised`}
               style={{ padding: "4px 8px", fontSize: "12px", flexShrink: 0 }}
               onClick={handleCopy}
-              aria-label="Copy error details to clipboard"
+              aria-label={isCopied ? "Error details copied to clipboard" : "Copy error details to clipboard"}
               title="Copy error details to clipboard"
             >
               {isCopied ? "✓ Copied!" : "Copy error"}
