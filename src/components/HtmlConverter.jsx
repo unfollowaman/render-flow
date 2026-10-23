@@ -39,7 +39,7 @@ const HtmlConverter = forwardRef(function HtmlConverter(
       />
       {error && <ErrorCard error={error} />}
       {result && (
-        <OutputCard result={result} ref={outputRef} onReset={onReset} />
+        <OutputCard result={result} ref={outputRef} onReset={onReset} mode={mode} />
       )}
     </>
   );

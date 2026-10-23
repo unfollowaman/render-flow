@@ -33,7 +33,7 @@ const MermaidConverter = forwardRef(function MermaidConverter(
       />
       {mermaidError && <ErrorCard error={mermaidError} />}
       {mermaidResult && (
-        <OutputCard result={mermaidResult} ref={outputRef} onReset={onReset} />
+        <OutputCard result={mermaidResult} ref={outputRef} onReset={onReset} mode={mode} />
       )}
     </>
   );

@@ -35,7 +35,7 @@ const LatexConverter = forwardRef(function LatexConverter(
       />
       {latexError && <ErrorCard error={latexError} />}
       {latexResult && (
-        <OutputCard result={latexResult} ref={outputRef} onReset={onReset} />
+        <OutputCard result={latexResult} ref={outputRef} onReset={onReset} mode={mode} />
       )}
     </>
   );
