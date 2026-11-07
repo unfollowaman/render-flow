@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import { useHtmlToPngConversion, waitForFontsAndImages } from './useHtmlToPngConversion'
+import { useHtmlToPngConversion, waitForFontsAndImages, DEFAULT_VIEWPORT_WIDTH } from './useHtmlToPngConversion'
 
 vi.mock('html-to-image', () => ({
   toPng: vi.fn().mockResolvedValue('data:image/png;base64,fake')
@@ -117,11 +117,100 @@ describe('useHtmlToPngConversion conversion loop without artificial macro-task d
 
     expect(result.current.result).toEqual({
       image: 'data:image/png;base64,fake',
-      width: 0,
+      width: 1200,
       height: 0
     })
     expect(result.current.loading).toBe(false)
     expect(result.current.error).toBeNull()
+  })
+
+  it('exports DEFAULT_VIEWPORT_WIDTH set to 1200', () => {
+    expect(DEFAULT_VIEWPORT_WIDTH).toBe(1200)
+  })
+
+  it('applies explicit dimensions when specified in HTML/CSS', async () => {
+    const outputRef = { current: { scrollIntoView: vi.fn() } }
+    const { result } = renderHook(() => useHtmlToPngConversion({ outputRef }))
+
+    const origCreateElement = document.createElement.bind(document)
+    vi.spyOn(document, 'createElement').mockImplementation((tagName, options) => {
+      const el = origCreateElement(tagName, options)
+      if (tagName.toLowerCase() === 'iframe') {
+        const fakeDoc = {
+          open: vi.fn(),
+          close: vi.fn(),
+          write: vi.fn(),
+          readyState: 'complete',
+          body: document.createElement('body'),
+          documentElement: document.createElement('html'),
+          images: [],
+          fonts: { ready: Promise.resolve() }
+        }
+        Object.defineProperty(el, 'contentDocument', {
+          get: () => fakeDoc,
+          configurable: true
+        })
+        Object.defineProperty(el, 'contentWindow', {
+          get: () => ({ document: fakeDoc }),
+          configurable: true
+        })
+      }
+      return el
+    })
+
+    await act(async () => {
+      await result.current.handleConvert("<body style='width: 800px; height: 600px;'>Content</body>")
+    })
+
+    expect(result.current.result).toEqual({
+      image: 'data:image/png;base64,fake',
+      width: 800,
+      height: 600
+    })
+  })
+
+  it('expands finalWidth when content scrollWidth exceeds default viewport', async () => {
+    const outputRef = { current: { scrollIntoView: vi.fn() } }
+    const { result } = renderHook(() => useHtmlToPngConversion({ outputRef }))
+
+    const origCreateElement = document.createElement.bind(document)
+    vi.spyOn(document, 'createElement').mockImplementation((tagName, options) => {
+      const el = origCreateElement(tagName, options)
+      if (tagName.toLowerCase() === 'iframe') {
+        const fakeDoc = {
+          open: vi.fn(),
+          close: vi.fn(),
+          write: vi.fn(),
+          readyState: 'complete',
+          body: document.createElement('body'),
+          documentElement: {
+            get scrollWidth() { return 1600 },
+            get scrollHeight() { return 900 }
+          },
+          images: [],
+          fonts: { ready: Promise.resolve() }
+        }
+        Object.defineProperty(el, 'contentDocument', {
+          get: () => fakeDoc,
+          configurable: true
+        })
+        Object.defineProperty(el, 'contentWindow', {
+          get: () => ({ document: fakeDoc }),
+          configurable: true
+        })
+      }
+      return el
+    })
+
+    await act(async () => {
+      await result.current.handleConvert('<table>Wide content</table>')
+    })
+
+    expect(result.current.result).toEqual({
+      image: 'data:image/png;base64,fake',
+      width: 1600,
+      height: 900
+    })
   })
 })
 

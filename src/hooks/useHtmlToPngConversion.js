@@ -6,8 +6,10 @@ import { runIfLatest } from '../utils/requestHelpers.js'
 
 const BODY_WIDTH_REGEX = /(?:body|html)\s*(?:\/\*.*?\*\/\s*)*\{[^}]*?width:\s*(\d+)px/i
 const BODY_HEIGHT_REGEX = /(?:body|html)\s*(?:\/\*.*?\*\/\s*)*\{[^}]*?height:\s*(\d+)px/i
-const INLINE_WIDTH_REGEX = /<(?:body|html)[^>]*style="[^"]*width:\s*(\d+)px/i
-const INLINE_HEIGHT_REGEX = /<(?:body|html)[^>]*style="[^"]*height:\s*(\d+)px/i
+const INLINE_WIDTH_REGEX = /<(?:body|html)[^>]*style=["'][^"']*width:\s*(\d+)px/i
+const INLINE_HEIGHT_REGEX = /<(?:body|html)[^>]*style=["'][^"']*height:\s*(\d+)px/i
+
+export const DEFAULT_VIEWPORT_WIDTH = 1200;
 
 function extractDimensions(html) {
   const bodyWidthMatch = html.match(BODY_WIDTH_REGEX)
@@ -124,6 +126,13 @@ export function useHtmlToPngConversion({ outputRef }) {
     // Create a hidden iframe to render the HTML in isolation
     const iframe = createIsolatedIframe()
 
+    const { width: explicitWidth, height: explicitHeight } = extractDimensions(htmlToConvert)
+    const initialViewportWidth = explicitWidth !== null ? explicitWidth : DEFAULT_VIEWPORT_WIDTH
+    iframe.style.width = initialViewportWidth + 'px'
+    if (explicitHeight !== null) {
+      iframe.style.height = explicitHeight + 'px'
+    }
+
     document.body.appendChild(iframe)
 
     try {
@@ -167,9 +176,7 @@ export function useHtmlToPngConversion({ outputRef }) {
       const scrollWidth = iframe.contentDocument.documentElement.scrollWidth
       const scrollHeight = iframe.contentDocument.documentElement.scrollHeight
 
-      const { width: explicitWidth, height: explicitHeight } = extractDimensions(htmlToConvert)
-
-      const finalWidth = explicitWidth !== null ? explicitWidth : scrollWidth
+      const finalWidth = explicitWidth !== null ? explicitWidth : Math.max(initialViewportWidth, scrollWidth)
       const finalHeight = explicitHeight !== null ? explicitHeight : scrollHeight
 
       const totalArea = finalWidth * finalHeight
