@@ -66,6 +66,7 @@ export function useLatexToPngConversion({ outputRef }) {
       const iframe = createIsolatedIframe();
 
       document.body.appendChild(iframe);
+      console.log('[DIAGNOSTIC] iframe appended to body. Total iframes in body:', document.querySelectorAll('iframe').length);
 
       const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
       iframeDoc.open();
@@ -110,6 +111,7 @@ export function useLatexToPngConversion({ outputRef }) {
       }
 
       // Wait a tick for fonts/layout
+      console.log('[DIAGNOSTIC] Checking font readiness in iframe');
       await new Promise(resolve => setTimeout(resolve, 0));
       if (iframeDoc.fonts && iframeDoc.fonts.ready) {
          await iframeDoc.fonts.ready;
@@ -153,6 +155,7 @@ export function useLatexToPngConversion({ outputRef }) {
               pixelRatio: DPI_SCALE
           });
       } finally {
+        console.log('[DIAGNOSTIC] In inner finally (toBlob): Total iframes in document.body:', document.querySelectorAll('iframe').length);
           document.body.removeChild(iframe);
       }
 
@@ -169,10 +172,13 @@ export function useLatexToPngConversion({ outputRef }) {
         }, 100);
       });
     } catch (err) {
+      console.log('[DIAGNOSTIC] Caught error in catch block:', err.message);
+      console.log('[DIAGNOSTIC] In catch block: Total iframes remaining in document.body:', document.querySelectorAll('iframe').length);
       runIfLatest(myRequestId, latestRequestIdRef, () => {
         setError(err.message || 'An error occurred during conversion.');
       });
     } finally {
+      console.log('[DIAGNOSTIC] In outer finally: Total iframes remaining in document.body:', document.querySelectorAll('iframe').length);
       runIfLatest(myRequestId, latestRequestIdRef, () => {
         setLoading(false);
       });
