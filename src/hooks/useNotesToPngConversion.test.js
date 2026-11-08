@@ -229,7 +229,7 @@ describe('useNotesToPngConversion extracted helper functions', () => {
       expect(flattenPagesItems([])).toEqual([]);
     });
 
-    test('flattens pages items preserving explicit IDs and generating missing IDs', () => {
+    test('flattens pages items preserving explicit IDs and generating missing IDs and sequential question numbers', () => {
       const pages = [
         {
           items: [
@@ -246,9 +246,26 @@ describe('useNotesToPngConversion extracted helper functions', () => {
 
       const res = flattenPagesItems(pages);
       expect(res).toEqual([
-        { id: 'custom-1', question: 'Q1' },
-        { id: 'item-2', question: 'Q2' },
-        { id: 'item-3', question: 'Q3' }
+        { id: 'custom-1', question: 'Q1', number: 1 },
+        { id: 'item-2', question: 'Q2', number: 2 },
+        { id: 'item-3', question: 'Q3', number: 3 }
+      ]);
+    });
+
+    test('flattens pages items preserving explicit item.number if provided', () => {
+      const pages = [
+        {
+          items: [
+            { id: 'custom-1', question: 'Q1', number: 10 },
+            { question: 'Q2', number: '2a' }
+          ]
+        }
+      ];
+
+      const res = flattenPagesItems(pages);
+      expect(res).toEqual([
+        { id: 'custom-1', question: 'Q1', number: 10 },
+        { id: 'item-2', question: 'Q2', number: '2a' }
       ]);
     });
   });

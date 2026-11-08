@@ -293,4 +293,41 @@ describe('NotesConverter & Notes Mode integration', () => {
 
     expect(await screen.findByText('Content too large to fit within a single page in this phase')).toBeTruthy();
   });
+
+  test('Multi-page document with omitted question numbers renders sequential question numbers across pages without resetting', async () => {
+    const multiItemsNoNumbers = Array.from({ length: 12 }, (_, i) => ({
+      type: "question",
+      question: [{ type: "text", content: `Question ${i + 1} content text` }],
+      solution: [{ type: "text", content: `Solution ${i + 1} content text` }]
+    }));
+
+    const sampleDocNoNumbers = JSON.stringify({
+      chapter: { title: "Chapter Auto Number", subtitle: "Testing auto numbering" },
+      pages: [
+        { items: multiItemsNoNumbers.slice(0, 6) },
+        { items: multiItemsNoNumbers.slice(6) }
+      ]
+    });
+
+    render(<NotesConverter mode="notes" setMode={() => {}} />);
+
+    const textarea = screen.getByLabelText('Input Notes JSON');
+    fireEvent.change(textarea, { target: { value: sampleDocNoNumbers } });
+
+    const generateBtn = screen.getByRole('button', { name: /Generate/i });
+    fireEvent.click(generateBtn);
+
+    expect(await screen.findByText('Question 1 content text')).toBeTruthy();
+    expect(screen.getByText('Question 11 content text')).toBeTruthy();
+    expect(screen.getByText('Question 12 content text')).toBeTruthy();
+
+    const scrollContainer = screen.getByLabelText('Generated Notes Pages Preview');
+    const pageDivs = scrollContainer.querySelectorAll('[data-page-index]');
+    expect(pageDivs.length).toBeGreaterThanOrEqual(2);
+
+    // Page 2 should have sequential badges (e.g. 11, 12), NOT reset to 1, 2
+    const page2 = pageDivs[1];
+    expect(page2.textContent).toContain('11');
+    expect(page2.textContent).toContain('12');
+  });
 });

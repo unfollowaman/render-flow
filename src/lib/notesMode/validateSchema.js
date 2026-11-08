@@ -97,8 +97,8 @@ function validateItem(item, itemPath, errors) {
  * Validates a "question" item (Phase 1).
  */
 function validateQuestionItem(item, itemPath, errors) {
-  if (item.number === undefined || item.number === null || (typeof item.number !== 'number' && typeof item.number !== 'string')) {
-    errors.push({ path: `${itemPath}.number`, message: 'Field "number" is required and must be a number or string' });
+  if (item.number !== undefined && item.number !== null && typeof item.number !== 'number' && typeof item.number !== 'string') {
+    errors.push({ path: `${itemPath}.number`, message: 'Field "number" must be a number or string' });
   }
 
   // Question content array

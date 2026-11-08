@@ -67,7 +67,8 @@ export function flattenPagesItems(pages) {
           itemCounter += 1;
           flattenedItems.push({
             ...item,
-            id: item.id || `item-${itemCounter}`
+            id: item.id || `item-${itemCounter}`,
+            number: item.number !== undefined ? item.number : itemCounter
           });
         }
       }

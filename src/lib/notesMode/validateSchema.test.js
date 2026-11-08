@@ -28,6 +28,52 @@ describe('validateNotesJson', () => {
     expect(result.errors).toEqual([]);
   });
 
+  test('A question item omitting explicit number passes validation with valid: true', () => {
+    const validDocWithoutNumber = {
+      chapter: {
+        title: 'Chapter 1: Kinematics',
+        subtitle: 'Motion in One Dimension'
+      },
+      pages: [
+        {
+          items: [
+            {
+              type: 'question',
+              question: [{ type: 'text', content: 'What is speed?' }],
+              solution: [{ type: 'text', content: 'Scalar rate of motion.' }]
+            }
+          ]
+        }
+      ]
+    };
+
+    const result = validateNotesJson(validDocWithoutNumber);
+    expect(result.valid).toBe(true);
+    expect(result.errors).toEqual([]);
+  });
+
+  test('A question item with invalid number type fails validation', () => {
+    const invalidDoc = {
+      chapter: { title: 'Chapter 1', subtitle: 'Subtitle' },
+      pages: [
+        {
+          items: [
+            {
+              type: 'question',
+              number: { invalid: true },
+              question: [{ type: 'text', content: 'What is speed?' }],
+              solution: [{ type: 'text', content: 'Scalar rate of motion.' }]
+            }
+          ]
+        }
+      ]
+    };
+
+    const result = validateNotesJson(invalidDoc);
+    expect(result.valid).toBe(false);
+    expect(result.errors[0].path).toBe('pages[0].items[0].number');
+  });
+
   // Test Case 2: A document missing chapter.title fails with a specific error path pointing at "chapter.title".
   test('Test Case 2: A document missing chapter.title fails with a specific error path pointing at "chapter.title"', () => {
     const invalidDoc = {
