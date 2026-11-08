@@ -21,6 +21,9 @@ vi.mock('html-to-image', () => ({
 describe('useLatexToPngConversion', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    if (!globalThis.URL.createObjectURL) {
+      globalThis.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
+    }
   });
 
   it('calls katex.renderToString with trust: false', async () => {
@@ -106,7 +109,20 @@ describe('useLatexToPngConversion', () => {
     expect(result.current.result).toBeNull();
   });
 
-  it('demonstrates iframe leak when an error occurs before toBlob (e.g. stylesheet query failure)', async () => {
+  it('cleans up iframe from document.body on successful conversion', async () => {
+    const outputRef = { current: { scrollIntoView: vi.fn() } };
+    const { result } = renderHook(() => useLatexToPngConversion({ outputRef }));
+
+    await act(async () => {
+      await result.current.handleConvert('E = mc^2');
+    });
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.result).not.toBeNull();
+    expect(document.querySelectorAll('iframe').length).toBe(0);
+  });
+
+  it('cleans up iframe from document.body when an error occurs before toBlob (e.g. stylesheet query failure)', async () => {
     const outputRef = { current: { scrollIntoView: vi.fn() } };
     const { result } = renderHook(() => useLatexToPngConversion({ outputRef }));
 
@@ -123,17 +139,15 @@ describe('useLatexToPngConversion', () => {
         await result.current.handleConvert('x^2 + y^2 = z^2');
       });
 
-      const leakedIframes = document.querySelectorAll('iframe');
-      console.log('[TEST REPRODUCTION 1] Leaked iframes in DOM after error:', leakedIframes.length);
       expect(result.current.error).toBe('Simulated stylesheet query failure');
-      expect(leakedIframes.length).toBe(1); // PROVES THE BUG: IFRAME WAS LEAKED!
+      expect(document.querySelectorAll('iframe').length).toBe(0);
     } finally {
       document.querySelectorAll = originalQuerySelectorAll;
       document.querySelectorAll('iframe').forEach(el => el.remove());
     }
   });
 
-  it('demonstrates iframe leak when fonts.ready rejects', async () => {
+  it('cleans up iframe from document.body when fonts.ready rejects', async () => {
     const outputRef = { current: { scrollIntoView: vi.fn() } };
     const { result } = renderHook(() => useLatexToPngConversion({ outputRef }));
 
@@ -142,10 +156,13 @@ describe('useLatexToPngConversion', () => {
       const res = origAppendChild.call(document.body, node);
       if (node.tagName === 'IFRAME') {
         const doc = node.contentDocument || node.contentWindow.document;
+        const rejectedPromise = Promise.reject(new Error('Font readiness failed: network timeout'));
+        // Prevent Vitest unhandled rejection noise in node environment
+        rejectedPromise.catch(() => {});
         Object.defineProperty(doc, 'fonts', {
           configurable: true,
           get: () => ({
-            ready: Promise.reject(new Error('Font readiness failed: network timeout'))
+            ready: rejectedPromise
           })
         });
       }
@@ -157,10 +174,42 @@ describe('useLatexToPngConversion', () => {
         await result.current.handleConvert('\\int_0^\\infty e^{-x^2} dx');
       });
 
-      const leakedIframes = document.querySelectorAll('iframe');
-      console.log('[TEST REPRODUCTION 2] Leaked iframes when fonts.ready rejects:', leakedIframes.length);
       expect(result.current.error).toBe('Font readiness failed: network timeout');
-      expect(leakedIframes.length).toBe(1); // PROVES THE BUG: IFRAME WAS LEAKED!
+      expect(document.querySelectorAll('iframe').length).toBe(0);
+    } finally {
+      document.body.appendChild.mockRestore();
+      document.querySelectorAll('iframe').forEach(el => el.remove());
+    }
+  });
+
+  it('cleans up iframe from document.body when formula exceeds maximum canvas size guardrail', async () => {
+    const outputRef = { current: { scrollIntoView: vi.fn() } };
+    const { result } = renderHook(() => useLatexToPngConversion({ outputRef }));
+
+    const origAppendChild = document.body.appendChild;
+    vi.spyOn(document.body, 'appendChild').mockImplementation(function (node) {
+      const res = origAppendChild.call(document.body, node);
+      if (node.tagName === 'IFRAME') {
+        const doc = node.contentDocument || node.contentWindow.document;
+        const origGetElementById = doc.getElementById.bind(doc);
+        doc.getElementById = (id) => {
+          const el = origGetElementById(id);
+          if (el && id === 'latex-container') {
+            el.getBoundingClientRect = () => ({ width: 20000, height: 20000 });
+          }
+          return el;
+        };
+      }
+      return res;
+    });
+
+    try {
+      await act(async () => {
+        await result.current.handleConvert('\\Huge x');
+      });
+
+      expect(result.current.error).toContain('Formula is too large to render');
+      expect(document.querySelectorAll('iframe').length).toBe(0);
     } finally {
       document.body.appendChild.mockRestore();
       document.querySelectorAll('iframe').forEach(el => el.remove());

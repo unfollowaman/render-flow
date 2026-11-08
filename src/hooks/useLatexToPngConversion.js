@@ -64,13 +64,12 @@ export function useLatexToPngConversion({ outputRef }) {
       // Create offscreen container via isolated iframe to prevent html-to-image from
       // traversing cross-origin stylesheets (like Google Fonts) and throwing SecurityErrors.
       const iframe = createIsolatedIframe();
-
       document.body.appendChild(iframe);
-      console.log('[DIAGNOSTIC] iframe appended to body. Total iframes in body:', document.querySelectorAll('iframe').length);
 
-      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-      iframeDoc.open();
-      iframeDoc.write(`
+      try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(`
         <!DOCTYPE html>
         <html>
         <head>
@@ -82,103 +81,97 @@ export function useLatexToPngConversion({ outputRef }) {
         </body>
         </html>
       `);
-      iframeDoc.close();
+        iframeDoc.close();
 
-      const container = iframeDoc.getElementById('latex-container');
+        const container = iframeDoc.getElementById('latex-container');
 
-      // Copy local styles into iframe, avoiding Google Fonts
-      const loadPromises = [];
-      const styles = document.querySelectorAll('style, link[rel="stylesheet"]');
-      styles.forEach(el => {
-        if (el.tagName.toLowerCase() === 'link' && el.href.includes('fonts.googleapis.com')) return;
+        // Copy local styles into iframe, avoiding Google Fonts
+        const loadPromises = [];
+        const styles = document.querySelectorAll('style, link[rel="stylesheet"]');
+        styles.forEach(el => {
+          if (el.tagName.toLowerCase() === 'link' && el.href.includes('fonts.googleapis.com')) return;
 
-        const clone = el.cloneNode(true);
-        if (clone.tagName.toLowerCase() === 'link') {
-          loadPromises.push(new Promise((resolve) => {
-            clone.onload = resolve;
-            clone.onerror = resolve; // Ignore errors, just move on
-          }));
+          const clone = el.cloneNode(true);
+          if (clone.tagName.toLowerCase() === 'link') {
+            loadPromises.push(new Promise((resolve) => {
+              clone.onload = resolve;
+              clone.onerror = resolve; // Ignore errors, just move on
+            }));
+          }
+          iframeDoc.head.appendChild(clone);
+        });
+
+        if (loadPromises.length > 0) {
+          // Wait for all stylesheet links to load, with a 2-second timeout
+          await Promise.race([
+            Promise.all(loadPromises),
+            new Promise(resolve => setTimeout(resolve, 2000))
+          ]);
         }
-        iframeDoc.head.appendChild(clone);
-      });
 
-      if (loadPromises.length > 0) {
-        // Wait for all stylesheet links to load, with a 2-second timeout
-        await Promise.race([
-          Promise.all(loadPromises),
-          new Promise(resolve => setTimeout(resolve, 2000))
-        ]);
-      }
+        // Wait a tick for fonts/layout
+        await new Promise(resolve => setTimeout(resolve, 0));
+        const fontsReady = iframeDoc.fonts?.ready;
+        if (fontsReady) {
+          await fontsReady;
+        }
 
-      // Wait a tick for fonts/layout
-      console.log('[DIAGNOSTIC] Checking font readiness in iframe');
-      await new Promise(resolve => setTimeout(resolve, 0));
-      if (iframeDoc.fonts && iframeDoc.fonts.ready) {
-         await iframeDoc.fonts.ready;
-      }
+        const rect = container.getBoundingClientRect();
+        let intrinsicWidth = Math.ceil(rect.width);
+        let intrinsicHeight = Math.ceil(rect.height);
 
-      const rect = container.getBoundingClientRect();
-      let intrinsicWidth = Math.ceil(rect.width);
-      let intrinsicHeight = Math.ceil(rect.height);
+        if (!intrinsicWidth || !intrinsicHeight || isNaN(intrinsicWidth) || isNaN(intrinsicHeight)) {
+          intrinsicWidth = 800;
+          intrinsicHeight = 200;
+        }
 
-      if (!intrinsicWidth || !intrinsicHeight || isNaN(intrinsicWidth) || isNaN(intrinsicHeight)) {
-        intrinsicWidth = 800;
-        intrinsicHeight = 200;
-      }
+        if (myRequestId !== latestRequestIdRef.current) {
+          return;
+        }
 
-      if (myRequestId !== latestRequestIdRef.current) {
-         document.body.removeChild(iframe);
-         return;
-      }
+        const DPI_SCALE = 2; // Matches previous behavior via canvasToBlob
+        const finalWidth = intrinsicWidth * DPI_SCALE;
+        const finalHeight = intrinsicHeight * DPI_SCALE;
 
-      const DPI_SCALE = 2; // Matches previous behavior via canvasToBlob
-      const finalWidth = intrinsicWidth * DPI_SCALE;
-      const finalHeight = intrinsicHeight * DPI_SCALE;
-
-      if (finalWidth * finalHeight > 200000000) {
-          document.body.removeChild(iframe);
+        if (finalWidth * finalHeight > 200000000) {
           throw new Error('Formula is too large to render (exceeds maximum canvas size). Try simplifying the expression or breaking it into smaller parts.');
-      }
+        }
 
-      // Use html-to-image
-      let blob;
-      try {
-          const { toBlob } = await import('html-to-image');
-          blob = await toBlob(container, {
-              width: intrinsicWidth,
-              height: intrinsicHeight,
-              style: {
-                  margin: '0',
-                  padding: '0'
-              },
-              backgroundColor: '#ffffff',
-              pixelRatio: DPI_SCALE
-          });
-      } finally {
-        console.log('[DIAGNOSTIC] In inner finally (toBlob): Total iframes in document.body:', document.querySelectorAll('iframe').length);
-          document.body.removeChild(iframe);
-      }
+        // Use html-to-image
+        const { toBlob } = await import('html-to-image');
+        const blob = await toBlob(container, {
+          width: intrinsicWidth,
+          height: intrinsicHeight,
+          style: {
+            margin: '0',
+            padding: '0'
+          },
+          backgroundColor: '#ffffff',
+          pixelRatio: DPI_SCALE
+        });
 
-      if (!blob) {
+        if (!blob) {
           throw new Error('Failed to create PNG blob.');
+        }
+
+        resultObjectUrl = URL.createObjectURL(blob);
+
+        runIfLatest(myRequestId, latestRequestIdRef, () => {
+          setResult({ image: resultObjectUrl, width: finalWidth, height: finalHeight });
+          setTimeout(() => {
+            outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
+        });
+      } finally {
+        if (iframe.parentNode) {
+          iframe.parentNode.removeChild(iframe);
+        }
       }
-
-      resultObjectUrl = URL.createObjectURL(blob);
-
-      runIfLatest(myRequestId, latestRequestIdRef, () => {
-        setResult({ image: resultObjectUrl, width: finalWidth, height: finalHeight });
-        setTimeout(() => {
-          outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-      });
     } catch (err) {
-      console.log('[DIAGNOSTIC] Caught error in catch block:', err.message);
-      console.log('[DIAGNOSTIC] In catch block: Total iframes remaining in document.body:', document.querySelectorAll('iframe').length);
       runIfLatest(myRequestId, latestRequestIdRef, () => {
         setError(err.message || 'An error occurred during conversion.');
       });
     } finally {
-      console.log('[DIAGNOSTIC] In outer finally: Total iframes remaining in document.body:', document.querySelectorAll('iframe').length);
       runIfLatest(myRequestId, latestRequestIdRef, () => {
         setLoading(false);
       });
