@@ -1,0 +1,835 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 920 720"
+  width="100%"
+  height="100%"
+  preserveAspectRatio="xMidYMid meet"
+>
+  <defs>
+    <!-- ========================================== -->
+    <!-- SHADOW & LIGHTING FILTERS                  -->
+    <!-- ========================================== -->
+
+    <!-- Soft ambient & directional shadow for the Dark JSON Editor Window -->
+    <filter id="editor-shadow" x="-20%" y="-20%" width="145%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#090B0E" flood-opacity="0.34" />
+      <feDropShadow dx="-4" dy="6" stdDeviation="7" flood-color="#000000" flood-opacity="0.22" />
+    </filter>
+
+    <!-- Floating 3D shadow for the White Notes Preview Panel -->
+    <filter id="notes-shadow" x="-25%" y="-20%" width="150%" height="155%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="-8" dy="16" stdDeviation="16" flood-color="#0B0E14" flood-opacity="0.28" />
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#1E242B" flood-opacity="0.14" />
+    </filter>
+
+    <!-- Dimensional shadow for the Curved Transformation Arrow -->
+    <filter id="arrow-shadow" x="-25%" y="-25%" width="155%" height="155%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="-2" dy="8" stdDeviation="6" flood-color="#080A0D" flood-opacity="0.38" />
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#7A4100" flood-opacity="0.22" />
+    </filter>
+
+    <!-- Soft shadow for Window Controls & Bullets -->
+    <filter id="control-shadow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="2.5" stdDeviation="2" flood-color="#000000" flood-opacity="0.42" />
+    </filter>
+
+    <!-- Soft shadow for Golden Bullet Points -->
+    <filter id="bullet-shadow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="2.5" stdDeviation="2" flood-color="#8C5800" flood-opacity="0.28" />
+    </filter>
+
+    <!-- Subtle depth shadow for Code & Heading Typography -->
+    <filter id="text-shadow" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.45" />
+    </filter>
+
+    <!-- Subtle shadow for Decorative Rays -->
+    <filter id="ray-shadow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#A86500" flood-opacity="0.20" />
+    </filter>
+
+    <!-- Soft Gaussian blur for inner 3D rim highlights -->
+    <filter id="soft-highlight" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.2" />
+    </filter>
+
+    <!-- ========================================== -->
+    <!-- JSON CODE EDITOR GRADIENTS & CLIPS         -->
+    <!-- ========================================== -->
+
+    <!-- Outer 3D rim gradient for dark window -->
+    <linearGradient id="editor-outer-rim" x1="0%" y1="0%" x2="15%" y2="100%">
+      <stop offset="0%" stop-color="#585E68" />
+      <stop offset="12%" stop-color="#393D45" />
+      <stop offset="85%" stop-color="#1A1D22" />
+      <stop offset="100%" stop-color="#0F1114" />
+    </linearGradient>
+
+    <!-- Main charcoal-to-black body gradient -->
+    <linearGradient id="editor-body-grad" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#272B31" />
+      <stop offset="45%" stop-color="#202429" />
+      <stop offset="100%" stop-color="#16191D" />
+    </linearGradient>
+
+    <!-- Slightly lighter top title bar gradient -->
+    <linearGradient id="editor-header-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3B4048" />
+      <stop offset="25%" stop-color="#31353C" />
+      <stop offset="100%" stop-color="#292D33" />
+    </linearGradient>
+
+    <!-- Top glossy rim reflection on editor -->
+    <linearGradient id="editor-top-gloss" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.32" />
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.14" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.24" />
+    </linearGradient>
+
+    <!-- Window Control: Red (#FF5545) -->
+    <radialGradient id="btn-red-grad" cx="35%" cy="28%" r="70%" fx="32%" fy="25%">
+      <stop offset="0%" stop-color="#FF7B6B" />
+      <stop offset="45%" stop-color="#FF5545" />
+      <stop offset="88%" stop-color="#E03122" />
+      <stop offset="100%" stop-color="#B81F12" />
+    </radialGradient>
+
+    <!-- Window Control: Yellow (#FFC52E) -->
+    <radialGradient id="btn-yellow-grad" cx="35%" cy="28%" r="70%" fx="32%" fy="25%">
+      <stop offset="0%" stop-color="#FFE36E" />
+      <stop offset="45%" stop-color="#FFC52E" />
+      <stop offset="88%" stop-color="#EAA000" />
+      <stop offset="100%" stop-color="#C47D00" />
+    </radialGradient>
+
+    <!-- Window Control: Green (#68D947) -->
+    <radialGradient id="btn-green-grad" cx="35%" cy="28%" r="70%" fx="32%" fy="25%">
+      <stop offset="0%" stop-color="#8FF26D" />
+      <stop offset="45%" stop-color="#68D947" />
+      <stop offset="88%" stop-color="#32B317" />
+      <stop offset="100%" stop-color="#1E8A08" />
+    </radialGradient>
+
+    <!-- JSON Syntax Highlighting: Golden-Yellow / Orange Gradient -->
+    <linearGradient id="json-syntax-gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFCC33" />
+      <stop offset="55%" stop-color="#FFB11A" />
+      <stop offset="100%" stop-color="#F2910A" />
+    </linearGradient>
+
+    <!-- JSON Braces & Punctuation: Crisp Warm White Gradient -->
+    <linearGradient id="json-syntax-white" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#DCE2EA" />
+    </linearGradient>
+
+    <!-- Clip Path for Dark Editor Interior -->
+    <clipPath id="editor-inner-clip">
+      <rect x="49" y="104" width="516" height="404" rx="44" ry="44" />
+    </clipPath>
+
+    <!-- ========================================== -->
+    <!-- TRANSFORMATION ARROW & RAYS GRADIENTS      -->
+    <!-- ========================================== -->
+
+    <!-- 3D Lower Bevel / Extrusion of the Arrow -->
+    <linearGradient id="arrow-bevel-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E58E00" />
+      <stop offset="50%" stop-color="#D47600" />
+      <stop offset="100%" stop-color="#B85D00" />
+    </linearGradient>
+
+    <!-- Main Arrow Body Gradient (Golden-Yellow to Warm Orange) -->
+    <linearGradient id="arrow-body-grad" x1="10%" y1="5%" x2="90%" y2="95%">
+      <stop offset="0%" stop-color="#FFE03B" />
+      <stop offset="42%" stop-color="#FFC014" />
+      <stop offset="82%" stop-color="#FF9E00" />
+      <stop offset="100%" stop-color="#F08300" />
+    </linearGradient>
+
+    <!-- Glossy Top Highlight on the Arrow -->
+    <linearGradient id="arrow-highlight-grad" x1="0%" y1="0%" x2="100%" y2="60%">
+      <stop offset="0%" stop-color="#FFF7AD" stop-opacity="0.9" />
+      <stop offset="55%" stop-color="#FFE866" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#FFC414" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Decorative Rays Gradient -->
+    <linearGradient id="ray-grad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#FFD426" />
+      <stop offset="60%" stop-color="#FFB30A" />
+      <stop offset="100%" stop-color="#F59300" />
+    </linearGradient>
+
+    <!-- ========================================== -->
+    <!-- NOTES PREVIEW PANEL GRADIENTS & CLIPS      -->
+    <!-- ========================================== -->
+
+    <!-- Outer Silver-Gray 3D Border Frame -->
+    <linearGradient id="notes-outer-border" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#D0D5DC" />
+      <stop offset="35%" stop-color="#9FA5AE" />
+      <stop offset="75%" stop-color="#7D838C" />
+      <stop offset="100%" stop-color="#636972" />
+    </linearGradient>
+
+    <!-- Inner White Bevel Rim -->
+    <linearGradient id="notes-inner-rim" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="75%" stop-color="#F5F7FA" />
+      <stop offset="100%" stop-color="#D5D9E0" />
+    </linearGradient>
+
+    <!-- Main White-to-Light-Gray Card Surface -->
+    <linearGradient id="notes-surface-grad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="55%" stop-color="#F7F8FA" />
+      <stop offset="100%" stop-color="#EAECEF" />
+    </linearGradient>
+
+    <!-- Top Golden-Yellow Header Strip Gradient -->
+    <linearGradient id="notes-header-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE854" />
+      <stop offset="28%" stop-color="#FFCA14" />
+      <stop offset="85%" stop-color="#F9AF00" />
+      <stop offset="100%" stop-color="#E59600" />
+    </linearGradient>
+
+    <!-- Header Strip Upper Glossy Highlight -->
+    <linearGradient id="notes-header-gloss" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.85" />
+      <stop offset="15%" stop-color="#FFFBE0" stop-opacity="0.92" />
+      <stop offset="50%" stop-color="#FFF5B8" stop-opacity="0.55" />
+      <stop offset="85%" stop-color="#FFFBE0" stop-opacity="0.90" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.80" />
+    </linearGradient>
+
+    <!-- Deep Forest Green (#003B2A) Heading Gradient -->
+    <linearGradient id="notes-heading-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#054230" />
+      <stop offset="50%" stop-color="#003B2A" />
+      <stop offset="100%" stop-color="#002419" />
+    </linearGradient>
+
+    <!-- Golden-Yellow Circular Bullet 3D Radial Gradient -->
+    <radialGradient id="bullet-gold-grad" cx="34%" cy="28%" r="72%" fx="30%" fy="24%">
+      <stop offset="0%" stop-color="#FFF282" />
+      <stop offset="38%" stop-color="#FFD026" />
+      <stop offset="80%" stop-color="#F7A400" />
+      <stop offset="100%" stop-color="#D97E00" />
+    </radialGradient>
+
+    <!-- Horizontal Note Placeholder Bar Gradient (Light-to-Dark Gray) -->
+    <linearGradient id="note-bar-grad-1" x1="0%" y1="20%" x2="100%" y2="80%">
+      <stop offset="0%" stop-color="#BDBFC4" />
+      <stop offset="55%" stop-color="#9A9EA5" />
+      <stop offset="100%" stop-color="#767A82" />
+    </linearGradient>
+
+    <linearGradient id="note-bar-grad-2" x1="0%" y1="20%" x2="100%" y2="80%">
+      <stop offset="0%" stop-color="#BFC1C6" />
+      <stop offset="55%" stop-color="#9C9FA6" />
+      <stop offset="100%" stop-color="#797D85" />
+    </linearGradient>
+
+    <linearGradient id="note-bar-grad-3" x1="0%" y1="20%" x2="100%" y2="80%">
+      <stop offset="0%" stop-color="#C0C2C7" />
+      <stop offset="55%" stop-color="#9EA2A9" />
+      <stop offset="100%" stop-color="#7C8088" />
+    </linearGradient>
+
+    <!-- Subtle top bevel shadow on placeholder bars -->
+    <linearGradient id="note-bar-rim" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6E727A" stop-opacity="0.35" />
+      <stop offset="25%" stop-color="#FFFFFF" stop-opacity="0" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.45" />
+    </linearGradient>
+
+    <!-- Clip Path for the Notes Card Interior -->
+    <clipPath id="notes-inner-clip">
+      <rect x="442" y="302" width="400" height="332" rx="41" ry="41" />
+    </clipPath>
+  </defs>
+
+  <!-- ================================================================= -->
+  <!-- 1. JSON CODE EDITOR WINDOW (LEFT)                                 -->
+  <!-- ================================================================= -->
+  <g id="json-code-editor">
+    <!-- Outer 3D Body with Drop Shadow -->
+    <rect
+      id="editor-outer-shell"
+      x="45"
+      y="100"
+      width="524"
+      height="414"
+      rx="48"
+      ry="48"
+      fill="url(#editor-outer-rim)"
+      filter="url(#editor-shadow)"
+    />
+
+    <!-- Bottom 3D Lip / Dark Base Bevel -->
+    <rect
+      id="editor-bottom-bevel"
+      x="47"
+      y="106"
+      width="520"
+      height="406"
+      rx="46"
+      ry="46"
+      fill="#111317"
+    />
+
+    <!-- Main Editor Charcoal Surface + Header (Clipped to Rounded Silhouette) -->
+    <g clip-path="url(#editor-inner-clip)">
+      <!-- Charcoal-to-Black Code Area Background -->
+      <rect
+        id="editor-code-bg"
+        x="49"
+        y="104"
+        width="516"
+        height="404"
+        fill="url(#editor-body-grad)"
+      />
+
+      <!-- Slightly Lighter Top Title Bar -->
+      <rect
+        id="editor-title-bar"
+        x="49"
+        y="104"
+        width="516"
+        height="74"
+        fill="url(#editor-header-grad)"
+      />
+
+      <!-- Subtle Divider Line Between Title Bar and Code Area -->
+      <line
+        id="editor-header-divider-dark"
+        x1="49"
+        y1="178"
+        x2="565"
+        y2="178"
+        stroke="#181B20"
+        stroke-width="2"
+      />
+      <line
+        id="editor-header-divider-highlight"
+        x1="49"
+        y1="180"
+        x2="565"
+        y2="180"
+        stroke="#363B42"
+        stroke-width="1"
+        stroke-opacity="0.6"
+      />
+
+      <!-- Subtle Specular Top Edge Highlight -->
+      <path
+        id="editor-top-highlight"
+        d="M 92 106 L 522 106"
+        stroke="url(#editor-top-gloss)"
+        stroke-width="3"
+        stroke-linecap="round"
+        filter="url(#soft-highlight)"
+      />
+
+      <!-- Subtle Left & Bottom Inner Rim Vignette -->
+      <rect
+        id="editor-inner-vignette"
+        x="50.5"
+        y="105.5"
+        width="513"
+        height="401"
+        rx="42.5"
+        ry="42.5"
+        fill="none"
+        stroke="#FFFFFF"
+        stroke-width="1.5"
+        stroke-opacity="0.08"
+      />
+    </g>
+
+    <!-- Three Circular Window Controls -->
+    <g id="editor-window-controls" filter="url(#control-shadow)">
+      <!-- Red Control (#FF5545) -->
+      <g id="control-red">
+        <circle cx="98" cy="142" r="19" fill="url(#btn-red-grad)" />
+        <ellipse
+          cx="92"
+          cy="134"
+          rx="8"
+          ry="4.5"
+          transform="rotate(-22 92 134)"
+          fill="#FFA396"
+          fill-opacity="0.55"
+        />
+        <circle
+          cx="98"
+          cy="142"
+          r="18.2"
+          fill="none"
+          stroke="#FFFFFF"
+          stroke-width="0.8"
+          stroke-opacity="0.25"
+        />
+      </g>
+
+      <!-- Yellow Control (#FFC52E) -->
+      <g id="control-yellow">
+        <circle cx="152" cy="142" r="19" fill="url(#btn-yellow-grad)" />
+        <ellipse
+          cx="146"
+          cy="134"
+          rx="8"
+          ry="4.5"
+          transform="rotate(-22 146 134)"
+          fill="#FFF3A8"
+          fill-opacity="0.65"
+        />
+        <circle
+          cx="152"
+          cy="142"
+          r="18.2"
+          fill="none"
+          stroke="#FFFFFF"
+          stroke-width="0.8"
+          stroke-opacity="0.28"
+        />
+      </g>
+
+      <!-- Green Control (#68D947) -->
+      <g id="control-green">
+        <circle cx="206" cy="142" r="19" fill="url(#btn-green-grad)" />
+        <ellipse
+          cx="200"
+          cy="134"
+          rx="8"
+          ry="4.5"
+          transform="rotate(-22 200 134)"
+          fill="#B8FF9E"
+          fill-opacity="0.58"
+        />
+        <circle
+          cx="206"
+          cy="142"
+          r="18.2"
+          fill="none"
+          stroke="#FFFFFF"
+          stroke-width="0.8"
+          stroke-opacity="0.25"
+        />
+      </g>
+    </g>
+
+    <!-- JSON Code Content -->
+    <g
+      id="json-code-text"
+      font-family="ui-monospace, 'SFMono-Regular', 'JetBrains Mono', 'Fira Code', 'Roboto Mono', Menlo, Consolas, monospace"
+      font-size="37"
+      font-weight="700"
+      filter="url(#text-shadow)"
+    >
+      <!-- Opening Brace -->
+      <text x="92" y="246" fill="url(#json-syntax-white)">{</text>
+
+      <!-- Line 1: "title": "Notes", -->
+      <text x="120" y="304">
+        <tspan fill="url(#json-syntax-gold)">"title"</tspan><tspan fill="url(#json-syntax-white)">: </tspan><tspan fill="url(#json-syntax-gold)">"Notes"</tspan><tspan fill="url(#json-syntax-white)">,</tspan>
+      </text>
+
+      <!-- Line 2: "content": "..." -->
+      <text x="120" y="362">
+        <tspan fill="url(#json-syntax-gold)">"content"</tspan><tspan fill="url(#json-syntax-white)">: </tspan><tspan fill="url(#json-syntax-gold)" letter-spacing="2">"..."</tspan>
+      </text>
+
+      <!-- Closing Brace -->
+      <text x="92" y="420" fill="url(#json-syntax-white)">}</text>
+    </g>
+  </g>
+
+  <!-- ================================================================= -->
+  <!-- 2. DECORATIVE RAYS ANCHORED TO TOP-RIGHT CORNER OF NOTES PANEL    -->
+  <!-- ================================================================= -->
+  <g id="decorative-rays" filter="url(#ray-shadow)" transform="translate(801, 338)">
+    <!-- Ray 1: Nearly Vertical, Tilted Slightly Outward (11 deg) -->
+    <g id="ray-1-vertical" transform="rotate(11)">
+      <path
+        id="ray-left"
+        d="M 0 -55
+           C -2.8 -55, -4.6 -56.8, -5.0 -59.8
+           L -9.2 -95.5
+           C -10.0 -102.2, -5.4 -107.0, 0 -107.0
+           C 5.4 -107.0, 10.0 -102.2, 9.2 -95.5
+           L 5.0 -59.8
+           C 4.6 -56.8, 2.8 -55, 0 -55 Z"
+        fill="url(#ray-grad)"
+      />
+      <path
+        d="M -1.5 -102.5 C -4.8 -102.0, -6.2 -98.5, -5.6 -93.5 L -2.4 -63.0"
+        fill="none"
+        stroke="#FFF394"
+        stroke-width="2.8"
+        stroke-linecap="round"
+        stroke-opacity="0.72"
+      />
+    </g>
+
+    <!-- Ray 2: Diagonal, Approximately 45 Degrees Outward (41 deg) -->
+    <g id="ray-2-diagonal" transform="rotate(41)">
+      <path
+        id="ray-middle"
+        d="M 0 -55
+           C -2.8 -55, -4.6 -56.8, -5.0 -59.8
+           L -9.2 -95.5
+           C -10.0 -102.2, -5.4 -107.0, 0 -107.0
+           C 5.4 -107.0, 10.0 -102.2, 9.2 -95.5
+           L 5.0 -59.8
+           C 4.6 -56.8, 2.8 -55, 0 -55 Z"
+        fill="url(#ray-grad)"
+      />
+      <path
+        d="M -1.5 -102.5 C -4.8 -102.0, -6.2 -98.5, -5.6 -93.5 L -2.4 -63.0"
+        fill="none"
+        stroke="#FFF394"
+        stroke-width="2.8"
+        stroke-linecap="round"
+        stroke-opacity="0.72"
+      />
+    </g>
+
+    <!-- Ray 3: More Horizontal, Tilted Outward (71 deg) -->
+    <g id="ray-3-horizontal" transform="rotate(71)">
+      <path
+        id="ray-right"
+        d="M 0 -55
+           C -2.8 -55, -4.6 -56.8, -5.0 -59.8
+           L -9.2 -95.5
+           C -10.0 -102.2, -5.4 -107.0, 0 -107.0
+           C 5.4 -107.0, 10.0 -102.2, 9.2 -95.5
+           L 5.0 -59.8
+           C 4.6 -56.8, 2.8 -55, 0 -55 Z"
+        fill="url(#ray-grad)"
+      />
+      <path
+        d="M -1.5 -102.5 C -4.8 -102.0, -6.2 -98.5, -5.6 -93.5 L -2.4 -63.0"
+        fill="none"
+        stroke="#FFF394"
+        stroke-width="2.8"
+        stroke-linecap="round"
+        stroke-opacity="0.72"
+      />
+    </g>
+  </g>
+
+  <!-- ================================================================= -->
+  <!-- 3. FLOATING NOTES PREVIEW PANEL (RIGHT)                           -->
+  <!-- ================================================================= -->
+  <g id="notes-preview-panel">
+    <!-- Outer Silver-Gray 3D Frame with Realistic Ambient Drop Shadow -->
+    <rect
+      id="notes-outer-card"
+      x="436"
+      y="296"
+      width="412"
+      height="344"
+      rx="46"
+      ry="46"
+      fill="url(#notes-outer-border)"
+      filter="url(#notes-shadow)"
+    />
+
+    <!-- Fine Inner Bright Bevel Rim for 3D Elevation -->
+    <rect
+      id="notes-bevel-rim"
+      x="439.5"
+      y="299.5"
+      width="405"
+      height="337"
+      rx="43"
+      ry="43"
+      fill="url(#notes-inner-rim)"
+    />
+
+    <!-- Clipped Interior: Surface + Golden Header Strip -->
+    <g clip-path="url(#notes-inner-clip)">
+      <!-- Main White-to-Light-Gray Card Body -->
+      <rect
+        id="notes-body-surface"
+        x="442"
+        y="302"
+        width="400"
+        height="332"
+        fill="url(#notes-surface-grad)"
+      />
+
+      <!-- Top Golden-Yellow Horizontal Header Strip -->
+      <rect
+        id="notes-yellow-header"
+        x="442"
+        y="302"
+        width="400"
+        height="45"
+        fill="url(#notes-header-grad)"
+      />
+
+      <!-- Subtle Warm Divider Line Under Yellow Header -->
+      <line
+        id="notes-header-bottom-edge"
+        x1="442"
+        y1="347"
+        x2="842"
+        y2="347"
+        stroke="#DF9400"
+        stroke-width="1.5"
+        stroke-opacity="0.55"
+      />
+
+      <!-- Bright Glossy Highlight Along Upper Edge of Yellow Header -->
+      <path
+        id="notes-header-top-highlight"
+        d="M 462 308 C 520 305, 764 305, 822 308"
+        fill="none"
+        stroke="url(#notes-header-gloss)"
+        stroke-width="5.5"
+        stroke-linecap="round"
+        filter="url(#soft-highlight)"
+      />
+
+      <!-- Crisp Specular Rim Along Left/Top Curve of Header -->
+      <path
+        id="notes-header-rim-shine"
+        d="M 448 332 C 450 314, 464 305, 486 305 L 798 305 C 820 305, 834 314, 836 332"
+        fill="none"
+        stroke="#FFFFFF"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-opacity="0.65"
+      />
+
+      <!-- Subtle Inner Rim Shadow Along Bottom of Card for 3D Cushion Effect -->
+      <path
+        id="notes-bottom-inner-shading"
+        d="M 446 592 C 446 618, 464 631, 488 631 L 796 631 C 820 631, 838 618, 838 592"
+        fill="none"
+        stroke="#D0D5DD"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-opacity="0.6"
+      />
+    </g>
+
+    <!-- Fine Outer Glossy Border Outline -->
+    <rect
+      id="notes-border-outline"
+      x="436.5"
+      y="296.5"
+      width="411"
+      height="343"
+      rx="45.5"
+      ry="45.5"
+      fill="none"
+      stroke="#7A8089"
+      stroke-width="1"
+      stroke-opacity="0.55"
+    />
+
+    <!-- Main Heading: "Notes" in Deep Forest Green (#003B2A) -->
+    <text
+      id="notes-heading"
+      x="486"
+      y="414"
+      font-family="system-ui, -apple-system, 'Segoe UI', 'Plus Jakarta Sans', 'Inter', Roboto, Helvetica, Arial, sans-serif"
+      font-size="56"
+      font-weight="900"
+      letter-spacing="-0.8"
+      fill="url(#notes-heading-grad)"
+    >Notes</text>
+
+    <!-- Three Formatted Note / List Rows -->
+    <g id="notes-list-rows">
+      <!-- Row 1: Bullet + Longest Gray Bar -->
+      <g id="note-row-1">
+        <g id="bullet-1" filter="url(#bullet-shadow)">
+          <circle cx="506" cy="466" r="15.5" fill="url(#bullet-gold-grad)" />
+          <ellipse
+            cx="501"
+            cy="459.5"
+            rx="6.5"
+            ry="3.6"
+            transform="rotate(-24 501 459.5)"
+            fill="#FFF9B8"
+            fill-opacity="0.75"
+          />
+        </g>
+        <rect
+          id="bar-1"
+          x="544"
+          y="454"
+          width="248"
+          height="24"
+          rx="12"
+          ry="12"
+          fill="url(#note-bar-grad-1)"
+        />
+        <rect
+          x="544.5"
+          y="454.5"
+          width="247"
+          height="23"
+          rx="11.5"
+          ry="11.5"
+          fill="none"
+          stroke="url(#note-bar-rim)"
+          stroke-width="1"
+        />
+      </g>
+
+      <!-- Row 2: Bullet + Medium-Long Gray Bar -->
+      <g id="note-row-2">
+        <g id="bullet-2" filter="url(#bullet-shadow)">
+          <circle cx="506" cy="520" r="15.5" fill="url(#bullet-gold-grad)" />
+          <ellipse
+            cx="501"
+            cy="513.5"
+            rx="6.5"
+            ry="3.6"
+            transform="rotate(-24 501 513.5)"
+            fill="#FFF9B8"
+            fill-opacity="0.75"
+          />
+        </g>
+        <rect
+          id="bar-2"
+          x="544"
+          y="508"
+          width="238"
+          height="24"
+          rx="12"
+          ry="12"
+          fill="url(#note-bar-grad-2)"
+        />
+        <rect
+          x="544.5"
+          y="508.5"
+          width="237"
+          height="23"
+          rx="11.5"
+          ry="11.5"
+          fill="none"
+          stroke="url(#note-bar-rim)"
+          stroke-width="1"
+        />
+      </g>
+
+      <!-- Row 3: Bullet + Slightly Shorter Gray Bar -->
+      <g id="note-row-3">
+        <g id="bullet-3" filter="url(#bullet-shadow)">
+          <circle cx="506" cy="574" r="15.5" fill="url(#bullet-gold-grad)" />
+          <ellipse
+            cx="501"
+            cy="567.5"
+            rx="6.5"
+            ry="3.6"
+            transform="rotate(-24 501 567.5)"
+            fill="#FFF9B8"
+            fill-opacity="0.75"
+          />
+        </g>
+        <rect
+          id="bar-3"
+          x="544"
+          y="562"
+          width="184"
+          height="24"
+          rx="12"
+          ry="12"
+          fill="url(#note-bar-grad-3)"
+        />
+        <rect
+          x="544.5"
+          y="562.5"
+          width="183"
+          height="23"
+          rx="11.5"
+          ry="11.5"
+          fill="none"
+          stroke="url(#note-bar-rim)"
+          stroke-width="1"
+        />
+      </g>
+    </g>
+  </g>
+
+  <!-- ================================================================= -->
+  <!-- 4. CURVED GOLDEN-YELLOW TRANSFORMATION ARROW                      -->
+  <!-- ================================================================= -->
+  <g id="transformation-arrow" filter="url(#arrow-shadow)">
+    <!-- 3D Lower Extrusion / Amber Bevel Layer -->
+    <path
+      id="arrow-3d-extrusion"
+      d="M 284 438
+         C 282 431, 290 428, 294 435
+         C 310 472, 336 492, 380 494
+         L 377 475
+         C 376 467, 384 463, 391 468
+         L 441 510
+         C 447 515, 447 522, 440 527
+         L 388 567
+         C 381 572, 373 567, 375 559
+         L 379 540
+         C 320 537, 291 498, 284 438 Z"
+      fill="url(#arrow-bevel-grad)"
+    />
+
+    <!-- Main Golden-Yellow Sculpted Arrow Silhouette -->
+    <path
+      id="arrow-main-surface"
+      d="M 284 434
+         C 283 427, 291 425, 294 432
+         C 311 468, 337 487, 381 489
+         L 378 470
+         C 377 462, 385 458, 392 464
+         L 440 505
+         C 446 510, 446 517, 439 522
+         L 388 561
+         C 381 566, 374 561, 376 553
+         L 380 534
+         C 322 531, 292 493, 284 434 Z"
+      fill="url(#arrow-body-grad)"
+    />
+
+    <!-- Glossy Top Highlight Along the Inner Curve & Arrowhead -->
+    <path
+      id="arrow-top-gloss-curve"
+      d="M 290 436
+         C 307 472, 335 491, 384 492"
+      fill="none"
+      stroke="url(#arrow-highlight-grad)"
+      stroke-width="4.5"
+      stroke-linecap="round"
+    />
+
+    <!-- Glossy Highlight on Upper Wing of Arrowhead -->
+    <path
+      id="arrow-head-gloss"
+      d="M 384 467 L 435 510"
+      fill="none"
+      stroke="#FFF39E"
+      stroke-width="3.5"
+      stroke-linecap="round"
+      stroke-opacity="0.8"
+    />
+
+    <!-- Subtle Specular Highlight Along Outer Belly of the Curve -->
+    <path
+      id="arrow-belly-highlight"
+      d="M 289 452
+         C 299 498, 326 525, 375 529"
+      fill="none"
+      stroke="#FFE86E"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      stroke-opacity="0.55"
+    />
+  </g>
+</svg>

@@ -1,0 +1,527 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 720" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- ==========================================
+         SHADOW FILTERS
+         ========================================== -->
+    <!-- Soft 3D ambient + directional shadow for the Dark Code Editor -->
+    <filter id="editor-shadow" x="-12%" y="-10%" width="126%" height="132%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="-4" dy="18" stdDeviation="16" flood-color="#0B0D11" flood-opacity="0.34" result="drop1" />
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#0B0D11" flood-opacity="0.22" result="drop2" />
+      <feMerge>
+        <feMergeNode in="drop1" />
+        <feMergeNode in="drop2" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Soft 3D shadow for the White Equation Preview Card -->
+    <filter id="card-shadow" x="-14%" y="-12%" width="130%" height="136%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="-2" dy="18" stdDeviation="18" flood-color="#14181F" flood-opacity="0.16" result="cardDrop1" />
+      <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#14181F" flood-opacity="0.12" result="cardDrop2" />
+      <feMerge>
+        <feMergeNode in="cardDrop1" />
+        <feMergeNode in="cardDrop2" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Dimensional shadow for the Golden Transformation Arrow -->
+    <filter id="arrow-shadow" x="-20%" y="-20%" width="145%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="-2" dy="9" stdDeviation="7" flood-color="#0D0F14" flood-opacity="0.32" result="arrowDrop1" />
+      <feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#3D2200" flood-opacity="0.25" result="arrowDrop2" />
+      <feMerge>
+        <feMergeNode in="arrowDrop1" />
+        <feMergeNode in="arrowDrop2" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Subtle shadow for the top-right yellow accent rays (generous region to prevent clipping) -->
+    <filter id="rays-shadow" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="5" stdDeviation="4.5" flood-color="#6B4800" flood-opacity="0.20" />
+    </filter>
+
+    <!-- Subtle depth shadow for code syntax inside the dark editor -->
+    <filter id="code-shadow" x="-10%" y="-10%" width="120%" height="130%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#0E1014" flood-opacity="0.85" />
+    </filter>
+
+    <!-- Soft blur for 3D pillow bevel highlights -->
+    <filter id="soft-bevel-blur" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="3.5" />
+    </filter>
+
+    <filter id="card-pillow-blur" x="-8%" y="-8%" width="116%" height="116%">
+      <feGaussianBlur stdDeviation="4.5" />
+    </filter>
+
+    <!-- ==========================================
+         CODE EDITOR GRADIENTS & CLIPS
+         ========================================== -->
+    <clipPath id="editor-clip">
+      <rect x="32" y="82" width="584" height="413" rx="52" ry="52" />
+    </clipPath>
+
+    <clipPath id="titlebar-clip">
+      <rect x="32" y="82" width="584" height="98" />
+    </clipPath>
+
+    <!-- Main charcoal-to-black body gradient -->
+    <linearGradient id="editor-body-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#272A31" />
+      <stop offset="30%" stop-color="#21242B" />
+      <stop offset="85%" stop-color="#1B1E24" />
+      <stop offset="100%" stop-color="#14161B" />
+    </linearGradient>
+
+    <!-- Outer 3D rim gradient for editor -->
+    <linearGradient id="editor-outer-rim" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4A4F5C" />
+      <stop offset="22%" stop-color="#2F333C" />
+      <stop offset="85%" stop-color="#1B1D23" />
+      <stop offset="100%" stop-color="#0F1115" />
+    </linearGradient>
+
+    <!-- Slightly lighter top title bar gradient -->
+    <linearGradient id="titlebar-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3A3E48" />
+      <stop offset="28%" stop-color="#32363F" />
+      <stop offset="92%" stop-color="#2C3038" />
+      <stop offset="100%" stop-color="#252830" />
+    </linearGradient>
+
+    <!-- Top glossy rim highlight on title bar -->
+    <linearGradient id="titlebar-top-shine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#585E6B" stop-opacity="0.85" />
+      <stop offset="50%" stop-color="#3F444F" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#32363F" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Inner 3D clay cushion bevel for editor -->
+    <linearGradient id="editor-pillow-shine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#555B68" stop-opacity="0.55" />
+      <stop offset="25%" stop-color="#373B44" stop-opacity="0.2" />
+      <stop offset="85%" stop-color="#17191E" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#0C0E12" stop-opacity="0.7" />
+    </linearGradient>
+
+    <!-- ==========================================
+         TRAFFIC LIGHT BUTTON GRADIENTS
+         ========================================== -->
+    <!-- Red Button (#FF5545 base) -->
+    <radialGradient id="btn-red-grad" cx="35%" cy="30%" r="70%" fx="32%" fy="26%">
+      <stop offset="0%" stop-color="#FF7F70" />
+      <stop offset="38%" stop-color="#FF5545" />
+      <stop offset="82%" stop-color="#E63525" />
+      <stop offset="100%" stop-color="#C22215" />
+    </radialGradient>
+
+    <!-- Yellow Button (#FFC52E base) -->
+    <radialGradient id="btn-yellow-grad" cx="35%" cy="30%" r="70%" fx="32%" fy="26%">
+      <stop offset="0%" stop-color="#FFE37A" />
+      <stop offset="38%" stop-color="#FFC52E" />
+      <stop offset="82%" stop-color="#E8A205" />
+      <stop offset="100%" stop-color="#C48200" />
+    </radialGradient>
+
+    <!-- Green Button (#68D947 base) -->
+    <radialGradient id="btn-green-grad" cx="35%" cy="30%" r="70%" fx="32%" fy="26%">
+      <stop offset="0%" stop-color="#87F266" />
+      <stop offset="38%" stop-color="#52D936" />
+      <stop offset="82%" stop-color="#2EB817" />
+      <stop offset="100%" stop-color="#1E940B" />
+    </radialGradient>
+
+    <!-- Code Syntax Gradients -->
+    <linearGradient id="code-yellow-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFDF4A" />
+      <stop offset="55%" stop-color="#F7C325" />
+      <stop offset="100%" stop-color="#E0A510" />
+    </linearGradient>
+
+    <linearGradient id="code-white-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="65%" stop-color="#F1F4F8" />
+      <stop offset="100%" stop-color="#DAE0E8" />
+    </linearGradient>
+
+    <!-- ==========================================
+         WHITE EQUATION PREVIEW CARD GRADIENTS
+         ========================================== -->
+    <!-- Metallic silver-gray outer border gradient -->
+    <linearGradient id="card-border-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8D929B" />
+      <stop offset="50%" stop-color="#7E838C" />
+      <stop offset="100%" stop-color="#6B7078" />
+    </linearGradient>
+
+    <!-- Soft 3D inner cushion bevel -->
+    <linearGradient id="card-bevel-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#D2D6DC" />
+      <stop offset="15%" stop-color="#E5E8EC" />
+      <stop offset="85%" stop-color="#D8DCE2" />
+      <stop offset="100%" stop-color="#B8BDC6" />
+    </linearGradient>
+
+    <!-- Main porcelain white-to-light-gray face gradient -->
+    <linearGradient id="card-face-grad" x1="0%" y1="0%" x2="15%" y2="100%">
+      <stop offset="0%" stop-color="#FAFBFD" />
+      <stop offset="35%" stop-color="#F3F5F8" />
+      <stop offset="85%" stop-color="#EAECEF" />
+      <stop offset="100%" stop-color="#E2E5E9" />
+    </linearGradient>
+
+    <!-- Top-left glossy rim highlight on white card -->
+    <linearGradient id="card-gloss-rim" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
+      <stop offset="30%" stop-color="#FFFFFF" stop-opacity="0.55" />
+      <stop offset="85%" stop-color="#FFFFFF" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#CFD4DC" stop-opacity="0.6" />
+    </linearGradient>
+
+    <!-- Deep rich ink gradient for rendered equation -->
+    <linearGradient id="math-ink-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#111317" />
+      <stop offset="100%" stop-color="#040507" />
+    </linearGradient>
+
+    <!-- ==========================================
+         TRANSFORMATION ARROW & RAYS GRADIENTS
+         ========================================== -->
+    <!-- Golden-yellow primary body gradient (#FFD000 to #FF9F00) -->
+    <linearGradient id="arrow-body-grad" x1="15%" y1="10%" x2="85%" y2="90%">
+      <stop offset="0%" stop-color="#FFE135" />
+      <stop offset="35%" stop-color="#FFC800" />
+      <stop offset="78%" stop-color="#FFAC00" />
+      <stop offset="100%" stop-color="#F29400" />
+    </linearGradient>
+
+    <!-- 3D lower amber bevel/extrusion gradient for arrow and rays -->
+    <linearGradient id="arrow-depth-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E68A00" />
+      <stop offset="55%" stop-color="#D97A00" />
+      <stop offset="100%" stop-color="#BF6500" />
+    </linearGradient>
+
+    <!-- Bright glossy upper ridge highlight for arrow -->
+    <linearGradient id="arrow-highlight-grad" x1="0%" y1="0%" x2="90%" y2="80%">
+      <stop offset="0%" stop-color="#FFF49C" stop-opacity="0.95" />
+      <stop offset="50%" stop-color="#FFE352" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#FFC400" stop-opacity="0.2" />
+    </linearGradient>
+
+    <!-- Sparkle rays golden-yellow gradient -->
+    <linearGradient id="ray-gold-grad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#FFE03B" />
+      <stop offset="50%" stop-color="#FFC010" />
+      <stop offset="100%" stop-color="#F29700" />
+    </linearGradient>
+  </defs>
+
+  <!-- ============================================================
+       1. DARK CODE EDITOR WINDOW (LEFT)
+       ============================================================ -->
+  <g id="code-editor-window" filter="url(#editor-shadow)">
+    <!-- Outer 3D Base Silhouette -->
+    <rect x="32" y="82" width="584" height="413" rx="52" ry="52" fill="url(#editor-outer-rim)" />
+
+    <!-- Clipped Interior Content of Editor -->
+    <g clip-path="url(#editor-clip)">
+      <!-- Main Dark Charcoal Body -->
+      <rect x="34" y="84" width="580" height="407" rx="50" ry="50" fill="url(#editor-body-grad)" />
+
+      <!-- Soft 3D Pillow Inner Rim Shading around Main Body -->
+      <rect x="40" y="90" width="568" height="395" rx="45" ry="45" fill="none" stroke="url(#editor-pillow-shine)" stroke-width="8" filter="url(#soft-bevel-blur)" />
+
+      <!-- Bottom Dark 3D Lip Bevel -->
+      <path d="M 34 445 C 34 472, 56 492, 84 492 L 564 492 C 592 492, 614 472, 614 445 L 614 496 L 34 496 Z" fill="#101216" opacity="0.7" />
+
+      <!-- Lighter Top Title Bar -->
+      <g clip-path="url(#titlebar-clip)">
+        <rect x="32" y="82" width="584" height="98" fill="url(#titlebar-grad)" />
+        <!-- Soft 3D Dome Highlight along Top Curve of Title Bar -->
+        <path d="M 42 134 C 42 103, 62 87, 90 87 L 558 87 C 586 87, 606 103, 606 134" fill="none" stroke="url(#titlebar-top-shine)" stroke-width="7" stroke-linecap="round" filter="url(#soft-bevel-blur)" />
+      </g>
+
+      <!-- Title Bar Horizontal Divider Seam -->
+      <line x1="32" y1="179.5" x2="616" y2="179.5" stroke="#1E2127" stroke-width="2" />
+      <line x1="32" y1="181.5" x2="616" y2="181.5" stroke="#2D3139" stroke-width="1" opacity="0.65" />
+    </g>
+
+    <!-- Subtle Crisp Inner Rim Highlight -->
+    <rect x="34.5" y="84.5" width="579" height="408" rx="49.5" ry="49.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="1.5" />
+
+    <!-- ==========================================
+         WINDOW CONTROL BUTTONS (TRAFFIC LIGHTS)
+         ========================================== -->
+    <g id="window-controls">
+      <!-- Red Control (#FF5545) -->
+      <g id="control-red">
+        <circle cx="95" cy="135" r="22.5" fill="#17191E" opacity="0.7" />
+        <circle cx="95" cy="132" r="22" fill="url(#btn-red-grad)" />
+        <path d="M 79 124 A 18 18 0 0 1 108 117" fill="none" stroke="#FFA399" stroke-width="2" stroke-linecap="round" opacity="0.65" />
+      </g>
+
+      <!-- Yellow Control (#FFC52E) -->
+      <g id="control-yellow">
+        <circle cx="158" cy="135" r="22.5" fill="#17191E" opacity="0.7" />
+        <circle cx="158" cy="132" r="22" fill="url(#btn-yellow-grad)" />
+        <path d="M 142 124 A 18 18 0 0 1 171 117" fill="none" stroke="#FFF0A8" stroke-width="2" stroke-linecap="round" opacity="0.7" />
+      </g>
+
+      <!-- Green Control (#68D947) -->
+      <g id="control-green">
+        <circle cx="221" cy="135" r="22.5" fill="#17191E" opacity="0.7" />
+        <circle cx="221" cy="132" r="22" fill="url(#btn-green-grad)" />
+        <path d="M 205 124 A 18 18 0 0 1 234 117" fill="none" stroke="#B2FF9E" stroke-width="2" stroke-linecap="round" opacity="0.65" />
+      </g>
+    </g>
+
+    <!-- ==========================================
+         LATEX CODE EXPRESSION: \text{E = mc^2}
+         Rendered using clean, native SVG text elements
+         with monospaced font and syntax coloring.
+         ========================================== -->
+    <text x="92" y="304" font-family="Consolas, Monaco, 'Courier New', monospace" font-size="39" font-weight="600" letter-spacing="0.5" filter="url(#code-shadow)">
+      <tspan fill="url(#code-yellow-grad)">\text</tspan><tspan fill="url(#code-white-grad)">{E = mc^2}</tspan>
+    </text>
+  </g>
+
+  <!-- ============================================================
+       2. GOLDEN SPARKLE RAYS (ANCHORED TO CARD TOP-RIGHT CORNER)
+       Card top-right corner arc center is at (881, 372), radius 52.
+       Rays radiate from common origin (875, 368) with a uniform ~12px
+       gap outside the card's rounded border at 13°, 42°, and 71°.
+       ============================================================ -->
+  <g id="accent-rays" transform="translate(875, 368)" filter="url(#rays-shadow)">
+    <!-- Ray 1: Nearly vertical, slightly tilted outward (13°) -->
+    <g id="ray-1" transform="rotate(13)">
+      <!-- Orange dimensional shading base -->
+      <path d="M -5.2 -61.5 C -7.5 -75.5, -12.0 -96.5, -12.0 -105.0 C -12.0 -112.5, -6.5 -117.5, 0 -117.5 C 6.5 -117.5, 12.0 -112.5, 12.0 -105.0 C 12.0 -96.5, 7.5 -75.5, 5.2 -61.5 C 4.2 -56.0, -4.2 -56.0, -5.2 -61.5 Z" fill="url(#arrow-depth-grad)" transform="translate(0.8, 2.0)" />
+      <!-- Golden-yellow primary body -->
+      <path d="M -5.2 -61.5 C -7.5 -75.5, -12.0 -96.5, -12.0 -105.0 C -12.0 -112.5, -6.5 -117.5, 0 -117.5 C 6.5 -117.5, 12.0 -112.5, 12.0 -105.0 C 12.0 -96.5, 7.5 -75.5, 5.2 -61.5 C 4.2 -56.0, -4.2 -56.0, -5.2 -61.5 Z" fill="url(#ray-gold-grad)" />
+      <!-- Glossy highlight -->
+      <path d="M -2.5 -65.5 C -4.8 -77.5, -8.2 -95.5, -8.2 -104.0 C -8.2 -109.2, -4.5 -113.0, 0.5 -113.0" fill="none" stroke="#FFF39A" stroke-width="2.6" stroke-linecap="round" opacity="0.72" />
+    </g>
+
+    <!-- Ray 2: Diagonal, ~45 degrees outward (42°) -->
+    <g id="ray-2" transform="rotate(42)">
+      <!-- Orange dimensional shading base -->
+      <path d="M -5.2 -64.0 C -7.6 -78.5, -12.2 -100.5, -12.2 -109.0 C -12.2 -116.5, -6.6 -121.5, 0 -121.5 C 6.6 -121.5, 12.2 -116.5, 12.2 -109.0 C 12.2 -100.5, 7.6 -78.5, 5.2 -64.0 C 4.2 -58.5, -4.2 -58.5, -5.2 -64.0 Z" fill="url(#arrow-depth-grad)" transform="translate(1.4, 1.6)" />
+      <!-- Golden-yellow primary body -->
+      <path d="M -5.2 -64.0 C -7.6 -78.5, -12.2 -100.5, -12.2 -109.0 C -12.2 -116.5, -6.6 -121.5, 0 -121.5 C 6.6 -121.5, 12.2 -116.5, 12.2 -109.0 C 12.2 -100.5, 7.6 -78.5, 5.2 -64.0 C 4.2 -58.5, -4.2 -58.5, -5.2 -64.0 Z" fill="url(#ray-gold-grad)" />
+      <!-- Glossy highlight -->
+      <path d="M -2.5 -68.0 C -4.8 -80.5, -8.4 -99.5, -8.4 -108.0 C -8.4 -113.2, -4.5 -117.0, 0.5 -117.0" fill="none" stroke="#FFF39A" stroke-width="2.6" stroke-linecap="round" opacity="0.72" />
+    </g>
+
+    <!-- Ray 3: More horizontal, tilted outward (71°) -->
+    <g id="ray-3" transform="rotate(71)">
+      <!-- Orange dimensional shading base -->
+      <path d="M -5.2 -66.5 C -7.5 -80.0, -12.0 -100.0, -12.0 -108.5 C -12.0 -116.0, -6.5 -121.0, 0 -121.0 C 6.5 -121.0, 12.0 -116.0, 12.0 -108.5 C 12.0 -100.0, 7.5 -80.0, 5.2 -66.5 C 4.2 -61.0, -4.2 -61.0, -5.2 -66.5 Z" fill="url(#arrow-depth-grad)" transform="translate(1.8, 0.8)" />
+      <!-- Golden-yellow primary body -->
+      <path d="M -5.2 -66.5 C -7.5 -80.0, -12.0 -100.0, -12.0 -108.5 C -12.0 -116.0, -6.5 -121.0, 0 -121.0 C 6.5 -121.0, 12.0 -116.0, 12.0 -108.5 C 12.0 -100.0, 7.5 -80.0, 5.2 -66.5 C 4.2 -61.0, -4.2 -61.0, -5.2 -66.5 Z" fill="url(#ray-gold-grad)" />
+      <!-- Glossy highlight -->
+      <path d="M -2.5 -70.5 C -4.8 -82.0, -8.2 -99.0, -8.2 -107.5 C -8.2 -112.7, -4.5 -116.5, 0.5 -116.5" fill="none" stroke="#FFF39A" stroke-width="2.6" stroke-linecap="round" opacity="0.72" />
+    </g>
+  </g>
+
+  <!-- ============================================================
+       3. MATHEMATICAL PREVIEW PANEL (RIGHT)
+       ============================================================ -->
+  <g id="math-preview-panel" filter="url(#card-shadow)">
+    <!-- Outer Fine Silver-Gray Border Silhouette -->
+    <rect x="441" y="320" width="492" height="316" rx="52" ry="52" fill="url(#card-border-grad)" />
+
+    <!-- Intermediate 3D Cushion Rim -->
+    <rect x="445.5" y="324.5" width="483" height="307" rx="47.5" ry="47.5" fill="url(#card-bevel-grad)" />
+
+    <!-- Main Porcelain White-to-Light-Gray Face -->
+    <rect x="451" y="330" width="472" height="296" rx="42" ry="42" fill="url(#card-face-grad)" />
+
+    <!-- Soft Glossy 3D Pillow Highlight around Inner Perimeter -->
+    <rect x="454" y="333" width="466" height="290" rx="39" ry="39" fill="none" stroke="url(#card-gloss-rim)" stroke-width="6.5" filter="url(#card-pillow-blur)" />
+
+    <!-- Crisp Inner Specular Rim Line -->
+    <rect x="446.5" y="325.5" width="481" height="305" rx="46.5" ry="46.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.7" stroke-width="1.2" />
+
+    <!-- ==========================================
+         MATHEMATICAL EQUATION: E = mc²
+         (Computer Modern / Latin Modern mathematical
+          serif vector path geometry)
+         ========================================== -->
+    <g id="equation-e-mc2" aria-label="E = mc²" fill="url(#math-ink-grad)">
+      <!-- Italic Serif Capital 'E' -->
+      <path id="glyph-E" d="
+        M 515.5 441.5
+        L 580.5 441.5
+        L 577.8 463.5
+        L 573.2 463.5
+        C 573.6 456.5, 573.0 451.2, 570.2 448.8
+        C 567.4 446.5, 562.0 446.2, 552.5 446.2
+        L 538.2 446.2
+        L 531.6 474.2
+        L 544.5 474.2
+        C 550.8 474.2, 554.4 473.4, 556.4 471.4
+        C 558.4 469.4, 560.0 466.0, 561.2 461.8
+        L 565.6 461.8
+        L 559.2 490.2
+        L 554.8 490.2
+        C 555.4 486.0, 555.2 482.8, 553.6 481.0
+        C 552.0 479.2, 548.4 478.8, 542.5 478.8
+        L 530.5 478.8
+        L 523.8 507.2
+        C 523.1 509.8, 523.4 510.8, 525.8 511.2
+        C 527.5 511.4, 532.0 511.5, 541.5 511.5
+        C 553.5 511.5, 561.2 510.2, 565.8 506.8
+        C 570.4 503.4, 574.5 497.2, 577.8 488.5
+        L 582.5 488.5
+        L 572.8 516.2
+        L 499.5 516.2
+        L 500.6 511.5
+        L 504.2 511.5
+        C 507.8 511.5, 510.0 511.0, 511.2 509.8
+        C 512.2 508.8, 513.0 506.4, 513.8 502.8
+        L 526.2 450.2
+        C 526.9 447.6, 526.6 446.6, 524.2 446.2
+        L 516.6 446.2
+        Z" />
+
+      <!-- Mathematical Equals Sign '=' -->
+      <g id="glyph-equals">
+        <rect x="606.5" y="476.5" width="62.5" height="6.4" rx="3.2" ry="3.2" />
+        <rect x="606.5" y="495.5" width="62.5" height="6.4" rx="3.2" ry="3.2" />
+      </g>
+
+      <!-- Italic Serif Lowercase 'm' -->
+      <path id="glyph-m" d="
+        M 692.5 480.8
+        C 695.5 470.2, 700.2 464.5, 706.5 464.5
+        C 711.8 464.5, 714.8 467.8, 714.8 473.2
+        C 714.8 474.8, 714.5 476.6, 714.0 478.5
+        C 719.8 469.2, 726.8 464.5, 734.5 464.5
+        C 741.2 464.5, 745.2 468.2, 745.2 474.8
+        C 745.2 476.5, 744.9 478.2, 744.4 480.0
+        C 750.4 469.6, 757.5 464.5, 765.5 464.5
+        C 772.5 464.5, 776.8 468.8, 776.8 475.8
+        C 776.8 479.8, 775.2 485.8, 771.8 496.5
+        C 769.2 504.6, 768.2 508.4, 768.2 510.2
+        C 768.2 511.6, 769.0 512.4, 770.4 512.4
+        C 773.2 512.4, 776.6 508.2, 779.2 499.5
+        L 783.2 500.8
+        C 779.8 511.8, 774.2 517.2, 767.2 517.2
+        C 761.6 517.2, 758.2 513.8, 758.2 508.2
+        C 758.2 505.5, 759.2 501.2, 761.5 494.0
+        L 765.2 482.2
+        C 766.4 478.2, 767.0 475.2, 767.0 473.2
+        C 767.0 470.4, 765.2 468.8, 762.2 468.8
+        C 756.8 468.8, 750.8 473.5, 746.2 481.8
+        C 744.2 485.4, 742.6 489.8, 741.2 495.5
+        L 736.2 516.2
+        L 726.2 516.2
+        L 733.8 483.8
+        C 734.8 479.4, 735.4 476.0, 735.4 473.6
+        C 735.4 470.5, 733.6 468.8, 730.5 468.8
+        C 725.2 468.8, 719.2 473.4, 714.6 481.5
+        C 712.6 485.0, 711.0 489.5, 709.6 495.2
+        L 704.6 516.2
+        L 694.6 516.2
+        L 703.8 477.5
+        C 704.6 474.2, 705.0 471.8, 705.0 470.5
+        C 705.0 469.2, 704.2 468.5, 703.0 468.5
+        C 700.2 468.5, 697.8 472.6, 695.6 481.8
+        Z" />
+
+      <!-- Italic Serif Lowercase 'c' -->
+      <path id="glyph-c" d="
+        M 824.8 502.5
+        L 828.2 505.2
+        C 821.2 513.6, 813.0 517.2, 803.5 517.2
+        C 792.2 517.2, 785.0 509.6, 785.0 497.5
+        C 785.0 480.8, 797.5 464.5, 814.2 464.5
+        C 822.4 464.5, 827.5 468.6, 827.5 474.6
+        C 827.5 478.6, 824.5 481.6, 820.8 481.6
+        C 817.4 481.6, 815.0 479.4, 815.0 476.2
+        C 815.0 473.6, 816.8 471.5, 819.5 470.8
+        C 818.2 469.2, 816.2 468.5, 813.5 468.5
+        C 803.6 468.5, 795.6 482.5, 795.6 498.5
+        C 795.6 507.2, 799.8 512.2, 806.8 512.2
+        C 813.4 512.2, 819.2 509.0, 824.8 502.5
+        Z" />
+
+      <!-- Upright Serif Superscript '2' -->
+      <path id="glyph-sup-2" d="
+        M 830.5 475.2
+        L 830.5 471.2
+        L 845.2 455.6
+        C 852.4 448.0, 855.6 442.2, 855.6 436.2
+        C 855.6 430.5, 851.6 426.8, 845.8 426.8
+        C 841.2 426.8, 837.8 429.0, 836.0 432.6
+        C 838.6 433.0, 840.2 434.8, 840.2 437.4
+        C 840.2 440.4, 838.0 442.5, 835.2 442.5
+        C 832.2 442.5, 830.2 440.2, 830.2 436.8
+        C 830.2 428.8, 837.2 422.2, 847.5 422.2
+        C 857.8 422.2, 864.5 428.0, 864.5 436.2
+        C 864.5 442.8, 860.8 448.0, 850.5 456.6
+        L 838.5 467.2
+        L 853.8 467.2
+        C 858.2 467.2, 860.2 466.5, 861.4 460.5
+        L 865.0 460.5
+        L 862.5 475.2
+        Z" />
+    </g>
+  </g>
+
+  <!-- ============================================================
+       4. CURVED GOLDEN TRANSFORMATION ARROW
+       ============================================================ -->
+  <g id="transformation-arrow" filter="url(#arrow-shadow)">
+    <!-- 3D Lower Amber Bevel / Extrusion Layer -->
+    <path d="
+      M 258.5 367.5
+      C 256.5 408.0, 272.0 456.0, 309.0 482.5
+      C 327.0 495.5, 348.0 502.5, 369.5 504.5
+      L 363.5 524.5
+      C 361.5 531.5, 368.5 536.5, 374.5 532.0
+      L 434.0 489.0
+      C 439.5 485.0, 439.5 478.0, 434.0 473.5
+      L 382.0 430.5
+      C 375.5 425.0, 368.0 429.5, 368.5 437.5
+      L 370.0 456.5
+      C 344.0 455.0, 319.5 444.5, 299.5 425.0
+      C 281.5 407.5, 270.0 386.5, 264.5 366.5
+      C 263.0 362.0, 258.8 362.5, 258.5 367.5
+      Z" fill="url(#arrow-depth-grad)" />
+
+    <!-- Primary Golden-Yellow Sculpted Body -->
+    <path d="
+      M 258.5 364.5
+      C 257.0 403.5, 273.0 449.5, 310.0 475.5
+      C 328.0 488.2, 349.0 495.0, 370.5 497.0
+      L 364.5 518.5
+      C 362.8 525.0, 369.2 529.5, 375.0 525.2
+      L 433.5 483.5
+      C 438.8 479.8, 438.8 473.2, 433.5 469.0
+      L 382.0 427.0
+      C 375.8 422.0, 368.5 426.2, 369.0 434.0
+      L 370.5 453.0
+      C 344.5 451.5, 320.0 441.0, 300.0 421.5
+      C 282.0 404.0, 270.5 383.5, 264.5 364.0
+      C 263.2 359.8, 258.8 360.2, 258.5 364.5
+      Z" fill="url(#arrow-body-grad)" />
+
+    <!-- Dimensional Specular Highlight along Upper Inner Curve & Arrowhead Ridge -->
+    <path d="
+      M 262.0 368.0
+      C 268.5 391.5, 282.0 414.5, 302.5 432.5
+      C 323.0 450.5, 347.5 459.5, 373.5 460.5
+      C 375.5 460.5, 377.0 458.8, 376.8 456.5
+      L 375.2 435.5
+      C 375.0 432.0, 378.5 430.5, 381.2 432.8
+      L 429.0 472.0" fill="none" stroke="url(#arrow-highlight-grad)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85" />
+
+    <!-- Subtle Soft Inner Glow on Arrow Belly -->
+    <path d="
+      M 273.0 408.0
+      C 288.0 442.0, 322.0 474.0, 372.0 482.0" fill="none" stroke="#FFE866" stroke-width="6" stroke-linecap="round" opacity="0.45" filter="url(#soft-bevel-blur)" />
+  </g>
+</svg>

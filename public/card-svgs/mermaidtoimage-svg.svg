@@ -1,0 +1,490 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- ==========================================
+         SHADOW FILTERS
+         ========================================== -->
+    <!-- Soft ambient drop shadow for the dark code editor window -->
+    <filter id="editor-shadow" x="-15%" y="-15%" width="135%" height="140%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#0A0D12" flood-opacity="0.28" />
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#0A0D12" flood-opacity="0.18" />
+    </filter>
+
+    <!-- Soft ambient & contact drop shadow for the floating white flowchart panel -->
+    <filter id="panel-shadow" x="-18%" y="-15%" width="140%" height="145%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="-6" dy="16" stdDeviation="18" flood-color="#0D1117" flood-opacity="0.24" />
+      <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#0D1117" flood-opacity="0.14" />
+    </filter>
+
+    <!-- Dimensional shadow for the golden transformation arrow -->
+    <filter id="arrow-shadow" x="-25%" y="-25%" width="160%" height="165%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#0B0E13" flood-opacity="0.38" />
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#593500" flood-opacity="0.28" />
+    </filter>
+
+    <!-- Subtle elevation shadow for flowchart nodes A, B, C -->
+    <filter id="node-shadow" x="-15%" y="-15%" width="130%" height="140%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#1C222B" flood-opacity="0.14" />
+    </filter>
+
+    <!-- Subtle shadow for traffic light window controls -->
+    <filter id="control-shadow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#0B0D10" flood-opacity="0.55" />
+    </filter>
+
+    <!-- Soft blur for 3D specular highlights -->
+    <filter id="soft-bevel" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3.5" />
+    </filter>
+
+    <filter id="node-gloss-blur" x="-10%" y="-20%" width="120%" height="140%">
+      <feGaussianBlur stdDeviation="2.2" />
+    </filter>
+
+    <!-- ==========================================
+         CODE EDITOR GRADIENTS & CLIPS
+         ========================================== -->
+    <clipPath id="editor-clip">
+      <rect x="35" y="85" width="582" height="488" rx="60" ry="60" />
+    </clipPath>
+
+    <!-- Main editor dark charcoal body gradient -->
+    <linearGradient id="editor-body-grad" x1="0%" y1="0%" x2="15%" y2="100%">
+      <stop offset="0%" stop-color="#272B30" />
+      <stop offset="55%" stop-color="#202328" />
+      <stop offset="100%" stop-color="#181B1F" />
+    </linearGradient>
+
+    <!-- Lighter charcoal title bar gradient -->
+    <linearGradient id="editor-header-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3A3F47" />
+      <stop offset="35%" stop-color="#31353C" />
+      <stop offset="100%" stop-color="#282C32" />
+    </linearGradient>
+
+    <!-- Editor top-left 3D rim highlight -->
+    <linearGradient id="editor-rim-highlight" x1="0%" y1="0%" x2="70%" y2="80%">
+      <stop offset="0%" stop-color="#68707A" stop-opacity="0.75" />
+      <stop offset="35%" stop-color="#484E57" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#25292E" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Window Control: Red (#FF5545) -->
+    <radialGradient id="red-btn-grad" cx="35%" cy="28%" r="70%" fx="32%" fy="25%">
+      <stop offset="0%" stop-color="#FF8577" />
+      <stop offset="32%" stop-color="#FF5545" />
+      <stop offset="78%" stop-color="#E03222" />
+      <stop offset="100%" stop-color="#B81F12" />
+    </radialGradient>
+
+    <!-- Window Control: Yellow (#FFC52E) -->
+    <radialGradient id="yellow-btn-grad" cx="35%" cy="28%" r="70%" fx="32%" fy="25%">
+      <stop offset="0%" stop-color="#FFE678" />
+      <stop offset="32%" stop-color="#FFC52E" />
+      <stop offset="80%" stop-color="#E59C00" />
+      <stop offset="100%" stop-color="#BF7B00" />
+    </radialGradient>
+
+    <!-- Window Control: Green (#68D947) -->
+    <radialGradient id="green-btn-grad" cx="35%" cy="28%" r="70%" fx="32%" fy="25%">
+      <stop offset="0%" stop-color="#99F578" />
+      <stop offset="32%" stop-color="#68D947" />
+      <stop offset="80%" stop-color="#33B317" />
+      <stop offset="100%" stop-color="#208C0A" />
+    </radialGradient>
+
+    <!-- Syntax highlighting yellow gradient -->
+    <linearGradient id="code-yellow-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFCA28" />
+      <stop offset="100%" stop-color="#F0A808" />
+    </linearGradient>
+
+    <!-- ==========================================
+         WHITE FLOWCHART PANEL GRADIENTS
+         ========================================== -->
+    <!-- Metallic silver-gray outer 3D border -->
+    <linearGradient id="panel-outer-rim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C8CCD2" />
+      <stop offset="50%" stop-color="#9CA1A9" />
+      <stop offset="100%" stop-color="#767B83" />
+    </linearGradient>
+
+    <!-- Inner card surface gradient -->
+    <linearGradient id="panel-surface-grad" x1="15%" y1="5%" x2="85%" y2="95%">
+      <stop offset="0%" stop-color="#E4E8EE" />
+      <stop offset="48%" stop-color="#EEF1F5" />
+      <stop offset="100%" stop-color="#F8FAFC" />
+    </linearGradient>
+
+    <!-- Subtle glossy diagonal reflection on the white card -->
+    <linearGradient id="panel-gloss-sheen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.45" />
+      <stop offset="55%" stop-color="#FFFFFF" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#D5DBE3" stop-opacity="0.3" />
+    </linearGradient>
+
+    <!-- ==========================================
+         FLOWCHART NODE GRADIENTS
+         ========================================== -->
+    <!-- Main 3D yellow node fill -->
+    <linearGradient id="node-fill-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFE135" />
+      <stop offset="28%" stop-color="#FFCC14" />
+      <stop offset="82%" stop-color="#F7B305" />
+      <stop offset="100%" stop-color="#DF9600" />
+    </linearGradient>
+
+    <!-- Inner 3D rim shading for nodes -->
+    <linearGradient id="node-inner-bevel" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF49C" stop-opacity="0.9" />
+      <stop offset="22%" stop-color="#FFD426" stop-opacity="0" />
+      <stop offset="80%" stop-color="#C98200" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#B87300" stop-opacity="0.55" />
+    </linearGradient>
+
+    <!-- Top glossy highlight bar on each yellow node -->
+    <linearGradient id="node-top-gloss" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFF6A8" stop-opacity="0.15" />
+      <stop offset="20%" stop-color="#FFF7B8" stop-opacity="0.88" />
+      <stop offset="50%" stop-color="#FFFCE0" stop-opacity="0.95" />
+      <stop offset="80%" stop-color="#FFF7B8" stop-opacity="0.88" />
+      <stop offset="100%" stop-color="#FFF6A8" stop-opacity="0.15" />
+    </linearGradient>
+
+    <!-- ==========================================
+         TRANSFORMATION ARROW & RAYS GRADIENTS
+         ========================================== -->
+    <!-- 3D Lower bevel / side depth of the golden arrow -->
+    <linearGradient id="arrow-depth-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59B00" />
+      <stop offset="55%" stop-color="#E38200" />
+      <stop offset="100%" stop-color="#CC6E00" />
+    </linearGradient>
+
+    <!-- Main upper surface of the golden arrow -->
+    <linearGradient id="arrow-main-grad" x1="10%" y1="0%" x2="90%" y2="90%">
+      <stop offset="0%" stop-color="#FFDF38" />
+      <stop offset="40%" stop-color="#FFC112" />
+      <stop offset="85%" stop-color="#FAA402" />
+      <stop offset="100%" stop-color="#F09300" />
+    </linearGradient>
+
+    <!-- Glossy highlight on the golden arrow -->
+    <linearGradient id="arrow-highlight-grad" x1="0%" y1="0%" x2="100%" y2="60%">
+      <stop offset="0%" stop-color="#FFF394" stop-opacity="0.85" />
+      <stop offset="55%" stop-color="#FFDF4D" stop-opacity="0.45" />
+      <stop offset="100%" stop-color="#FFB700" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Decorative rays golden gradient -->
+    <linearGradient id="ray-grad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#FFCE26" />
+      <stop offset="60%" stop-color="#F8B008" />
+      <stop offset="100%" stop-color="#E89600" />
+    </linearGradient>
+  </defs>
+
+  <!-- =========================================================================
+       1. CODE EDITOR WINDOW (LEFT)
+       ========================================================================= -->
+  <g id="code-editor-window">
+    <!-- Outer base with ambient drop shadow -->
+    <rect x="35" y="85" width="582" height="488" rx="60" ry="60" fill="#171A1E" filter="url(#editor-shadow)" />
+
+    <!-- Clipped interior for crisp title bar & 3D bevels -->
+    <g clip-path="url(#editor-clip)">
+      <!-- Main Dark Charcoal Editor Body -->
+      <rect x="35" y="85" width="582" height="488" fill="url(#editor-body-grad)" />
+
+      <!-- Lighter Charcoal Title Bar -->
+      <rect x="35" y="85" width="582" height="101" fill="url(#editor-header-grad)" />
+
+      <!-- Title Bar Bottom Seam & Subtle Groove -->
+      <line x1="35" y1="186" x2="617" y2="186" stroke="#181B20" stroke-width="2.5" />
+      <line x1="35" y1="188" x2="617" y2="188" stroke="#323740" stroke-width="1.2" opacity="0.6" />
+
+      <!-- 3D Inner Bevel Shadow along bottom and right edges -->
+      <rect x="35" y="85" width="582" height="488" rx="60" ry="60" fill="none" stroke="#101215" stroke-width="12" opacity="0.8" />
+
+      <!-- 3D Inner Molded Rim Highlight (top and left edges) -->
+      <rect x="41" y="91" width="570" height="476" rx="54" ry="54" fill="none" stroke="url(#editor-rim-highlight)" stroke-width="6" filter="url(#soft-bevel)" />
+
+      <!-- Extra top title-bar edge sheen -->
+      <path d="M 95 90 L 557 90" stroke="#7A828E" stroke-width="3" stroke-linecap="round" opacity="0.45" filter="url(#soft-bevel)" />
+      <!-- Subtle left vertical edge sheen -->
+      <path d="M 41 145 L 41 510" stroke="#4D535C" stroke-width="3" stroke-linecap="round" opacity="0.35" filter="url(#soft-bevel)" />
+    </g>
+
+    <!-- Subtle outer contour stroke for crisp definition -->
+    <rect x="35.5" y="85.5" width="581" height="487" rx="60" ry="60" fill="none" stroke="#2D3239" stroke-width="1.5" />
+
+    <!-- Window Controls (Traffic Light Buttons) -->
+    <g id="window-controls" filter="url(#control-shadow)">
+      <!-- Red Control (#FF5545) -->
+      <g id="control-close" transform="translate(100, 138)">
+        <circle cx="0" cy="0" r="22.5" fill="url(#red-btn-grad)" />
+        <ellipse cx="-6" cy="-8" rx="9" ry="5.5" transform="rotate(-25 -6 -8)" fill="#FFB3A8" opacity="0.45" />
+        <circle cx="0" cy="0" r="22" fill="none" stroke="#8C170B" stroke-width="1" opacity="0.4" />
+      </g>
+
+      <!-- Yellow Control (#FFC52E) -->
+      <g id="control-minimize" transform="translate(161, 138)">
+        <circle cx="0" cy="0" r="22.5" fill="url(#yellow-btn-grad)" />
+        <ellipse cx="-6" cy="-8" rx="9" ry="5.5" transform="rotate(-25 -6 -8)" fill="#FFF4B8" opacity="0.55" />
+        <circle cx="0" cy="0" r="22" fill="none" stroke="#8F5B00" stroke-width="1" opacity="0.35" />
+      </g>
+
+      <!-- Green Control (#68D947) -->
+      <g id="control-expand" transform="translate(223, 138)">
+        <circle cx="0" cy="0" r="22.5" fill="url(#green-btn-grad)" />
+        <ellipse cx="-6" cy="-8" rx="9" ry="5.5" transform="rotate(-25 -6 -8)" fill="#C8FFAE" opacity="0.5" />
+        <circle cx="0" cy="0" r="22" fill="none" stroke="#166605" stroke-width="1" opacity="0.35" />
+      </g>
+    </g>
+
+    <!-- Mermaid Code Typography -->
+    <g id="mermaid-code-text" font-family="ui-monospace, 'SFMono-Regular', 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Segoe UI', Roboto, Helvetica, Arial, monospace" font-weight="700" style="user-select: none;">
+      <!-- Line 1: graph TD -->
+      <text x="103" y="271" font-size="60" letter-spacing="-0.5">
+        <tspan fill="url(#code-yellow-grad)">graph</tspan>
+        <tspan dx="6" fill="#F2F4F8">TD</tspan>
+      </text>
+
+      <!-- Line 2: A --> B -->
+      <g transform="translate(174, 355)" font-size="57">
+        <text x="0" y="0" fill="#F2F4F8">A</text>
+        <!-- Crisp double hyphen and golden arrowhead matching the reference syntax highlighting -->
+        <rect x="59" y="-23" width="20" height="7.5" rx="2.5" fill="#F2F4F8" />
+        <rect x="85" y="-23" width="20" height="7.5" rx="2.5" fill="#F2F4F8" />
+        <path d="M 114 -33 L 136 -19.25 L 114 -5.5" fill="none" stroke="url(#code-yellow-grad)" stroke-width="7.8" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="159" y="0" fill="#F2F4F8">B</text>
+      </g>
+
+      <!-- Line 3: B --> C -->
+      <g transform="translate(174, 438)" font-size="57">
+        <text x="0" y="0" fill="#F2F4F8">B</text>
+        <!-- Crisp double hyphen and golden arrowhead matching the reference syntax highlighting -->
+        <rect x="59" y="-23" width="20" height="7.5" rx="2.5" fill="#F2F4F8" />
+        <rect x="85" y="-23" width="20" height="7.5" rx="2.5" fill="#F2F4F8" />
+        <path d="M 114 -33 L 136 -19.25 L 114 -5.5" fill="none" stroke="url(#code-yellow-grad)" stroke-width="7.8" stroke-linecap="round" stroke-linejoin="round" />
+        <text x="159" y="0" fill="#F2F4F8">C</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- =========================================================================
+       2. DECORATIVE GOLDEN RAYS (ANCHORED TO TOP-RIGHT CORNER OF PREVIEW CARD)
+       ========================================================================= -->
+  <g id="decorative-rays" transform="translate(864, 326)">
+    <!-- Ray 1: Nearly vertical, tilted slightly outward (9 deg) -->
+    <g id="ray-1" transform="rotate(9) translate(0, -49)">
+      <path d="M 0 0
+               C -3 0, -5.5 -2.5, -6.5 -7
+               L -14 -44
+               C -16.5 -55, -9 -62, 0 -62
+               C 9 -62, 16.5 -55, 14 -44
+               L 6.5 -7
+               C 5.5 -2.5, 3 0, 0 0 Z"
+            fill="url(#ray-grad)" />
+      <path d="M -8 -51 C -4.5 -56, 4.5 -56, 8 -51"
+            stroke="#FFE97D"
+            stroke-width="3"
+            stroke-linecap="round"
+            fill="none"
+            opacity="0.6" />
+    </g>
+
+    <!-- Ray 2: Diagonal, ~45 degrees outward (39 deg) -->
+    <g id="ray-2" transform="rotate(39) translate(0, -55)">
+      <path d="M 0 0
+               C -3 0, -5.5 -2.5, -6.5 -7
+               L -14 -44
+               C -16.5 -55, -9 -62, 0 -62
+               C 9 -62, 16.5 -55, 14 -44
+               L 6.5 -7
+               C 5.5 -2.5, 3 0, 0 0 Z"
+            fill="url(#ray-grad)" />
+      <path d="M -8 -51 C -4.5 -56, 4.5 -56, 8 -51"
+            stroke="#FFE97D"
+            stroke-width="3"
+            stroke-linecap="round"
+            fill="none"
+            opacity="0.58" />
+    </g>
+
+    <!-- Ray 3: More horizontal, tilted outward (69 deg) -->
+    <g id="ray-3" transform="rotate(69) translate(0, -65)">
+      <path d="M 0 0
+               C -3 0, -5.5 -2.5, -6.5 -7
+               L -14 -44
+               C -16.5 -55, -9 -62, 0 -62
+               C 9 -62, 16.5 -55, 14 -44
+               L 6.5 -7
+               C 5.5 -2.5, 3 0, 0 0 Z"
+            fill="url(#ray-grad)" />
+      <path d="M -8 -51 C -4.5 -56, 4.5 -56, 8 -51"
+            stroke="#FFE97D"
+            stroke-width="3"
+            stroke-linecap="round"
+            fill="none"
+            opacity="0.55" />
+    </g>
+  </g>
+
+  <!-- =========================================================================
+       3. FLOWCHART PREVIEW PANEL (RIGHT)
+       ========================================================================= -->
+  <g id="flowchart-preview-panel">
+    <!-- Outer 3D Card Body with Drop Shadow -->
+    <rect x="448" y="290" width="482" height="386" rx="56" ry="56" fill="url(#panel-outer-rim)" filter="url(#panel-shadow)" />
+
+    <!-- Dark Charcoal Fine Outer Contour -->
+    <rect x="448.5" y="290.5" width="481" height="385" rx="55.5" ry="55.5" fill="none" stroke="#6E737B" stroke-width="1.5" />
+
+    <!-- Bright White 3D Bevel Ridge -->
+    <rect x="453" y="295" width="472" height="376" rx="51" ry="51" fill="#FFFFFF" />
+
+    <!-- Main Soft White-to-Light-Gray Interior Surface -->
+    <rect x="460" y="302" width="458" height="362" rx="45" ry="45" fill="url(#panel-surface-grad)" />
+
+    <!-- Glossy Diagonal Surface Reflection -->
+    <path d="M 650 302 L 873 302 C 898 302, 918 322, 918 347 L 918 619 C 918 644, 898 664, 873 664 L 540 664 Z"
+          fill="url(#panel-gloss-sheen)" />
+
+    <!-- Subtle Inner Rim Highlight & Bottom Cushion Shading -->
+    <rect x="457" y="299" width="464" height="368" rx="48" ry="48" fill="none" stroke="#FFFFFF" stroke-width="3.5" opacity="0.9" />
+    <rect x="452" y="294" width="474" height="378" rx="52" ry="52" fill="none" stroke="#858A92" stroke-width="2.5" opacity="0.45" />
+
+    <!-- ==========================================
+         FLOWCHART CONNECTORS (A -> B and A -> C)
+         ========================================== -->
+    <g id="flowchart-connectors" fill="none" stroke="#0D0F12" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Center vertical stem emerging from bottom of Node A -->
+      <path d="M 687 437 L 687 454" stroke-width="10" />
+
+      <!-- Left Branch: Smooth rounded-elbow path from A to B -->
+      <path d="M 687 444
+               L 687 454
+               C 687 468, 677 476, 661 476
+               L 605 476
+               C 588 476, 579 485, 579 501
+               L 579 512"
+            stroke-width="8.5" />
+
+      <!-- Right Branch: Smooth rounded-elbow path from A to C -->
+      <path d="M 687 444
+               L 687 454
+               C 687 468, 697 476, 713 476
+               L 769 476
+               C 786 476, 795 485, 795 501
+               L 795 512"
+            stroke-width="8.5" />
+
+      <!-- Left Arrowhead pointing to Node B -->
+      <path d="M 566 496 L 579 515 L 592 496" stroke-width="8" />
+
+      <!-- Right Arrowhead pointing to Node C -->
+      <path d="M 782 496 L 795 515 L 808 496" stroke-width="8" />
+    </g>
+
+    <!-- ==========================================
+         FLOWCHART NODES (A, B, C)
+         ========================================== -->
+    <!-- NODE A (Top Center) -->
+    <g id="node-A" transform="translate(602, 341)" filter="url(#node-shadow)">
+      <!-- Main yellow rounded rectangle -->
+      <rect x="0" y="0" width="170" height="96" rx="28" ry="28" fill="url(#node-fill-grad)" />
+      <!-- 3D Inner cushion bevel -->
+      <rect x="3" y="3" width="164" height="90" rx="25" ry="25" fill="none" stroke="url(#node-inner-bevel)" stroke-width="5" />
+      <!-- Glossy top highlight bar -->
+      <rect x="18" y="6" width="134" height="11" rx="5.5" fill="url(#node-top-gloss)" filter="url(#node-gloss-blur)" />
+      <!-- Crisp dark outline -->
+      <rect x="0" y="0" width="170" height="96" rx="28" ry="28" fill="none" stroke="#0D0F12" stroke-width="4.2" />
+      <!-- Bold Node Label A -->
+      <text x="85" y="67" text-anchor="middle" fill="#0B0D10" font-family="'Inter', 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="56" font-weight="900" style="user-select: none;">A</text>
+    </g>
+
+    <!-- NODE B (Bottom Left) -->
+    <g id="node-B" transform="translate(494, 520)" filter="url(#node-shadow)">
+      <!-- Main yellow rounded rectangle -->
+      <rect x="0" y="0" width="170" height="98" rx="28" ry="28" fill="url(#node-fill-grad)" />
+      <!-- 3D Inner cushion bevel -->
+      <rect x="3" y="3" width="164" height="92" rx="25" ry="25" fill="none" stroke="url(#node-inner-bevel)" stroke-width="5" />
+      <!-- Glossy top highlight bar -->
+      <rect x="18" y="6" width="134" height="11" rx="5.5" fill="url(#node-top-gloss)" filter="url(#node-gloss-blur)" />
+      <!-- Crisp dark outline -->
+      <rect x="0" y="0" width="170" height="98" rx="28" ry="28" fill="none" stroke="#0D0F12" stroke-width="4.2" />
+      <!-- Bold Node Label B -->
+      <text x="85" y="68" text-anchor="middle" fill="#0B0D10" font-family="'Inter', 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="56" font-weight="900" style="user-select: none;">B</text>
+    </g>
+
+    <!-- NODE C (Bottom Right) -->
+    <g id="node-C" transform="translate(710, 520)" filter="url(#node-shadow)">
+      <!-- Main yellow rounded rectangle -->
+      <rect x="0" y="0" width="170" height="98" rx="28" ry="28" fill="url(#node-fill-grad)" />
+      <!-- 3D Inner cushion bevel -->
+      <rect x="3" y="3" width="164" height="92" rx="25" ry="25" fill="none" stroke="url(#node-inner-bevel)" stroke-width="5" />
+      <!-- Glossy top highlight bar -->
+      <rect x="18" y="6" width="134" height="11" rx="5.5" fill="url(#node-top-gloss)" filter="url(#node-gloss-blur)" />
+      <!-- Crisp dark outline -->
+      <rect x="0" y="0" width="170" height="98" rx="28" ry="28" fill="none" stroke="#0D0F12" stroke-width="4.2" />
+      <!-- Bold Node Label C -->
+      <text x="85" y="68" text-anchor="middle" fill="#0B0D10" font-family="'Inter', 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="56" font-weight="900" style="user-select: none;">C</text>
+    </g>
+  </g>
+
+  <!-- =========================================================================
+       4. CURVED GOLDEN TRANSFORMATION ARROW
+       ========================================================================= -->
+  <g id="transformation-arrow" filter="url(#arrow-shadow)">
+    <!-- Lower 3D Bevel / Extrusion Layer for Dimensional Depth -->
+    <path d="M 266 467
+             C 264 467, 263 470, 263 475
+             C 265 542, 307 586, 378 589
+             L 374 611
+             C 372 620, 381 625, 388 619
+             L 444 569
+             C 450 564, 450 556, 443 551
+             L 391 511
+             C 383 505, 375 510, 376 519
+             L 380 544
+             C 325 540, 293 513, 272 470
+             C 270 467, 268 467, 266 467 Z"
+          fill="url(#arrow-depth-grad)" />
+
+    <!-- Main Sculpted Golden-Yellow Arrow Body -->
+    <path d="M 267 464
+             C 265 464, 264 467, 264 472
+             C 268 534, 310 577, 382 580
+             L 378 604
+             C 376 613, 385 618, 392 612
+             L 443 565
+             C 448 560, 448 553, 442 548
+             L 391 509
+             C 383 503, 375 508, 377 517
+             L 381 541
+             C 326 537, 293 510, 272 467
+             C 270 464, 268 464, 267 464 Z"
+          fill="url(#arrow-main-grad)" />
+
+    <!-- Glossy Top-Edge Highlight along the Curve and Arrowhead -->
+    <path d="M 270 472
+             C 292 516, 328 543, 385 546
+             L 382 518
+             C 382 514, 386 512, 389 515
+             L 438 553"
+          fill="none"
+          stroke="url(#arrow-highlight-grad)"
+          stroke-width="5.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          filter="url(#node-gloss-blur)" />
+
+    <!-- Subtle Bottom Rim Specular Accent -->
+    <path d="M 272 500 C 288 552, 326 581, 380 584"
+          fill="none"
+          stroke="#FFE46B"
+          stroke-width="2"
+          stroke-linecap="round"
+          opacity="0.45" />
+  </g>
+</svg>

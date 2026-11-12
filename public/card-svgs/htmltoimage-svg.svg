@@ -1,0 +1,540 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- ========================================== -->
+    <!-- FILTERS FOR 3D SHADOWS, BEVELS & GLOWS     -->
+    <!-- ========================================== -->
+
+    <!-- Code Editor Main Drop Shadow -->
+    <filter id="editor-shadow" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#0B0E14" flood-opacity="0.32" />
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#0B0E14" flood-opacity="0.22" />
+    </filter>
+
+    <!-- Preview Card Main Drop Shadow (casts left onto editor & down onto canvas) -->
+    <filter id="card-shadow" x="-25%" y="-20%" width="155%" height="160%">
+      <feDropShadow dx="-8" dy="14" stdDeviation="16" flood-color="#0F141C" flood-opacity="0.28" />
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#18202C" flood-opacity="0.16" />
+    </filter>
+
+    <!-- Traffic Light Buttons 3D Shadow -->
+    <filter id="btn-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="2.5" stdDeviation="2" flood-color="#0D0F12" flood-opacity="0.65" />
+    </filter>
+
+    <!-- Code Text 3D Emboss & Shadow -->
+    <filter id="code-text-shadow" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.2" flood-color="#0D0F14" flood-opacity="0.7" />
+    </filter>
+
+    <!-- Transformation Arrow Drop Shadow -->
+    <filter id="arrow-shadow" x="-25%" y="-25%" width="155%" height="165%">
+      <feDropShadow dx="-2" dy="10" stdDeviation="8" flood-color="#141008" flood-opacity="0.38" />
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#141008" flood-opacity="0.25" />
+    </filter>
+
+    <!-- Landscape Elements (Sun & Mountains) Soft Shadow -->
+    <filter id="landscape-shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4.5" flood-color="#7A5200" flood-opacity="0.25" />
+      <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#9E6800" flood-opacity="0.22" />
+    </filter>
+
+    <!-- Front Mountain Overlap Shadow onto Back Mountain -->
+    <filter id="mountain-overlap-shadow" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="4" dy="2" stdDeviation="3.5" flood-color="#9A5200" flood-opacity="0.32" />
+    </filter>
+
+    <!-- Decorative Rays Soft Shadow -->
+    <filter id="ray-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="3.5" flood-color="#8A5600" flood-opacity="0.22" />
+    </filter>
+
+    <!-- Soft Gaussian Blur for 3D Specular Highlights -->
+    <filter id="soft-blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" />
+    </filter>
+
+    <filter id="edge-blur" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="1.2" />
+    </filter>
+
+    <!-- ========================================== -->
+    <!-- CLIP PATHS                                 -->
+    <!-- ========================================== -->
+
+    <clipPath id="editor-clip">
+      <rect x="66" y="152" width="555" height="360" rx="46" />
+    </clipPath>
+
+    <clipPath id="card-clip">
+      <rect x="513" y="313" width="391" height="264" rx="42" />
+    </clipPath>
+
+    <!-- ========================================== -->
+    <!-- GRADIENTS: CODE EDITOR WINDOW              -->
+    <!-- ========================================== -->
+
+    <!-- Editor Main Body Gradient (Charcoal to Near-Black) -->
+    <linearGradient id="editor-body-grad" x1="0%" y1="0%" x2="15%" y2="100%">
+      <stop offset="0%" stop-color="#272C33" />
+      <stop offset="55%" stop-color="#1E2228" />
+      <stop offset="100%" stop-color="#16191E" />
+    </linearGradient>
+
+    <!-- Editor Title Bar Header Gradient -->
+    <linearGradient id="editor-header-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3C414A" />
+      <stop offset="25%" stop-color="#333840" />
+      <stop offset="100%" stop-color="#2B3037" />
+    </linearGradient>
+
+    <!-- Editor 3D Outer Rim Bevel Gradient -->
+    <linearGradient id="editor-rim-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#585F6B" />
+      <stop offset="18%" stop-color="#3D434D" />
+      <stop offset="85%" stop-color="#22262C" />
+      <stop offset="100%" stop-color="#0E1014" />
+    </linearGradient>
+
+    <!-- Window Control: Red (#FF5545) -->
+    <radialGradient id="btn-red-grad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FF7B6E" />
+      <stop offset="45%" stop-color="#FF5545" />
+      <stop offset="85%" stop-color="#E03525" />
+      <stop offset="100%" stop-color="#BA2214" />
+    </radialGradient>
+
+    <!-- Window Control: Yellow (#FFC52E) -->
+    <radialGradient id="btn-yellow-grad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#FFE36E" />
+      <stop offset="45%" stop-color="#FFC52E" />
+      <stop offset="85%" stop-color="#E5A20A" />
+      <stop offset="100%" stop-color="#BF8000" />
+    </radialGradient>
+
+    <!-- Window Control: Green (#68D947) -->
+    <radialGradient id="btn-green-grad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#8FF272" />
+      <stop offset="45%" stop-color="#68D947" />
+      <stop offset="85%" stop-color="#3EB520" />
+      <stop offset="100%" stop-color="#278C0E" />
+    </radialGradient>
+
+    <!-- Golden Code Syntax Gradient -->
+    <linearGradient id="code-gold-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFD03B" />
+      <stop offset="55%" stop-color="#FFB414" />
+      <stop offset="100%" stop-color="#F09200" />
+    </linearGradient>
+
+    <!-- White Code Text ("Hello") Gradient -->
+    <linearGradient id="code-white-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="70%" stop-color="#F2F5F8" />
+      <stop offset="100%" stop-color="#D5DCE4" />
+    </linearGradient>
+
+    <!-- ========================================== -->
+    <!-- GRADIENTS: IMAGE PREVIEW PANEL             -->
+    <!-- ========================================== -->
+
+    <!-- Outer Silver-Gray Metallic Rim -->
+    <linearGradient id="card-outer-rim-grad" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#9A9FA8" />
+      <stop offset="50%" stop-color="#7A808A" />
+      <stop offset="100%" stop-color="#585E67" />
+    </linearGradient>
+
+    <!-- Inner Glossy Bevel Ring -->
+    <linearGradient id="card-inner-bevel-grad" x1="10%" y1="0%" x2="90%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="45%" stop-color="#F1F4F8" />
+      <stop offset="85%" stop-color="#D5DBE3" />
+      <stop offset="100%" stop-color="#C0C7D0" />
+    </linearGradient>
+
+    <!-- Main White-to-Light-Gray Card Surface -->
+    <linearGradient id="card-surface-grad" x1="15%" y1="5%" x2="85%" y2="95%">
+      <stop offset="0%" stop-color="#FAFBFD" />
+      <stop offset="55%" stop-color="#EFF2F6" />
+      <stop offset="100%" stop-color="#E2E7EE" />
+    </linearGradient>
+
+    <!-- ========================================== -->
+    <!-- GRADIENTS: SUN, MOUNTAINS, ARROW & RAYS    -->
+    <!-- ========================================== -->
+
+    <!-- Sun 3D Radial Gradient -->
+    <radialGradient id="sun-grad" cx="35%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#FFEA59" />
+      <stop offset="45%" stop-color="#FFC717" />
+      <stop offset="85%" stop-color="#FFA700" />
+      <stop offset="100%" stop-color="#EC8E00" />
+    </radialGradient>
+
+    <!-- Left (Front) Mountain Gradient -->
+    <linearGradient id="mountain-left-grad" x1="25%" y1="5%" x2="65%" y2="100%">
+      <stop offset="0%" stop-color="#FFE347" />
+      <stop offset="45%" stop-color="#FFC312" />
+      <stop offset="88%" stop-color="#FFA600" />
+      <stop offset="100%" stop-color="#EE8E00" />
+    </linearGradient>
+
+    <!-- Right (Back) Mountain Gradient -->
+    <linearGradient id="mountain-right-grad" x1="30%" y1="5%" x2="70%" y2="100%">
+      <stop offset="0%" stop-color="#FFDE3D" />
+      <stop offset="50%" stop-color="#FFBD0D" />
+      <stop offset="90%" stop-color="#FA9E00" />
+      <stop offset="100%" stop-color="#E58600" />
+    </linearGradient>
+
+    <!-- Mountain Top Edge 3D Highlight Gradient -->
+    <linearGradient id="mountain-highlight-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF799" stop-opacity="0.95" />
+      <stop offset="50%" stop-color="#FFE652" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#FFB800" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Curved Arrow Main Surface Gradient -->
+    <linearGradient id="arrow-main-grad" x1="10%" y1="15%" x2="90%" y2="85%">
+      <stop offset="0%" stop-color="#FFE142" />
+      <stop offset="45%" stop-color="#FFBF14" />
+      <stop offset="82%" stop-color="#FFA100" />
+      <stop offset="100%" stop-color="#F08800" />
+    </linearGradient>
+
+    <!-- Curved Arrow 3D Extrusion / Side Wall Gradient -->
+    <linearGradient id="arrow-side-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E58300" />
+      <stop offset="60%" stop-color="#CF6A00" />
+      <stop offset="100%" stop-color="#B05200" />
+    </linearGradient>
+
+    <!-- Decorative Rays Gradient -->
+    <linearGradient id="ray-grad" x1="20%" y1="10%" x2="80%" y2="90%">
+      <stop offset="0%" stop-color="#FFE247" />
+      <stop offset="55%" stop-color="#FFBD14" />
+      <stop offset="100%" stop-color="#F59800" />
+    </linearGradient>
+  </defs>
+
+  <!-- ================================================================= -->
+  <!-- 1. CODE EDITOR WINDOW (LEFT)                                      -->
+  <!-- ================================================================= -->
+  <g id="code-editor-window">
+    <!-- Outer 3D Shadow & Dark Lower Extrusion -->
+    <rect x="66" y="152" width="555" height="365" rx="46" fill="#101216" filter="url(#editor-shadow)" />
+
+    <!-- Clipped Window Body & Header -->
+    <g clip-path="url(#editor-clip)">
+      <!-- Main Dark Charcoal Window Background -->
+      <rect x="66" y="152" width="555" height="360" fill="url(#editor-body-grad)" />
+
+      <!-- Lighter Charcoal Title Bar Header -->
+      <rect x="66" y="152" width="555" height="74" fill="url(#editor-header-grad)" />
+
+      <!-- Subtle Title Bar Divider Seam -->
+      <line x1="66" y1="226" x2="621" y2="226" stroke="#181B20" stroke-width="2" />
+      <line x1="66" y1="227.5" x2="621" y2="227.5" stroke="#ffffff" stroke-opacity="0.04" stroke-width="1" />
+
+      <!-- Top & Side 3D Inner Specular Highlight -->
+      <path d="M 74,198 C 74,166 92,155 116,155 L 571,155 C 595,155 613,166 613,198" 
+            fill="none" stroke="#6E7785" stroke-width="3.5" stroke-opacity="0.65" filter="url(#soft-blur)" />
+
+      <!-- Subtle Bottom Inner Shadow for 3D Rounded Depth -->
+      <path d="M 70,470 C 70,502 92,511 116,511 L 571,511 C 595,511 617,502 617,470" 
+            fill="none" stroke="#090B0E" stroke-width="8" stroke-opacity="0.8" filter="url(#soft-blur)" />
+    </g>
+
+    <!-- 3D Molded Outer Rim Border -->
+    <rect x="67.5" y="153.5" width="552" height="357" rx="44.5" 
+          fill="none" stroke="url(#editor-rim-grad)" stroke-width="3" />
+
+    <!-- ========================================== -->
+    <!-- WINDOW CONTROLS (RED, YELLOW, GREEN)       -->
+    <!-- ========================================== -->
+    <g id="window-controls">
+      <!-- Red Control (#FF5545) -->
+      <g id="control-red" filter="url(#btn-shadow)">
+        <circle cx="124" cy="191.5" r="20.5" fill="#9E1C10" />
+        <circle cx="124" cy="190" r="20.5" fill="url(#btn-red-grad)" />
+        <path d="M 109,182 A 17,17 0 0,1 136,176" fill="none" stroke="#FFA69E" stroke-width="2.5" stroke-linecap="round" opacity="0.65" filter="url(#edge-blur)" />
+      </g>
+
+      <!-- Yellow Control (#FFC52E) -->
+      <g id="control-yellow" filter="url(#btn-shadow)">
+        <circle cx="183" cy="191.5" r="20.5" fill="#B37400" />
+        <circle cx="183" cy="190" r="20.5" fill="url(#btn-yellow-grad)" />
+        <path d="M 168,182 A 17,17 0 0,1 195,176" fill="none" stroke="#FFF0A6" stroke-width="2.5" stroke-linecap="round" opacity="0.7" filter="url(#edge-blur)" />
+      </g>
+
+      <!-- Green Control (#68D947) -->
+      <g id="control-green" filter="url(#btn-shadow)">
+        <circle cx="242" cy="191.5" r="20.5" fill="#21780B" />
+        <circle cx="242" cy="190" r="20.5" fill="url(#btn-green-grad)" />
+        <path d="M 227,182 A 17,17 0 0,1 254,176" fill="none" stroke="#B8FF9E" stroke-width="2.5" stroke-linecap="round" opacity="0.65" filter="url(#edge-blur)" />
+      </g>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- HTML CODE TYPOGRAPHY                       -->
+    <!-- ========================================== -->
+    <g id="code-typography" 
+       font-family="'Rubik', 'Nunito', 'Fira Sans', 'Segoe UI', 'Arial Rounded MT Bold', system-ui, sans-serif" 
+       font-size="42" 
+       font-weight="700" 
+       letter-spacing="0.5"
+       filter="url(#code-text-shadow)">
+
+      <!-- Line 1: <html> -->
+      <g id="code-line-1">
+        <text x="124" y="284.5" textLength="156" lengthAdjust="spacingAndGlyphs" fill="#9E5400">&lt;html&gt;</text>
+        <text x="124" y="282" textLength="156" lengthAdjust="spacingAndGlyphs" fill="url(#code-gold-grad)">&lt;html&gt;</text>
+      </g>
+
+      <!-- Line 2: <body> -->
+      <g id="code-line-2">
+        <text x="153" y="335.5" textLength="165" lengthAdjust="spacingAndGlyphs" fill="#9E5400">&lt;body&gt;</text>
+        <text x="153" y="333" textLength="165" lengthAdjust="spacingAndGlyphs" fill="url(#code-gold-grad)">&lt;body&gt;</text>
+      </g>
+
+      <!-- Line 3: <h1>Hello</h1> -->
+      <g id="code-line-3">
+        <!-- 3D Lower Extrusion Layer -->
+        <text x="180" y="386.5" fill="#9E5400">
+          <tspan x="180" textLength="94" lengthAdjust="spacingAndGlyphs">&lt;h1&gt;</tspan><tspan x="277" textLength="112" lengthAdjust="spacingAndGlyphs" fill="#8C96A4">Hello</tspan><tspan x="393" textLength="118" lengthAdjust="spacingAndGlyphs">&lt;/h1&gt;</tspan>
+        </text>
+        <!-- Subtle 3D Warm Bevel Accent on '>' before 'Hello' -->
+        <path d="M 255,363 L 269,371.5 L 255,380" fill="none" stroke="#B85D00" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7" />
+        <!-- Main Highlighted Text Layer -->
+        <text x="180" y="384" fill="url(#code-gold-grad)">
+          <tspan x="180" textLength="94" lengthAdjust="spacingAndGlyphs">&lt;h1&gt;</tspan><tspan x="277" textLength="112" lengthAdjust="spacingAndGlyphs" fill="url(#code-white-grad)">Hello</tspan><tspan x="393" textLength="118" lengthAdjust="spacingAndGlyphs">&lt;/h1&gt;</tspan>
+        </text>
+      </g>
+
+      <!-- Line 4: </body> -->
+      <g id="code-line-4">
+        <text x="153" y="437.5" textLength="188" lengthAdjust="spacingAndGlyphs" fill="#9E5400">&lt;/body&gt;</text>
+        <text x="153" y="435" textLength="188" lengthAdjust="spacingAndGlyphs" fill="url(#code-gold-grad)">&lt;/body&gt;</text>
+      </g>
+
+      <!-- Line 5: </html> -->
+      <g id="code-line-5">
+        <text x="124" y="488.5" textLength="179" lengthAdjust="spacingAndGlyphs" fill="#9E5400">&lt;/html&gt;</text>
+        <text x="124" y="486" textLength="179" lengthAdjust="spacingAndGlyphs" fill="url(#code-gold-grad)">&lt;/html&gt;</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ================================================================= -->
+  <!-- 2. IMAGE PREVIEW PANEL (RIGHT)                                    -->
+  <!-- ================================================================= -->
+  <g id="image-preview-panel">
+    <!-- Outer Card Base with Realistic Drop & Ambient Shadow -->
+    <rect x="513" y="313" width="391" height="264" rx="42" fill="url(#card-outer-rim-grad)" filter="url(#card-shadow)" />
+
+    <!-- Clipped Interior Layers for Smooth 3D Molded Rim -->
+    <g clip-path="url(#card-clip)">
+      <!-- Metallic Silver-Gray Outer Frame -->
+      <rect x="513" y="313" width="391" height="264" rx="42" fill="url(#card-outer-rim-grad)" />
+
+      <!-- 3D Glossy White-to-Cool-Gray Bevel Ring -->
+      <rect x="516.5" y="316.5" width="384" height="257" rx="38.5" fill="url(#card-inner-bevel-grad)" filter="url(#edge-blur)" />
+
+      <!-- Main Smooth White-to-Light-Gray Card Surface -->
+      <rect x="523" y="323" width="371" height="244" rx="33" fill="url(#card-surface-grad)" />
+
+      <!-- Glossy Top-Left Inner Rim Specular Highlight -->
+      <path d="M 520,362 C 520,328 534,319 564,319 L 854,319 C 882,319 896,328 896,358" 
+            fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" opacity="0.95" filter="url(#edge-blur)" />
+
+      <!-- Subtle Bottom Inner Rim Shading -->
+      <path d="M 520,532 C 520,562 536,571 564,571 L 854,571 C 882,571 897,562 897,532" 
+            fill="none" stroke="#B4BCC6" stroke-width="4" opacity="0.7" filter="url(#edge-blur)" />
+    </g>
+
+    <!-- Crisp Subtle Outer Border Stroke -->
+    <rect x="513.75" y="313.75" width="389.5" height="262.5" rx="41.25" 
+          fill="none" stroke="#686E78" stroke-width="1.5" opacity="0.85" />
+
+    <!-- ========================================== -->
+    <!-- LANDSCAPE ICON (SUN & MOUNTAINS)           -->
+    <!-- ========================================== -->
+    <g id="landscape-icon">
+      <!-- 1. Golden-Yellow Sun -->
+      <g id="sun" filter="url(#landscape-shadow)">
+        <!-- 3D Lower-Right Orange Rim -->
+        <circle cx="780.5" cy="385.5" r="41" fill="#D97E00" />
+        <!-- Main Domed Sun Sphere -->
+        <circle cx="780" cy="383" r="41" fill="url(#sun-grad)" />
+        <!-- Inner Top-Left Specular Arc -->
+        <path d="M 747,366 A 36,36 0 0,1 801,351" 
+              fill="none" stroke="#FFF59E" stroke-width="3.5" stroke-linecap="round" opacity="0.8" filter="url(#edge-blur)" />
+      </g>
+
+      <!-- 2. Overlapping Golden Mountains -->
+      <g id="mountains" filter="url(#landscape-shadow)">
+        <!-- Unified 3D Lower Orange Extrusion Base under Both Mountains -->
+        <path d="M 573,532.5 
+                 Q 548,532.5 562,513 
+                 L 638,429 
+                 Q 654,411 670,429 
+                 L 725,490 
+                 L 764,452 
+                 Q 779,437 794,452 
+                 L 850,514 
+                 Q 864,532.5 841,532.5 
+                 Z" 
+              fill="#DF8200" />
+
+        <!-- Right (Back) Mountain -->
+        <g id="mountain-right">
+          <path d="M 695,528 
+                   L 764,454 
+                   Q 779,438 794,454 
+                   L 850,513 
+                   Q 863,528 841,528 
+                   Z" 
+                fill="url(#mountain-right-grad)" />
+
+          <!-- Right Mountain Top Peak & Slope Highlight -->
+          <path d="M 736,485 L 765,454 Q 779,439 793,454 L 845,509" 
+                fill="none" stroke="url(#mountain-highlight-grad)" stroke-width="3.5" stroke-linecap="round" filter="url(#edge-blur)" />
+        </g>
+
+        <!-- Left (Front) Mountain with Overlap Shadow onto Right Mountain -->
+        <g id="mountain-left" filter="url(#mountain-overlap-shadow)">
+          <path d="M 573,528 
+                   Q 549,528 563,511 
+                   L 638,427 
+                   Q 654,409 670,427 
+                   L 754,516 
+                   Q 765,528 775,528 
+                   Z" 
+                fill="url(#mountain-left-grad)" />
+
+          <!-- Left Mountain Top-Left Slope & Peak 3D Specular Highlight -->
+          <path d="M 565,510 L 639,427 Q 654,410 669,427 L 751,514" 
+                fill="none" stroke="url(#mountain-highlight-grad)" stroke-width="4" stroke-linecap="round" filter="url(#edge-blur)" />
+        </g>
+
+        <!-- Continuous Golden Baseline Highlight Polish -->
+        <line x1="566" y1="526.5" x2="846" y2="526.5" stroke="#FFAE00" stroke-width="2" stroke-linecap="round" opacity="0.7" />
+      </g>
+    </g>
+  </g>
+
+  <!-- ================================================================= -->
+  <!-- 3. TRANSFORMATION ARROW (MIDDLE)                                  -->
+  <!-- ================================================================= -->
+  <g id="transformation-arrow" filter="url(#arrow-shadow)">
+    <!-- 3D Lower Orange Extrusion / Side Wall -->
+    <path d="M 339.5,436 
+             C 340.5,432 346,432 347.5,436.5 
+             C 363,477 397,493 444,491.5 
+             L 442.5,470 
+             C 442,461 450,458 457,463 
+             L 510,500 
+             C 516,504.5 516,512 510,516.5 
+             L 459,551.5 
+             C 451,557 443,552 444,543 
+             L 446.5,528.5 
+             C 386,530 347,495 339.5,436 Z" 
+          fill="url(#arrow-side-grad)" />
+
+    <!-- Main Golden-Yellow Arrow Top Surface -->
+    <path d="M 339.5,435 
+             C 340.5,431 346,431 347.5,435.5 
+             C 363,475 397,491 445,489.5 
+             L 443,467 
+             C 442.5,458 450.5,455 457.5,460 
+             L 510,497 
+             C 515.5,501 515.5,507.5 510,511.5 
+             L 459,545.5 
+             C 451.5,550.5 443.5,546 444.5,537.5 
+             L 447,522.5 
+             C 387,524 347,490 339.5,435 Z" 
+          fill="url(#arrow-main-grad)" />
+
+    <!-- 3D Specular Top Bevel Along Inner Curve & Upper Barb -->
+    <path d="M 344,436 
+             C 360,476 396,492 446,490.5" 
+          fill="none" stroke="#FFF380" stroke-width="3.5" stroke-linecap="round" opacity="0.85" filter="url(#edge-blur)" />
+
+    <path d="M 446,466 
+             C 446,460 451,458 456.5,462 
+             L 508,498.5" 
+          fill="none" stroke="#FFF380" stroke-width="3.5" stroke-linecap="round" opacity="0.85" filter="url(#edge-blur)" />
+
+    <!-- Soft Inner Contour Shading for Tubular 3D Volume -->
+    <path d="M 347,462 C 364,503 398,519 452,519 L 448,541" 
+          fill="none" stroke="#E07B00" stroke-width="3" stroke-linecap="round" opacity="0.5" filter="url(#edge-blur)" />
+  </g>
+
+  <!-- ================================================================= -->
+  <!-- 4. DECORATIVE RAYS (ANCHORED TO TOP-RIGHT CORNER OF PREVIEW CARD) -->
+  <!-- ================================================================= -->
+  <g id="decorative-rays" transform="translate(865, 347)" filter="url(#ray-shadow)">
+    <!-- Ray 1: Nearly Vertical, Tilted Slightly Outward (13 deg) -->
+    <g id="ray-1" transform="rotate(13)">
+      <!-- 3D Lower Rim -->
+      <path d="M -10.8,-81.56 
+               A 11,11 0 1,1 10.8,-81.56 
+               L 4.91,-48.44 
+               A 5,5 0 1,1 -4.91,-48.44 
+               Z" 
+            fill="#DF8200" transform="translate(1.05, 2.32)" />
+      <!-- Main Ray Body -->
+      <path d="M -10.8,-81.56 
+               A 11,11 0 1,1 10.8,-81.56 
+               L 4.91,-48.44 
+               A 5,5 0 1,1 -4.91,-48.44 
+               Z" 
+            fill="url(#ray-grad)" />
+      <!-- Specular Highlight -->
+      <path d="M -3.5,-51 L -8.2,-79 A 8.5,8.5 0 0,1 6.5,-86.5" 
+            fill="none" stroke="#FFF58C" stroke-width="2.2" stroke-linecap="round" opacity="0.85" filter="url(#edge-blur)" />
+    </g>
+
+    <!-- Ray 2: Diagonal Outward (43 deg) -->
+    <g id="ray-2" transform="rotate(43)">
+      <!-- 3D Lower Rim -->
+      <path d="M -10.8,-81.56 
+               A 11,11 0 1,1 10.8,-81.56 
+               L 4.91,-48.44 
+               A 5,5 0 1,1 -4.91,-48.44 
+               Z" 
+            fill="#DF8200" transform="translate(2.07, 1.49)" />
+      <!-- Main Ray Body -->
+      <path d="M -10.8,-81.56 
+               A 11,11 0 1,1 10.8,-81.56 
+               L 4.91,-48.44 
+               A 5,5 0 1,1 -4.91,-48.44 
+               Z" 
+            fill="url(#ray-grad)" />
+      <!-- Specular Highlight -->
+      <path d="M -3.5,-51 L -8.2,-79 A 8.5,8.5 0 0,1 6.5,-86.5" 
+            fill="none" stroke="#FFF58C" stroke-width="2.2" stroke-linecap="round" opacity="0.85" filter="url(#edge-blur)" />
+    </g>
+
+    <!-- Ray 3: More Horizontal, Tilted Outward (73 deg) -->
+    <g id="ray-3" transform="rotate(73)">
+      <!-- 3D Lower Rim -->
+      <path d="M -10.8,-81.56 
+               A 11,11 0 1,1 10.8,-81.56 
+               L 4.91,-48.44 
+               A 5,5 0 1,1 -4.91,-48.44 
+               Z" 
+            fill="#DF8200" transform="translate(2.54, 0.25)" />
+      <!-- Main Ray Body -->
+      <path d="M -10.8,-81.56 
+               A 11,11 0 1,1 10.8,-81.56 
+               L 4.91,-48.44 
+               A 5,5 0 1,1 -4.91,-48.44 
+               Z" 
+            fill="url(#ray-grad)" />
+      <!-- Specular Highlight -->
+      <path d="M -3.5,-51 L -8.2,-79 A 8.5,8.5 0 0,1 6.5,-86.5" 
+            fill="none" stroke="#FFF58C" stroke-width="2.2" stroke-linecap="round" opacity="0.85" filter="url(#edge-blur)" />
+    </g>
+  </g>
+</svg>
