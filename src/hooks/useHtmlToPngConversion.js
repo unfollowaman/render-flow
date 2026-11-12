@@ -129,9 +129,7 @@ export function useHtmlToPngConversion({ outputRef }) {
     const { width: explicitWidth, height: explicitHeight } = extractDimensions(htmlToConvert)
     const initialViewportWidth = explicitWidth !== null ? explicitWidth : DEFAULT_VIEWPORT_WIDTH
     iframe.style.width = initialViewportWidth + 'px'
-    if (explicitHeight !== null) {
-      iframe.style.height = explicitHeight + 'px'
-    }
+    iframe.style.height = explicitHeight !== null ? explicitHeight + 'px' : '0px'
 
     document.body.appendChild(iframe)
 
@@ -173,11 +171,17 @@ export function useHtmlToPngConversion({ outputRef }) {
       // Wait explicitly for fonts and images in the iframe document
       await waitForFontsAndImages(iframe.contentDocument)
 
-      const scrollWidth = iframe.contentDocument.documentElement.scrollWidth
-      const scrollHeight = iframe.contentDocument.documentElement.scrollHeight
+      const scrollWidth = iframeDoc?.documentElement?.scrollWidth || 0
+      const scrollHeight = Math.max(
+        iframeDoc?.documentElement?.scrollHeight || 0,
+        iframeDoc?.body?.scrollHeight || 0,
+        iframeDoc?.documentElement?.offsetHeight || 0,
+        iframeDoc?.body?.offsetHeight || 0
+      )
 
       const finalWidth = explicitWidth !== null ? explicitWidth : Math.max(initialViewportWidth, scrollWidth)
-      const finalHeight = explicitHeight !== null ? explicitHeight : scrollHeight
+      const measuredHeight = Math.max(1, Math.ceil(scrollHeight))
+      const finalHeight = explicitHeight !== null ? explicitHeight : measuredHeight
 
       const totalArea = finalWidth * finalHeight
       const MAX_AREA = 200000000

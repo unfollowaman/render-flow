@@ -118,7 +118,7 @@ describe('useHtmlToPngConversion conversion loop without artificial macro-task d
     expect(result.current.result).toEqual({
       image: 'data:image/png;base64,fake',
       width: 1200,
-      height: 0
+      height: 1
     })
     expect(result.current.loading).toBe(false)
     expect(result.current.error).toBeNull()
@@ -212,6 +212,96 @@ describe('useHtmlToPngConversion conversion loop without artificial macro-task d
       height: 900
     })
   })
+
+
+  it('pre-sizes iframe viewport height to 0px when explicit height is omitted', async () => {
+    const outputRef = { current: { scrollIntoView: vi.fn() } }
+    const { result } = renderHook(() => useHtmlToPngConversion({ outputRef }))
+
+    let capturedInitialHeight = null
+    const origCreateElement = document.createElement.bind(document)
+    vi.spyOn(document, 'createElement').mockImplementation((tagName, options) => {
+      const el = origCreateElement(tagName, options)
+      if (tagName.toLowerCase() === 'iframe') {
+        const fakeDoc = {
+          open: vi.fn(),
+          close: vi.fn(),
+          write: vi.fn(),
+          readyState: 'complete',
+          body: document.createElement('body'),
+          documentElement: document.createElement('html'),
+          images: [],
+          fonts: { ready: Promise.resolve() }
+        }
+        Object.defineProperty(el, 'contentDocument', {
+          get: () => fakeDoc,
+          configurable: true
+        })
+        Object.defineProperty(el, 'contentWindow', {
+          get: () => ({ document: fakeDoc }),
+          configurable: true
+        })
+        setTimeout(() => {
+          capturedInitialHeight = el.style.height
+        }, 0)
+      }
+      return el
+    })
+
+    await act(async () => {
+      await result.current.handleConvert('<div>No explicit height</div>')
+    })
+
+    expect(capturedInitialHeight).not.toBe('9999px')
+  })
+
+  it('measures content height dynamically according to CSSOM View standard without 9999px inflation', async () => {
+    const outputRef = { current: { scrollIntoView: vi.fn() } }
+    const { result } = renderHook(() => useHtmlToPngConversion({ outputRef }))
+
+    const origCreateElement = document.createElement.bind(document)
+    vi.spyOn(document, 'createElement').mockImplementation((tagName, options) => {
+      const el = origCreateElement(tagName, options)
+      if (tagName.toLowerCase() === 'iframe') {
+        const fakeDoc = {
+          open: vi.fn(),
+          close: vi.fn(),
+          write: vi.fn(),
+          readyState: 'complete',
+          body: document.createElement('body'),
+          documentElement: {
+            get scrollWidth() { return 1200 },
+            get scrollHeight() {
+              const viewportH = parseInt(el.style.height, 10) || 0
+              return Math.max(viewportH, 350)
+            }
+          },
+          images: [],
+          fonts: { ready: Promise.resolve() }
+        }
+        Object.defineProperty(el, 'contentDocument', {
+          get: () => fakeDoc,
+          configurable: true
+        })
+        Object.defineProperty(el, 'contentWindow', {
+          get: () => ({ document: fakeDoc }),
+          configurable: true
+        })
+      }
+      return el
+    })
+
+    await act(async () => {
+      await result.current.handleConvert('<div style="padding: 20px;">Short Card</div>')
+    })
+
+    expect(result.current.result).toEqual({
+      image: 'data:image/png;base64,fake',
+      width: 1200,
+      height: 350
+    })
+  })
+
 })
 
 describe('waitForFontsAndImages performance & functionality', () => {
