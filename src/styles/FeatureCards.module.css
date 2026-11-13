@@ -1,0 +1,259 @@
+/* ─────────────────────────────────────────────
+   FEATURE CARDS MODULE — render-flow
+   4 Animated Feature Cards (HTML, LaTeX, Mermaid, Notes)
+   ───────────────────────────────────────────── */
+
+.section {
+  width: 100%;
+  max-width: 1080px;
+  margin: 44px auto 0;
+  box-sizing: border-box;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* ── CARD SHELL ──────────────────────────────── */
+.card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 26px;
+  border: 1px solid rgba(30, 40, 35, 0.08);
+  box-shadow:
+    0 10px 24px -4px rgba(1, 43, 27, 0.06),
+    0 3px 6px -2px rgba(1, 43, 27, 0.03);
+  padding: 22px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition:
+    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.25s ease;
+  overflow: visible;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(1, 43, 27, 0.16);
+  box-shadow:
+    0 18px 36px -6px rgba(1, 43, 27, 0.10),
+    0 6px 12px -3px rgba(1, 43, 27, 0.05);
+}
+
+.card:focus-within {
+  border-color: rgba(255, 161, 0, 0.5);
+}
+
+/* ── SVG ILLUSTRATION VIEWPORT ───────────────── */
+.illustrationViewport {
+  width: 100%;
+  height: 165px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: visible;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.svgImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover .svgImage {
+  transform: scale(1.025);
+}
+
+/* ── TEXT CONTENT ────────────────────────────── */
+.cardTitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(17px, 1.4vw, 20px);
+  font-weight: 800;
+  color: #012b1b;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px 0;
+  line-height: 1.25;
+}
+
+.cardDescription {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(12.5px, 0.95vw, 13.5px);
+  font-weight: 500;
+  color: #5a6a64;
+  line-height: 1.45;
+  margin: 0 0 18px 0;
+}
+
+/* ── CTA PILL BUTTON ─────────────────────────── */
+.cardCta {
+  margin-top: auto;
+  width: 100%;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px 0 14px;
+  background: #ffffff;
+  border: 1px solid rgba(1, 43, 27, 0.12);
+  border-radius: 9999px;
+  color: #012b1b;
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(11.5px, 0.92vw, 13px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(1, 43, 27, 0.04);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+  box-sizing: border-box;
+}
+
+.card:hover .cardCta,
+.cardCta:hover {
+  background: #fafafb;
+  border-color: rgba(1, 43, 27, 0.22);
+  box-shadow: 0 4px 12px rgba(1, 43, 27, 0.08);
+}
+
+.cardCta:focus-visible {
+  outline: 2px solid #ffa100;
+  outline-offset: 3px;
+}
+
+.cardCta:active {
+  transform: scale(0.985);
+}
+
+.ctaLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 6px;
+}
+
+/* ── YELLOW CIRCULAR ARROW BADGE ─────────────── */
+.arrowBadge {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffa100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition:
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.2s ease;
+}
+
+.card:hover .arrowBadge,
+.cardCta:hover .arrowBadge {
+  transform: translateX(3px);
+  background: #ffab14;
+}
+
+.arrowIcon {
+  display: block;
+}
+
+/* ── RESPONSIVE BREAKPOINTS ──────────────────── */
+
+/* Intermediate screens / Tablet: 2 balanced columns */
+@media (max-width: 768px) {
+  .section {
+    margin-top: 36px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .card {
+    padding: 24px 20px 22px;
+  }
+
+  .illustrationViewport {
+    height: 185px;
+  }
+
+  .cardTitle {
+    font-size: 19px;
+  }
+
+  .cardDescription {
+    font-size: 13.5px;
+  }
+
+  .cardCta {
+    height: 48px;
+    font-size: 13px;
+    padding: 0 6px 0 16px;
+  }
+
+  .arrowBadge {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Mobile: Single column, stacked vertically */
+@media (max-width: 520px) {
+  .section {
+    margin-top: 28px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .card {
+    border-radius: 24px;
+    padding: 22px 18px 20px;
+    max-width: 440px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .illustrationViewport {
+    height: 180px;
+    margin-bottom: 16px;
+  }
+
+  .cardTitle {
+    font-size: 19px;
+  }
+
+  .cardDescription {
+    font-size: 13.5px;
+    margin-bottom: 18px;
+  }
+
+  .cardCta {
+    height: 46px;
+    font-size: 13px;
+  }
+
+  .arrowBadge {
+    width: 34px;
+    height: 34px;
+  }
+}

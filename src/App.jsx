@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState, Suspense, lazy } from "react";
 import styles from "./styles/Home.module.css";
 
-import { Header, Hero, Footer } from "./components";
+import { Header, Hero, Footer, FeatureCards } from "./components";
 
 const HtmlConverter = lazy(() => import("./components/HtmlConverter"));
 const MermaidConverter = lazy(() => import("./components/MermaidConverter"));
@@ -91,6 +91,14 @@ export default function App() {
             )}
           </Suspense>
         </section>
+
+        {/* ── FEATURE CARDS ──────────────────────────── */}
+        <FeatureCards
+          onSelectMode={(targetMode) => {
+            setMode(targetMode);
+            inputRef.current?.scrollToInput();
+          }}
+        />
       </main>
 
       {/* ── FOOTER ─────────────────────────────────── */}
