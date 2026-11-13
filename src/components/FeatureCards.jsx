@@ -38,6 +38,22 @@ const basePath = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
 export const FeatureCards = memo(function FeatureCards({ onSelectMode }) {
   const [sectionRef, isVisible] = useReveal({ threshold: 0.1 });
 
+  const handleCardMouseEnter = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX;
+    const y = e.clientY;
+
+    const distLeft = Math.abs(x - rect.left);
+    const distRight = Math.abs(rect.right - x);
+    const distTop = Math.abs(y - rect.top);
+    const distBottom = Math.abs(rect.bottom - y);
+
+    const minDist = Math.min(distLeft, distRight, distTop, distBottom);
+    // If entering from the right edge, set right wipe; otherwise default to left wipe (including top/bottom)
+    const direction = minDist === distRight ? "right" : "left";
+    e.currentTarget.setAttribute("data-wipe", direction);
+  };
+
   return (
     <section
       ref={sectionRef}
@@ -51,6 +67,8 @@ export const FeatureCards = memo(function FeatureCards({ onSelectMode }) {
             className={`${styles.card} reveal-tile`}
             style={{ "--reveal-i": idx }}
             onClick={() => onSelectMode?.(feature.mode)}
+            onMouseEnter={handleCardMouseEnter}
+            data-wipe="left"
           >
             {/* SVG Illustration Viewport */}
             <div className={styles.illustrationViewport}>
@@ -98,9 +116,24 @@ export const FeatureCards = memo(function FeatureCards({ onSelectMode }) {
                     <line x1="5" y1="12" x2="19" y2="12" />
                     <polyline points="12 5 19 12 12 19" />
                   </svg>
-                  {/* Active white arrow revealed seamlessly from left to right */}
+                  {/* Active white arrow revealed for Left-to-Right entry */}
                   <svg
-                    className={`${styles.arrowIcon} ${styles.arrowActive}`}
+                    className={`${styles.arrowIcon} ${styles.arrowActiveLtr}`}
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="2.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                  {/* Active white arrow revealed for Right-to-Left entry */}
+                  <svg
+                    className={`${styles.arrowIcon} ${styles.arrowActiveRtl}`}
                     width="15"
                     height="15"
                     viewBox="0 0 24 24"

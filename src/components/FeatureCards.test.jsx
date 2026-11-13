@@ -71,18 +71,50 @@ describe("FeatureCards", () => {
     expect(onSelectMode).toHaveBeenCalledWith("mermaid");
   });
 
-  it("renders dual-layer arrow SVGs (base and active) for directional fill animation", () => {
+  it("renders multi-layer arrow SVGs for directional fill animations", () => {
     const { container } = render(<FeatureCards onSelectMode={vi.fn()} />);
     const buttons = container.querySelectorAll("button");
     expect(buttons).toHaveLength(4);
 
     buttons.forEach((button) => {
       const svgs = button.querySelectorAll("svg");
-      expect(svgs.length).toBeGreaterThanOrEqual(2);
+      expect(svgs.length).toBeGreaterThanOrEqual(3);
       // Check stroke attributes: base dark (#012b1b) and active white (#ffffff)
       const strokes = Array.from(svgs).map((s) => s.getAttribute("stroke"));
       expect(strokes).toContain("#012b1b");
       expect(strokes).toContain("#ffffff");
     });
+  });
+
+  it("dynamically sets data-wipe direction based on pointer entry edge", () => {
+    const { container } = render(<FeatureCards onSelectMode={vi.fn()} />);
+    const articles = container.querySelectorAll("article");
+    const firstCard = articles[0];
+
+    // Mock getBoundingClientRect
+    firstCard.getBoundingClientRect = () => ({
+      left: 100,
+      right: 300,
+      top: 50,
+      bottom: 400,
+      width: 200,
+      height: 350,
+    });
+
+    // 1. Enter from the right edge (clientX = 295, very close to right: 300)
+    fireEvent.mouseEnter(firstCard, { clientX: 295, clientY: 200 });
+    expect(firstCard.getAttribute("data-wipe")).toBe("right");
+
+    // 2. Enter from the left edge (clientX = 105, very close to left: 100)
+    fireEvent.mouseEnter(firstCard, { clientX: 105, clientY: 200 });
+    expect(firstCard.getAttribute("data-wipe")).toBe("left");
+
+    // 3. Enter from the top edge (clientY = 55, closest to top: 50 -> defaults to left)
+    fireEvent.mouseEnter(firstCard, { clientX: 200, clientY: 55 });
+    expect(firstCard.getAttribute("data-wipe")).toBe("left");
+
+    // 4. Enter from the bottom edge (clientY = 395, closest to bottom: 400 -> defaults to left)
+    fireEvent.mouseEnter(firstCard, { clientX: 200, clientY: 395 });
+    expect(firstCard.getAttribute("data-wipe")).toBe("left");
   });
 });

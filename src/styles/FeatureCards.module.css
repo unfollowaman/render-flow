@@ -109,7 +109,7 @@
   box-sizing: border-box;
 }
 
-/* Seamless left-to-right yellow fill across pill */
+/* LTR yellow fill (Left-to-Right) via ::before */
 .cardCta::before {
   content: "";
   position: absolute;
@@ -117,15 +117,36 @@
   border-radius: 9999px;
   background: #ffa100;
   clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: clip-path 0.22s ease;
   z-index: 0;
   pointer-events: none;
 }
 
-.card:hover .cardCta::before,
-.cardCta:hover::before,
-.card:focus-within .cardCta::before {
+/* RTL yellow fill (Right-to-Left) via ::after */
+.cardCta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: #ffa100;
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path 0.22s ease;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* LTR hover trigger: pill starts sweeping from left */
+.card:not([data-wipe="right"]):hover .cardCta::before,
+.card:not([data-wipe="right"]):focus-within .cardCta::before {
   clip-path: inset(0 0% 0 0);
+  transition: clip-path 0.42s cubic-bezier(0.22, 1, 0.36, 1) 0s;
+}
+
+/* RTL hover trigger: pill starts sweeping from right */
+.card[data-wipe="right"]:hover .cardCta::after,
+.card[data-wipe="right"]:focus-within .cardCta::after {
+  clip-path: inset(0 0 0 0%);
+  transition: clip-path 0.42s cubic-bezier(0.22, 1, 0.36, 1) 0s;
 }
 
 .card:hover .cardCta,
@@ -168,7 +189,7 @@
   z-index: 1;
 }
 
-/* Seamless left-to-right black fill across circular badge */
+/* LTR black fill (starts left, sweeps right) */
 .arrowBadge::before {
   content: "";
   position: absolute;
@@ -176,15 +197,36 @@
   border-radius: 50%;
   background: #012b1b;
   clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: clip-path 0.20s ease;
   z-index: 0;
   pointer-events: none;
 }
 
-.card:hover .arrowBadge::before,
-.cardCta:hover .arrowBadge::before,
-.card:focus-within .arrowBadge::before {
+/* RTL black fill (starts right, sweeps left) */
+.arrowBadge::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #012b1b;
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path 0.20s ease;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* LTR hover trigger: starts ONLY when yellow pill wave reaches badge (~0.22s delay) */
+.card:not([data-wipe="right"]):hover .arrowBadge::before,
+.card:not([data-wipe="right"]):focus-within .arrowBadge::before {
   clip-path: inset(0 0% 0 0);
+  transition: clip-path 0.20s cubic-bezier(0.22, 1, 0.36, 1) 0.22s;
+}
+
+/* RTL hover trigger: starts immediately from right at 0s */
+.card[data-wipe="right"]:hover .arrowBadge::after,
+.card[data-wipe="right"]:focus-within .arrowBadge::after {
+  clip-path: inset(0 0 0 0%);
+  transition: clip-path 0.20s cubic-bezier(0.22, 1, 0.36, 1) 0s;
 }
 
 /* ── ARROW ICON & COLOR WIPE ─────────────────── */
@@ -208,26 +250,47 @@
   stroke: #012b1b;
 }
 
-/* Active white arrow revealed seamlessly from left to right */
-.arrowActive {
+/* LTR active white arrow */
+.arrowActiveLtr {
   position: absolute;
   inset: 0;
   stroke: #ffffff;
   clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: clip-path 0.20s ease;
 }
 
-.card:hover .arrowActive,
-.cardCta:hover .arrowActive,
-.card:focus-within .arrowActive {
+/* RTL active white arrow */
+.arrowActiveRtl {
+  position: absolute;
+  inset: 0;
+  stroke: #ffffff;
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path 0.20s ease;
+}
+
+/* LTR hover trigger: in lockstep with badge (~0.22s delay) */
+.card:not([data-wipe="right"]):hover .arrowActiveLtr,
+.card:not([data-wipe="right"]):focus-within .arrowActiveLtr {
   clip-path: inset(0 0% 0 0);
+  transition: clip-path 0.20s cubic-bezier(0.22, 1, 0.36, 1) 0.22s;
+}
+
+/* RTL hover trigger: in lockstep with badge (starts at 0s) */
+.card[data-wipe="right"]:hover .arrowActiveRtl,
+.card[data-wipe="right"]:focus-within .arrowActiveRtl {
+  clip-path: inset(0 0 0 0%);
+  transition: clip-path 0.20s cubic-bezier(0.22, 1, 0.36, 1) 0s;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cardCta::before,
+  .cardCta::after,
   .arrowBadge::before,
-  .arrowActive {
-    transition-duration: 0.01ms;
+  .arrowBadge::after,
+  .arrowActiveLtr,
+  .arrowActiveRtl {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
   }
 }
 
