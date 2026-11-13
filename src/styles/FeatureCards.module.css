@@ -117,7 +117,7 @@
   border-radius: 9999px;
   background: #ffa100;
   clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.22s ease;
+  transition: clip-path 0.18s cubic-bezier(0.25, 1, 0.5, 1);
   z-index: 0;
   pointer-events: none;
 }
@@ -130,7 +130,7 @@
   border-radius: 9999px;
   background: #ffa100;
   clip-path: inset(0 0 0 100%);
-  transition: clip-path 0.22s ease;
+  transition: clip-path 0.18s cubic-bezier(0.25, 1, 0.5, 1);
   z-index: 0;
   pointer-events: none;
 }
@@ -139,14 +139,14 @@
 .card:not([data-wipe="right"]):hover .cardCta::before,
 .card:not([data-wipe="right"]):focus-within .cardCta::before {
   clip-path: inset(0 0% 0 0);
-  transition: clip-path 0.42s cubic-bezier(0.22, 1, 0.36, 1) 0s;
+  transition: clip-path 0.36s cubic-bezier(0.16, 1, 0.3, 1) 0s;
 }
 
 /* RTL hover trigger: pill starts sweeping from right */
 .card[data-wipe="right"]:hover .cardCta::after,
 .card[data-wipe="right"]:focus-within .cardCta::after {
   clip-path: inset(0 0 0 0%);
-  transition: clip-path 0.42s cubic-bezier(0.22, 1, 0.36, 1) 0s;
+  transition: clip-path 0.36s cubic-bezier(0.16, 1, 0.3, 1) 0s;
 }
 
 .card:hover .cardCta,
@@ -197,7 +197,7 @@
   border-radius: 50%;
   background: #012b1b;
   clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.20s ease;
+  transition: clip-path 0.18s cubic-bezier(0.25, 1, 0.5, 1);
   z-index: 0;
   pointer-events: none;
 }
@@ -210,23 +210,23 @@
   border-radius: 50%;
   background: #012b1b;
   clip-path: inset(0 0 0 100%);
-  transition: clip-path 0.20s ease;
+  transition: clip-path 0.18s cubic-bezier(0.25, 1, 0.5, 1);
   z-index: 0;
   pointer-events: none;
 }
 
-/* LTR hover trigger: starts ONLY when yellow pill wave reaches badge (~0.22s delay) */
+/* LTR hover trigger: starts ONLY when yellow pill wave reaches badge (0.16s delay) */
 .card:not([data-wipe="right"]):hover .arrowBadge::before,
 .card:not([data-wipe="right"]):focus-within .arrowBadge::before {
   clip-path: inset(0 0% 0 0);
-  transition: clip-path 0.20s cubic-bezier(0.22, 1, 0.36, 1) 0.22s;
+  transition: clip-path 0.20s cubic-bezier(0.16, 1, 0.3, 1) 0.16s;
 }
 
 /* RTL hover trigger: starts immediately from right at 0s */
 .card[data-wipe="right"]:hover .arrowBadge::after,
 .card[data-wipe="right"]:focus-within .arrowBadge::after {
   clip-path: inset(0 0 0 0%);
-  transition: clip-path 0.20s cubic-bezier(0.22, 1, 0.36, 1) 0s;
+  transition: clip-path 0.20s cubic-bezier(0.16, 1, 0.3, 1) 0s;
 }
 
 /* ── ARROW ICON & COLOR WIPE ─────────────────── */
@@ -256,7 +256,7 @@
   inset: 0;
   stroke: #ffffff;
   clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.20s ease;
+  transition: clip-path 0.18s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* RTL active white arrow */
@@ -265,21 +265,21 @@
   inset: 0;
   stroke: #ffffff;
   clip-path: inset(0 0 0 100%);
-  transition: clip-path 0.20s ease;
+  transition: clip-path 0.18s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* LTR hover trigger: in lockstep with badge (~0.22s delay) */
+/* LTR hover trigger: in lockstep with badge (0.16s delay) */
 .card:not([data-wipe="right"]):hover .arrowActiveLtr,
 .card:not([data-wipe="right"]):focus-within .arrowActiveLtr {
   clip-path: inset(0 0% 0 0);
-  transition: clip-path 0.20s cubic-bezier(0.22, 1, 0.36, 1) 0.22s;
+  transition: clip-path 0.20s cubic-bezier(0.16, 1, 0.3, 1) 0.16s;
 }
 
 /* RTL hover trigger: in lockstep with badge (starts at 0s) */
 .card[data-wipe="right"]:hover .arrowActiveRtl,
 .card[data-wipe="right"]:focus-within .arrowActiveRtl {
   clip-path: inset(0 0 0 0%);
-  transition: clip-path 0.20s cubic-bezier(0.22, 1, 0.36, 1) 0s;
+  transition: clip-path 0.20s cubic-bezier(0.16, 1, 0.3, 1) 0s;
 }
 
 @media (prefers-reduced-motion: reduce) {
