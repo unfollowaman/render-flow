@@ -70,4 +70,19 @@ describe("FeatureCards", () => {
     fireEvent.click(articles[2]);
     expect(onSelectMode).toHaveBeenCalledWith("mermaid");
   });
+
+  it("renders dual-layer arrow SVGs (base and active) for directional fill animation", () => {
+    const { container } = render(<FeatureCards onSelectMode={vi.fn()} />);
+    const buttons = container.querySelectorAll("button");
+    expect(buttons).toHaveLength(4);
+
+    buttons.forEach((button) => {
+      const svgs = button.querySelectorAll("svg");
+      expect(svgs.length).toBeGreaterThanOrEqual(2);
+      // Check stroke attributes: base dark (#012b1b) and active white (#ffffff)
+      const strokes = Array.from(svgs).map((s) => s.getAttribute("stroke"));
+      expect(strokes).toContain("#012b1b");
+      expect(strokes).toContain("#ffffff");
+    });
+  });
 });

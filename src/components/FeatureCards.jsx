@@ -82,20 +82,38 @@ export const FeatureCards = memo(function FeatureCards({ onSelectMode }) {
             >
               <span className={styles.ctaLabel}>{feature.cta}</span>
               <span className={styles.arrowBadge} aria-hidden="true">
-                <svg
-                  className={styles.arrowIcon}
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#012b1b"
-                  strokeWidth="2.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
+                <span className={styles.arrowIconWrapper}>
+                  {/* Base dark arrow */}
+                  <svg
+                    className={`${styles.arrowIcon} ${styles.arrowBase}`}
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#012b1b"
+                    strokeWidth="2.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                  {/* Active white arrow revealed seamlessly from left to right */}
+                  <svg
+                    className={`${styles.arrowIcon} ${styles.arrowActive}`}
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="2.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </span>
               </span>
             </button>
           </article>

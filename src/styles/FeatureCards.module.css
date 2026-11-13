@@ -32,19 +32,7 @@
   height: 100%;
   box-sizing: border-box;
   cursor: pointer;
-  transition:
-    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.25s ease;
   overflow: visible;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(1, 43, 27, 0.16);
-  box-shadow:
-    0 18px 36px -6px rgba(1, 43, 27, 0.10),
-    0 6px 12px -3px rgba(1, 43, 27, 0.05);
 }
 
 .card:focus-within {
@@ -71,11 +59,6 @@
   object-fit: contain;
   display: block;
   pointer-events: none;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.card:hover .svgImage {
-  transform: scale(1.025);
 }
 
 /* ── TEXT CONTENT ────────────────────────────── */
@@ -100,6 +83,9 @@
 
 /* ── CTA PILL BUTTON ─────────────────────────── */
 .cardCta {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
   margin-top: auto;
   width: 100%;
   height: 46px;
@@ -118,18 +104,34 @@
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(1, 43, 27, 0.04);
   transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
+    border-color 0.35s ease,
     transform 0.15s ease;
   box-sizing: border-box;
 }
 
+/* Seamless left-to-right yellow fill across pill */
+.cardCta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: #ffa100;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.card:hover .cardCta::before,
+.cardCta:hover::before,
+.card:focus-within .cardCta::before {
+  clip-path: inset(0 0% 0 0);
+}
+
 .card:hover .cardCta,
-.cardCta:hover {
-  background: #fafafb;
-  border-color: rgba(1, 43, 27, 0.22);
-  box-shadow: 0 4px 12px rgba(1, 43, 27, 0.08);
+.cardCta:hover,
+.card:focus-within .cardCta {
+  border-color: #ffa100;
 }
 
 .cardCta:focus-visible {
@@ -142,14 +144,19 @@
 }
 
 .ctaLabel {
+  position: relative;
+  z-index: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   padding-right: 6px;
 }
 
-/* ── YELLOW CIRCULAR ARROW BADGE ─────────────── */
+/* ── CIRCULAR ARROW BADGE ────────────────────── */
 .arrowBadge {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
   width: 34px;
   height: 34px;
   border-radius: 50%;
@@ -158,19 +165,70 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition:
-    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-    background-color 0.2s ease;
+  z-index: 1;
 }
 
-.card:hover .arrowBadge,
-.cardCta:hover .arrowBadge {
-  transform: translateX(3px);
-  background: #ffab14;
+/* Seamless left-to-right black fill across circular badge */
+.arrowBadge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #012b1b;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.card:hover .arrowBadge::before,
+.cardCta:hover .arrowBadge::before,
+.card:focus-within .arrowBadge::before {
+  clip-path: inset(0 0% 0 0);
+}
+
+/* ── ARROW ICON & COLOR WIPE ─────────────────── */
+.arrowIconWrapper {
+  position: relative;
+  width: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
 }
 
 .arrowIcon {
   display: block;
+}
+
+.arrowBase {
+  position: absolute;
+  inset: 0;
+  stroke: #012b1b;
+}
+
+/* Active white arrow revealed seamlessly from left to right */
+.arrowActive {
+  position: absolute;
+  inset: 0;
+  stroke: #ffffff;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover .arrowActive,
+.cardCta:hover .arrowActive,
+.card:focus-within .arrowActive {
+  clip-path: inset(0 0% 0 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cardCta::before,
+  .arrowBadge::before,
+  .arrowActive {
+    transition-duration: 0.01ms;
+  }
 }
 
 /* ── RESPONSIVE BREAKPOINTS ──────────────────── */
