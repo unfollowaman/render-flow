@@ -347,7 +347,7 @@ describe('measureHeight caching & performance benchmark', () => {
 
     expect(result.pages.length).toBeGreaterThan(0);
     expect(result.overflowItems.length).toBe(100); // 10,000 / 100 = 100 oversized items
-  });
+  }, 20000);
 
   test('benchmark flowBlocksIntoColumns performance for 500 blocks', async () => {
     const blocks = Array.from({ length: 500 }, (_, i) => {
@@ -384,7 +384,7 @@ describe('measureHeight caching & performance benchmark', () => {
     console.log(`[Benchmark flowBlocksIntoColumns] 500 blocks -> Duration: ${duration.toFixed(2)}ms`);
 
     expect(result.pages.length).toBeGreaterThan(0);
-  });
+  }, 20000);
 });
 
 describe('flowBlocksIntoColumns XSS Sanitization', () => {

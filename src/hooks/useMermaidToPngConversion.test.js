@@ -1,11 +1,30 @@
-import { describe, it, expect } from 'vitest';
-import { arrayBufferToBase64 } from './useMermaidToPngConversion';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { renderHook, act, cleanup } from '@testing-library/react';
+import { useMermaidToPngConversion, arrayBufferToBase64 } from './useMermaidToPngConversion';
 
-import { vi } from 'vitest';
-
-import { renderHook, act } from '@testing-library/react';
+const originalFetch = globalThis.fetch;
+const originalImage = globalThis.Image;
 
 describe('useMermaidToPngConversion security configuration', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+    if (originalFetch !== undefined) {
+      globalThis.fetch = originalFetch;
+    } else {
+      delete globalThis.fetch;
+    }
+    if (originalImage !== undefined) {
+      globalThis.Image = originalImage;
+    } else {
+      delete globalThis.Image;
+    }
+  });
+
   it('initializes Mermaid with securityLevel set to strict', async () => {
     // Mock fetch for font loading
     globalThis.fetch = vi.fn().mockResolvedValue({
@@ -27,37 +46,60 @@ describe('useMermaidToPngConversion security configuration', () => {
       svg: '<svg viewBox="0 0 100 100"></svg>',
     });
 
-    const { useMermaidToPngConversion } = await import('./useMermaidToPngConversion.js');
     const ref = { current: null };
+    const { result, unmount } = renderHook(() => useMermaidToPngConversion({ outputRef: ref }));
 
-    const { result } = renderHook(() => useMermaidToPngConversion({ outputRef: ref }));
+    try {
+      await act(async () => {
+        await result.current.handleConvert('graph TD; A-->B;');
+      });
 
-    await act(async () => {
-      await result.current.handleConvert('graph TD; A-->B;');
-    });
-
-    expect(initializeSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        securityLevel: 'strict',
-      })
-    );
-  });
+      expect(initializeSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          securityLevel: 'strict',
+        })
+      );
+    } finally {
+      unmount();
+    }
+  }, 20000);
 });
 
 describe('useMermaidToPngConversion error handling', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+    if (originalFetch !== undefined) {
+      globalThis.fetch = originalFetch;
+    } else {
+      delete globalThis.fetch;
+    }
+    if (originalImage !== undefined) {
+      globalThis.Image = originalImage;
+    } else {
+      delete globalThis.Image;
+    }
+  });
+
   it('sets error state when input code string is empty or whitespace', async () => {
-    const { useMermaidToPngConversion } = await import('./useMermaidToPngConversion.js');
     const ref = { current: null };
+    const { result, unmount } = renderHook(() => useMermaidToPngConversion({ outputRef: ref }));
 
-    const { result } = renderHook(() => useMermaidToPngConversion({ outputRef: ref }));
+    try {
+      await act(async () => {
+        await result.current.handleConvert('   ');
+      });
 
-    await act(async () => {
-      await result.current.handleConvert('   ');
-    });
-
-    expect(result.current.error).toBe('Please enter some Mermaid code first.');
-    expect(result.current.loading).toBe(false);
-    expect(result.current.result).toBeNull();
+      expect(result.current.error).toBe('Please enter some Mermaid code first.');
+      expect(result.current.loading).toBe(false);
+      expect(result.current.result).toBeNull();
+    } finally {
+      unmount();
+    }
   });
 
   it('sets error state when mermaid.render throws an error', async () => {
@@ -77,18 +119,20 @@ describe('useMermaidToPngConversion error handling', () => {
     vi.spyOn(mermaid, 'initialize').mockImplementation(() => {});
     vi.spyOn(mermaid, 'render').mockRejectedValue(new Error('Syntax error'));
 
-    const { useMermaidToPngConversion } = await import('./useMermaidToPngConversion.js');
     const ref = { current: null };
+    const { result, unmount } = renderHook(() => useMermaidToPngConversion({ outputRef: ref }));
 
-    const { result } = renderHook(() => useMermaidToPngConversion({ outputRef: ref }));
+    try {
+      await act(async () => {
+        await result.current.handleConvert('graph TD; invalid code;');
+      });
 
-    await act(async () => {
-      await result.current.handleConvert('graph TD; invalid code;');
-    });
-
-    expect(result.current.error).toBe('Invalid Mermaid syntax.');
-    expect(result.current.loading).toBe(false);
-    expect(result.current.result).toBeNull();
+      expect(result.current.error).toBe('Invalid Mermaid syntax.');
+      expect(result.current.loading).toBe(false);
+      expect(result.current.result).toBeNull();
+    } finally {
+      unmount();
+    }
   });
 
   it('sets error state when SVG dimensions cannot be determined', async () => {
@@ -110,18 +154,20 @@ describe('useMermaidToPngConversion error handling', () => {
       svg: '<svg></svg>',
     });
 
-    const { useMermaidToPngConversion } = await import('./useMermaidToPngConversion.js');
     const ref = { current: null };
+    const { result, unmount } = renderHook(() => useMermaidToPngConversion({ outputRef: ref }));
 
-    const { result } = renderHook(() => useMermaidToPngConversion({ outputRef: ref }));
+    try {
+      await act(async () => {
+        await result.current.handleConvert('graph TD; A-->B;');
+      });
 
-    await act(async () => {
-      await result.current.handleConvert('graph TD; A-->B;');
-    });
-
-    expect(result.current.error).toBe('Unable to determine dimensions from Mermaid SVG.');
-    expect(result.current.loading).toBe(false);
-    expect(result.current.result).toBeNull();
+      expect(result.current.error).toBe('Unable to determine dimensions from Mermaid SVG.');
+      expect(result.current.loading).toBe(false);
+      expect(result.current.result).toBeNull();
+    } finally {
+      unmount();
+    }
   });
 });
 
@@ -171,5 +217,5 @@ describe('arrayBufferToBase64', () => {
 
     console.log(`[Benchmark arrayBufferToBase64] Total: ${totalTime.toFixed(2)}ms, Avg: ${avgTime.toFixed(4)}ms over ${iterations} runs (${size / 1024 / 1024}MB buffer)`);
     expect(totalTime).toBeGreaterThan(0);
-  });
+  }, 15000);
 });

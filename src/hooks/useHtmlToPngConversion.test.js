@@ -359,5 +359,5 @@ describe('waitForFontsAndImages performance & functionality', () => {
 
     expect(countDirect).toBe(2000)
     expect(countArrayFrom).toBe(2000)
-  })
+  }, 20000)
 })

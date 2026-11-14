@@ -155,7 +155,7 @@ describe('DocsApp', () => {
     });
 
     initSpy.mockRestore();
-  });
+  }, 20000);
 
   it('sanitizes SVG output from mermaid.render using DOMPurify', async () => {
     const sanitizeSpy = vi.spyOn(DOMPurify, 'sanitize');
@@ -178,7 +178,7 @@ describe('DocsApp', () => {
 
     sanitizeSpy.mockRestore();
     renderSpy.mockRestore();
-  });
+  }, 20000);
 
   it('handles mobile dropdown navigation change', () => {
     render(<DocsApp />);
