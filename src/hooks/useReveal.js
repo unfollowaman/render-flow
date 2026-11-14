@@ -8,8 +8,8 @@ export default function useReveal({ threshold = 0.15, once = true } = {}) {
     const el = ref.current;
     if (!el) return;
     if (
-      !('IntersectionObserver' in window) ||
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      typeof window.IntersectionObserver !== 'function' ||
+      (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
     ) {
       setVisible(true);
       return;

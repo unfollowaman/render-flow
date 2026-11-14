@@ -298,6 +298,14 @@ a {
   transition-delay: calc(0.2s + var(--reveal-i, 0) * 0.1s);
 }
 
+.reveal-instant,
+.reveal-instant .reveal-item {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .reveal-item {

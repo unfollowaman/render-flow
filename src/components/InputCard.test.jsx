@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, cleanup, act, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React, { createRef } from 'react';
-import { InputCard } from './InputCard';
+import { InputCard, suppressInputCardReveal, _resetInputCardRevealedForTesting } from './InputCard';
 
 describe('InputCard', () => {
   const defaultProps = {
@@ -31,6 +31,7 @@ describe('InputCard', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    _resetInputCardRevealedForTesting();
   });
 
   afterEach(() => {
@@ -484,6 +485,57 @@ describe('InputCard', () => {
 
       expect(setNotesError).toHaveBeenCalledWith('Please upload a valid .json file.');
       expect(statusRegion.textContent).toBe('Please upload a valid .json file.');
+    });
+  });
+
+  describe('Reveal Animation Suppression', () => {
+    it('renders with initial reveal animation class on fresh mount when IntersectionObserver is active', () => {
+      const origIO = window.IntersectionObserver;
+      window.IntersectionObserver = vi.fn().mockImplementation(() => ({
+        observe: vi.fn(),
+        disconnect: vi.fn(),
+        unobserve: vi.fn()
+      }));
+
+      try {
+        const { container } = render(<InputCard {...defaultProps} />);
+        const card = container.firstChild;
+        expect(card.classList.contains('reveal-instant')).toBe(false);
+        expect(card.classList.contains('reveal')).toBe(true);
+      } finally {
+        if (origIO === undefined) {
+          delete window.IntersectionObserver;
+        } else {
+          window.IntersectionObserver = origIO;
+        }
+      }
+    });
+
+    it('renders with reveal-instant when suppressInputCardReveal has been called', () => {
+      suppressInputCardReveal();
+      const { container } = render(<InputCard {...defaultProps} />);
+      const card = container.firstChild;
+      expect(card.classList.contains('reveal-instant')).toBe(true);
+      expect(card.classList.contains('reveal')).toBe(false);
+    });
+
+    it('renders with reveal-instant when suppressRevealAnimation prop is true', () => {
+      const { container } = render(<InputCard {...defaultProps} suppressRevealAnimation={true} />);
+      const card = container.firstChild;
+      expect(card.classList.contains('reveal-instant')).toBe(true);
+      expect(card.classList.contains('reveal')).toBe(false);
+    });
+
+    it('marks card as revealed when scrollToInput is invoked', () => {
+      const ref = createRef();
+      const { container } = render(<InputCard {...defaultProps} ref={ref} />);
+      const card = container.firstChild;
+
+      act(() => {
+        ref.current.scrollToInput();
+      });
+
+      expect(card.classList.contains('reveal-instant')).toBe(true);
     });
   });
 });

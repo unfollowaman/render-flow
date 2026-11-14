@@ -1,7 +1,7 @@
 export { Header } from './Header'
 export { Hero } from './Hero'
 export { Footer } from './Footer'
-export { InputCard } from './InputCard'
+export { InputCard, suppressInputCardReveal, _resetInputCardRevealedForTesting } from './InputCard'
 export { ErrorCard } from './ErrorCard'
 export { OutputCard } from './OutputCard'
 export { A4Page } from './A4Page'

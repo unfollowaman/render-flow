@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState, Suspense, lazy } from "react";
 import styles from "./styles/Home.module.css";
 
-import { Header, Hero, Footer, FeatureCards } from "./components";
+import { Header, Hero, Footer, FeatureCards, suppressInputCardReveal } from "./components";
 
 const HtmlConverter = lazy(() => import("./components/HtmlConverter"));
 const MermaidConverter = lazy(() => import("./components/MermaidConverter"));
@@ -95,6 +95,7 @@ export default function App() {
         {/* ── FEATURE CARDS ──────────────────────────── */}
         <FeatureCards
           onSelectMode={(targetMode) => {
+            suppressInputCardReveal();
             setMode(targetMode);
             inputRef.current?.scrollToInput();
           }}

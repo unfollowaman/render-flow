@@ -1,5 +1,5 @@
 import styles from "../styles/Home.module.css";
-import { useRef, useState, forwardRef, useImperativeHandle } from "react";
+import { useRef, useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import useReveal from "../hooks/useReveal";
 import { CodeEditor } from "./CodeEditor";
 
@@ -806,6 +806,16 @@ const NotesWorkspace = forwardRef(function NotesWorkspace({
   );
 });
 
+let hasInputCardRevealed = false;
+
+export function suppressInputCardReveal() {
+  hasInputCardRevealed = true;
+}
+
+export function _resetInputCardRevealedForTesting() {
+  hasInputCardRevealed = false;
+}
+
 export const InputCard = forwardRef(function InputCard({
   mode,
   setMode,
@@ -828,7 +838,8 @@ export const InputCard = forwardRef(function InputCard({
   setNotesError,
   validateNotesJson,
   handleNotesGenerate,
-  handleNotesReset
+  handleNotesReset,
+  suppressRevealAnimation
 }, ref) {
   const htmlRef = useRef(null);
   const mermaidRef = useRef(null);
@@ -836,6 +847,18 @@ export const InputCard = forwardRef(function InputCard({
   const notesRef = useRef(null);
   const cardRef = useRef(null);
   const [revealRef, revealVisible] = useReveal();
+  const [isRevealed, setIsRevealed] = useState(
+    () => hasInputCardRevealed || Boolean(suppressRevealAnimation)
+  );
+
+  useEffect(() => {
+    if (revealVisible) {
+      hasInputCardRevealed = true;
+      setIsRevealed(true);
+    }
+  }, [revealVisible]);
+
+  const isInstant = isRevealed || hasInputCardRevealed || Boolean(suppressRevealAnimation);
 
   useImperativeHandle(ref, () => ({
     resetHtml: () => {
@@ -851,6 +874,8 @@ export const InputCard = forwardRef(function InputCard({
       notesRef.current?.reset();
     },
     scrollToInput: () => {
+      hasInputCardRevealed = true;
+      setIsRevealed(true);
       cardRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }));
@@ -873,7 +898,7 @@ export const InputCard = forwardRef(function InputCard({
 
   return (
     <div
-      className={`${styles.card} neu-card reveal${revealVisible ? ' is-visible' : ''}`}
+      className={`${styles.card} neu-card${isInstant ? ' reveal-instant' : ` reveal${revealVisible ? ' is-visible' : ''}`}`}
       ref={(node) => {
         revealRef.current = node;
         cardRef.current = node;
