@@ -3,8 +3,8 @@ import React from 'react';
 import { render, act, screen, cleanup } from '@testing-library/react';
 import useReveal from './useReveal';
 
-function TestComponent({ threshold }) {
-  const [ref, visible] = useReveal({ threshold });
+function TestComponent({ threshold, once } = {}) {
+  const [ref, visible] = useReveal({ threshold, once });
   return <div ref={ref} data-testid="reveal-target" data-visible={visible ? 'true' : 'false'} />;
 }
 
@@ -12,6 +12,7 @@ describe('useReveal hook', () => {
   let observerCallback = null;
   let mockObserve = vi.fn();
   let mockDisconnect = vi.fn();
+  let mockUnobserve = vi.fn();
   let originalIntersectionObserver = window.IntersectionObserver;
   let originalMatchMedia = window.matchMedia;
 
@@ -19,13 +20,14 @@ describe('useReveal hook', () => {
     vi.clearAllMocks();
     mockObserve = vi.fn();
     mockDisconnect = vi.fn();
+    mockUnobserve = vi.fn();
 
     window.IntersectionObserver = vi.fn().mockImplementation((callback) => {
       observerCallback = callback;
       return {
         observe: mockObserve,
         disconnect: mockDisconnect,
-        unobserve: vi.fn()
+        unobserve: mockUnobserve
       };
     });
 
@@ -47,8 +49,29 @@ describe('useReveal hook', () => {
     window.matchMedia = originalMatchMedia;
   });
 
-  it('updates visible state based on intersection status on scroll in and out', () => {
+  it('sets visible to true on intersection and unobserves by default (once: true)', () => {
     render(<TestComponent />);
+    const target = screen.getByTestId('reveal-target');
+
+    expect(mockObserve).toHaveBeenCalledWith(target);
+    expect(target.getAttribute('data-visible')).toBe('false');
+
+    // Scroll in
+    act(() => {
+      observerCallback([{ isIntersecting: true }]);
+    });
+    expect(target.getAttribute('data-visible')).toBe('true');
+    expect(mockUnobserve).toHaveBeenCalledWith(target);
+
+    // Scroll out — should remain visible because once defaults to true
+    act(() => {
+      observerCallback([{ isIntersecting: false }]);
+    });
+    expect(target.getAttribute('data-visible')).toBe('true');
+  });
+
+  it('updates visible state based on intersection status on scroll in and out when once is false', () => {
+    render(<TestComponent once={false} />);
     const target = screen.getByTestId('reveal-target');
 
     expect(mockObserve).toHaveBeenCalledWith(target);
