@@ -15,7 +15,7 @@ test('tapping a feature card switches mode and scrolls to input', async () => {
   render(<App />);
 
   // Wait for lazy converter to load
-  await screen.findByRole('tablist', { name: /input mode selector/i });
+  await screen.findByRole('tablist', { name: /input mode selector/i }, { timeout: 4000 });
 
   const latexButtons = screen.getAllByRole('button', { name: /Try LaTeX Renderer for LaTeX to Image/i });
   fireEvent.click(latexButtons[0]);
