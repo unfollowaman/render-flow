@@ -1,6 +1,5 @@
 import { render, screen, cleanup, fireEvent } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import DOMPurify from 'dompurify';
+import { describe, it, expect, beforeEach } from 'vitest';
 import DocsApp from './DocsApp';
 
 describe('DocsApp', () => {
@@ -136,49 +135,33 @@ describe('DocsApp', () => {
     expect(unfollowLink.getAttribute('href')).toBe('https://x.com/unfollowaman');
   });
 
-  it('initializes mermaid with htmlLabels: false so SVG text elements are used and preserved by DOMPurify', async () => {
-    const mermaidModule = await import('mermaid');
-    const mermaid = mermaidModule.default || mermaidModule;
-    const initSpy = vi.spyOn(mermaid, 'initialize');
-
+  it('renders lightweight HTML/CSS flow diagrams with nodes and connectors for each mode', () => {
     render(<DocsApp />);
 
-    await vi.waitFor(() => {
-      expect(initSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          htmlLabels: false,
-          flowchart: expect.objectContaining({
-            htmlLabels: false,
-          }),
-        })
-      );
-    });
+    // Overview diagram steps
+    expect(screen.getByText('Paste code')).toBeTruthy();
+    expect(screen.getByText('Render Flow processes it in your browser')).toBeTruthy();
+    expect(screen.getAllByText('PNG delivered').length).toBe(4);
 
-    initSpy.mockRestore();
-  }, 20000);
+    // HTML mode steps
+    expect(screen.getByText('Paste HTML')).toBeTruthy();
+    expect(screen.getByText(/Extract width\/height/i)).toBeTruthy();
+    expect(screen.getByText(/Write into/i)).toBeTruthy();
+    expect(screen.getByText('Wait for fonts and images to load')).toBeTruthy();
+    expect(screen.getByText('html-to-image captures the iframe')).toBeTruthy();
 
-  it('sanitizes SVG output from mermaid.render using DOMPurify', async () => {
-    const sanitizeSpy = vi.spyOn(DOMPurify, 'sanitize');
-    const mermaidModule = await import('mermaid');
-    const mermaid = mermaidModule.default || mermaidModule;
+    // Mermaid mode steps
+    expect(screen.getByText('Paste Mermaid syntax')).toBeTruthy();
+    expect(screen.getByText('mermaid.js builds an SVG')).toBeTruthy();
+    expect(screen.getByText('Fonts embedded inline in the SVG')).toBeTruthy();
+    expect(screen.getByText('SVG rasterized to canvas')).toBeTruthy();
 
-    const renderSpy = vi.spyOn(mermaid, 'render').mockResolvedValue({
-      svg: '<svg><script>alert("xss")</script><text>Safe Text</text></svg>',
-    });
-
-    render(<DocsApp />);
-
-    await vi.waitFor(() => {
-      expect(sanitizeSpy).toHaveBeenCalled();
-    });
-
-    expect(screen.queryByText('alert("xss")')).toBeNull();
-    const safeTexts = screen.getAllByText('Safe Text');
-    expect(safeTexts.length).toBeGreaterThan(0);
-
-    sanitizeSpy.mockRestore();
-    renderSpy.mockRestore();
-  }, 20000);
+    // LaTeX mode steps
+    expect(screen.getByText('Paste LaTeX')).toBeTruthy();
+    expect(screen.getByText('KaTeX typesets the math')).toBeTruthy();
+    expect(screen.getByText('Isolated from page stylesheets')).toBeTruthy();
+    expect(screen.getByText('Rendered to canvas')).toBeTruthy();
+  });
 
   it('handles mobile dropdown navigation change', () => {
     render(<DocsApp />);

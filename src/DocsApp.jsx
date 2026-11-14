@@ -1,74 +1,32 @@
-import React, { useEffect, useRef, useState, useId } from "react";
-import DOMPurify from "dompurify";
+import React from "react";
 import styles from "./styles/Docs.module.css";
 import { Header, Footer } from "./components";
 
-function StaticMermaidDiagram({ chart, caption }) {
-  const containerRef = useRef(null);
-  const [svgHtml, setSvgHtml] = useState("");
-  const uniqueId = "doc-mermaid-" + useId().replace(/:/g, "");
-
-  useEffect(() => {
-    let isCancelled = false;
-
-    async function renderDiagram() {
-      try {
-        const mermaidModule = await import("mermaid");
-        const mermaid = mermaidModule.default || mermaidModule;
-
-        mermaid.initialize({
-          startOnLoad: false,
-          securityLevel: "strict",
-          htmlLabels: false,
-          flowchart: {
-            htmlLabels: false,
-          },
-          theme: "base",
-          themeVariables: {
-            fontFamily: "'Montserrat', sans-serif",
-            fontSize: "14px",
-            primaryColor: "#f2f2f4",
-            primaryTextColor: "#012b1b",
-            primaryBorderColor: "#012b1b",
-            lineColor: "#012b1b",
-            secondaryColor: "#ffa100",
-            tertiaryColor: "#e8e8ea",
-            background: "transparent",
-            mainBkg: "#f2f2f4",
-            nodeBorder: "#012b1b",
-            clusterBkg: "#e8e8ea",
-            clusterBorder: "#012b1b",
-            defaultLinkColor: "#012b1b",
-            titleColor: "#012b1b",
-            edgeLabelBackground: "#e8e8ea",
-          },
-        });
-
-        const { svg } = await mermaid.render(uniqueId, chart);
-        const cleanSvg = DOMPurify.sanitize(svg, {
-          USE_PROFILES: { html: true, svg: true, svgFilters: true },
-        });
-        if (!isCancelled) {
-          setSvgHtml(cleanSvg);
-        }
-      } catch (err) {
-        console.error("Failed to render docs Mermaid diagram:", err);
-      }
-    }
-
-    renderDiagram();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [chart, uniqueId]);
-
+function FlowDiagram({ steps, caption }) {
   return (
-    <div className={styles.diagramContainer} ref={containerRef}>
-      <div
-        className={styles.diagramSvg}
-        dangerouslySetInnerHTML={{ __html: svgHtml }}
-      />
+    <div className={styles.diagramContainer}>
+      <div className={styles.flowList} role="list">
+        {steps.map((step, idx) => (
+          <React.Fragment key={idx}>
+            <div className={styles.flowNode} role="listitem">
+              {step}
+            </div>
+            {idx < steps.length - 1 && (
+              <div className={styles.flowConnector} aria-hidden="true">
+                <div className={styles.flowLine} />
+                <svg
+                  className={styles.flowArrow}
+                  width="10"
+                  height="7"
+                  viewBox="0 0 10 7"
+                >
+                  <path d="M0 0 L10 0 L5 7 Z" fill="#012b1b" />
+                </svg>
+              </div>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
       {caption && <div className={styles.diagramCaption}>{caption}</div>}
     </div>
   );
@@ -173,8 +131,12 @@ export default function DocsApp() {
               <p className={styles.smallNote}>
                 Four modes are available: HTML, Mermaid, LaTeX, and Notes <span className={styles.badge}>IN DEVELOPMENT</span>.
               </p>
-              <StaticMermaidDiagram
-                chart={`flowchart TD\n    A["Paste code"] --> B["Render Flow processes it in your browser"]\n    B --> C["PNG delivered"]`}
+              <FlowDiagram
+                steps={[
+                  "Paste code",
+                  "Render Flow processes it in your browser",
+                  "PNG delivered",
+                ]}
                 caption="Every mode follows this same shape — only step 2 differs."
               />
             </section>
@@ -187,24 +149,55 @@ export default function DocsApp() {
               <p className={styles.paragraph}>
                 Paste any HTML, or drop a <code className={styles.inlineCode}>.html</code> file. Include explicit <code className={styles.inlineCode}>width</code> and <code className={styles.inlineCode}>height</code> on the <code className={styles.inlineCode}>body</code> — without it, Render Flow has to guess the canvas size.
               </p>
-              <StaticMermaidDiagram
-                chart={`flowchart TD\n    A["Paste HTML"] --> B["Extract width/height<br/>from body"]\n    B --> C["Write into<br/>hidden iframe"]\n    C --> D["Wait for fonts and images to load"]\n    D --> E["html-to-image captures the iframe"]\n    E --> F["PNG delivered"]`}
+              <FlowDiagram
+                steps={[
+                  "Paste HTML",
+                  (
+                    <>
+                      Extract width/height
+                      <br />
+                      from body
+                    </>
+                  ),
+                  (
+                    <>
+                      Write into
+                      <br />
+                      hidden iframe
+                    </>
+                  ),
+                  "Wait for fonts and images to load",
+                  "html-to-image captures the iframe",
+                  "PNG delivered",
+                ]}
               />
 
               <h3 className={styles.subSectionTitle}>Mermaid Mode</h3>
               <p className={styles.paragraph}>
                 Paste standard Mermaid syntax. Diagrams render with embedded fonts, so text stays sharp in the exported PNG.
               </p>
-              <StaticMermaidDiagram
-                chart={`flowchart TD\n    A["Paste Mermaid syntax"] --> B["mermaid.js builds an SVG"]\n    B --> C["Fonts embedded inline in the SVG"]\n    C --> D["SVG rasterized to canvas"]\n    D --> E["PNG delivered"]`}
+              <FlowDiagram
+                steps={[
+                  "Paste Mermaid syntax",
+                  "mermaid.js builds an SVG",
+                  "Fonts embedded inline in the SVG",
+                  "SVG rasterized to canvas",
+                  "PNG delivered",
+                ]}
               />
 
               <h3 className={styles.subSectionTitle}>LaTeX Mode</h3>
               <p className={styles.paragraph}>
                 Paste LaTeX math. It's rendered with KaTeX, so most common packages and symbols are supported.
               </p>
-              <StaticMermaidDiagram
-                chart={`flowchart TD\n    A["Paste LaTeX"] --> B["KaTeX typesets the math"]\n    B --> C["Isolated from page stylesheets"]\n    C --> D["Rendered to canvas"]\n    D --> E["PNG delivered"]`}
+              <FlowDiagram
+                steps={[
+                  "Paste LaTeX",
+                  "KaTeX typesets the math",
+                  "Isolated from page stylesheets",
+                  "Rendered to canvas",
+                  "PNG delivered",
+                ]}
               />
 
               <h3 className={styles.subSectionTitle}>

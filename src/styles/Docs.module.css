@@ -232,7 +232,7 @@
   text-decoration: underline;
 }
 
-/* Diagrams */
+/* Flow Diagrams (Pure HTML & CSS) */
 .diagramContainer {
   margin: 20px 0 24px;
   display: flex;
@@ -241,42 +241,45 @@
   background: transparent;
 }
 
-.diagramSvg {
-  width: 100%;
+.flowList {
   display: flex;
-  justify-content: center;
-  overflow-x: auto;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
-.diagramSvg svg {
-  max-width: 100%;
-  height: auto;
-  background: transparent !important;
-  overflow: visible;
-}
-
-.diagramSvg svg foreignObject {
-  overflow: visible;
-}
-
-.diagramSvg svg foreignObject > div {
+.flowNode {
+  background: #f2f2f4;
+  border: 1px solid #012b1b;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #012b1b;
   text-align: center;
-  word-break: normal;
-  overflow-wrap: break-word;
+  line-height: 1.4;
+  width: fit-content;
+  max-width: 360px;
   box-sizing: border-box;
-  padding: 2px 4px;
 }
 
-.diagramSvg svg foreignObject > div * {
-  text-align: center;
-  margin: 0;
+.flowConnector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
 }
 
-.diagramSvg svg :global(.node) rect,
-.diagramSvg svg :global(rect.label-container),
-.diagramSvg svg :global(.basic.label-container) {
-  rx: 8px !important;
-  ry: 8px !important;
+.flowLine {
+  width: 1.5px;
+  height: 24px;
+  background-color: #012b1b;
+}
+
+.flowArrow {
+  display: block;
+  flex-shrink: 0;
 }
 
 .diagramCaption {
